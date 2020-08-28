@@ -1,0 +1,291 @@
+<template>
+    <div class='main pa-0'>
+
+        <v-app-bar dense>
+            <v-btn icon @click='close'>
+                <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Playing from: {{$root.queue.source.text}}</v-toolbar-title>
+        </v-app-bar>
+        
+        <!-- Split to half -->
+        <v-row class='pa-2' no-gutters justify="center">
+            <!-- Left side (track info...) -->
+            <v-col class='col-6 text-center' align-self="center">
+                <v-img 
+                    :src='$root.track.albumArt.full' 
+                    :lazy-src="$root.track.albumArt.thumb"
+                    aspect-ratio="1"
+                    max-height="calc(90vh - 285px)"
+                    class='ma-4' 
+                    contain>
+                </v-img>
+                <h1 class='text-no-wrap text-truncate'>{{$root.track.title}}</h1>
+                <h2 class='primary--text text-no-wrap text-truncate'>{{$root.track.artistString}}</h2>
+                
+                <!-- Slider, timestamps -->
+                <v-row no-gutters class='py-2'>
+                    <v-col class='text-center' align-self="center">
+                        <span>{{$duration(position * 1000)}}</span>
+                    </v-col>
+                    <v-col class='col-8'>
+                        <v-slider 
+                            min='0' 
+                            step='1'
+                            :max='this.$root.duration() / 1000' 
+                            @click='seekEvent'
+                            @start='seeking = true'
+                            @end='seek'
+                            :value='position'
+                            ref='seeker'
+                            class='seekbar'
+                            hide-details>
+                        </v-slider>
+                    </v-col>
+                    <v-col class='text-center' align-self="center">
+                        <span>{{$duration($root.duration())}}</span>
+                    </v-col>
+                </v-row>
+
+                <!-- Controls -->
+                <v-row no-gutters class='ma-4'>
+                    <v-col>
+                        <v-btn icon x-large @click='$root.skip(-1)'>
+                            <v-icon size='42px'>mdi-skip-previous</v-icon>
+                        </v-btn>
+                    </v-col>
+                    <v-col>
+                        <v-btn icon x-large @click='$root.toggle()'>
+                            <v-icon size='56px' v-if='!$root.isPlaying()'>mdi-play</v-icon>
+                            <v-icon size='56px' v-if='$root.isPlaying()'>mdi-pause</v-icon>
+                        </v-btn>
+                    </v-col>
+                    <v-col>
+                        <v-btn icon x-large @click='$root.skip(1)'>
+                            <v-icon size='42px'>mdi-skip-next</v-icon>
+                        </v-btn>
+                    </v-col>
+                </v-row>
+
+                <!-- Bottom actions -->
+                <div class='d-flex my-1 mx-8 '>
+                    
+                    <v-btn icon @click='addLibrary'>
+                        <v-icon v-if='!inLibrary'>mdi-heart</v-icon>
+                        <v-icon v-if='inLibrary'>mdi-heart-remove</v-icon>
+                    </v-btn>
+
+                    <v-btn icon @click='playlistPopup = true'>
+                        <v-icon>mdi-playlist-plus</v-icon>
+                    </v-btn>
+
+                    <v-btn icon @click='download'>
+                        <v-icon>mdi-download</v-icon>
+                    </v-btn>
+
+                    <!-- Volume -->
+                    <v-slider
+                        min='0.00' 
+                        :prepend-icon='$root.muted ? "mdi-volume-off" : "mdi-volume-high"'
+                        max='1.00'
+                        step='0.01'
+                        v-model='$root.audio.volume'
+                        class='px-8'
+                        style='padding-top: 2px;'
+                        @change='updateVolume'
+                        @click:prepend='$root.toggleMute()'
+                    >
+                        <template v-slot:append>
+                            <div style='position: absolute; padding-top: 4px;'>
+                                {{Math.round($root.audio.volume * 100)}}%
+                            </div>
+                        </template>
+                    </v-slider>
+                </div>
+
+
+            </v-col>
+
+            <!-- Right side -->
+            <v-col class='col-6 pt-4'>
+                <v-tabs v-model='tab'>
+                    <v-tab key='queue'>
+                        Queue
+                    </v-tab>
+                    <v-tab key='info'>
+                        Info
+                    </v-tab>
+                    <v-tab key='lyrics'>
+                        Lyrics
+                    </v-tab>
+                </v-tabs>
+
+                <v-tabs-items v-model='tab'>
+                    <!-- Queue tab -->
+                    <v-tab-item key='queue'>
+                        <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 140px)'>
+                            <v-lazy 
+                            min-height="1" 
+                            transition="fade-transition"
+                            v-for="(track, index) in $root.queue.data"
+                            :key='index + "q" + track.id'
+                                ><TrackTile
+                                    :track='track'
+                                    @click='$root.playIndex(index)'
+                                ></TrackTile>
+                            </v-lazy>
+
+                        </v-list>
+                    </v-tab-item>
+                    <!-- Info tab -->
+                    <v-tab-item key='info'>
+                        <v-list two-line avatar class='overflow-y-auto text-center' style='max-height: calc(100vh - 140px)'>
+                            <h1>{{$root.track.title}}</h1>
+                            <!-- Album -->
+                            <h3>Album:</h3>
+                            <AlbumTile
+                                :album='$root.track.album'
+                                @clicked='$emit("close")'
+                            ></AlbumTile>
+                            <!-- Artists -->
+                            <h3>Artists:</h3>
+                            <v-list dense>
+                                <ArtistTile
+                                    v-for='(artist, index) in $root.track.artists'
+                                    :artist='artist'
+                                    :key="index + 'a' + artist.id"
+                                    @clicked='$emit("close")'
+                                    tiny
+                                    class='text-left'
+                                ></ArtistTile>
+                            </v-list>
+                            <!-- Meta -->
+                            <h3>Duration: <span>{{$duration($root.track.duration)}}</span></h3>
+                            <h3>Track number: {{$root.track.trackNumber}}</h3>
+                            <h3>Disk number: {{$root.track.diskNumber}}</h3>
+                            <h3>Explicit: {{$root.track.explicit?"Yes":"No"}}</h3>
+                            <h3>Source: {{$root.playbackInfo.source}}</h3>
+                            <h3>Format: {{$root.playbackInfo.format}}</h3>
+                            <h3>Quality: {{$root.playbackInfo.quality}}</h3>
+                        </v-list>
+                    </v-tab-item>
+                    <!-- Lyrics -->
+                    <v-tab-item key='lyrics'>
+                        <Lyrics :songId='$root.track.id' height='calc(100vh - 140px)'></Lyrics>
+                    </v-tab-item>
+
+                </v-tabs-items>
+                
+            </v-col>
+        </v-row>
+
+
+        <!-- Add to playlist dialog -->
+        <v-dialog max-width="400px" v-model='playlistPopup'>
+            <PlaylistPopup :track='$root.track' @close='playlistPopup = false'></PlaylistPopup>
+        </v-dialog>
+
+        <DownloadDialog :tracks='[$root.track]' v-if='downloadDialog' @close='downloadDialog = false'></DownloadDialog>
+
+    </div>
+</template>
+
+<style scoped>
+.main {
+    width: 100vw;
+    height: 100vh;
+}
+
+@media screen and (max-height: 864px) {
+    .imagescale {
+        max-height: 50vh;
+    }
+}
+
+@media screen and (max-height: 600px) {
+    .imagescale {
+        max-height: 45vh;
+    }
+}
+</style>
+
+<script>
+import TrackTile from '@/components/TrackTile.vue';
+import ArtistTile from '@/components/ArtistTile.vue';
+import AlbumTile from '@/components/AlbumTile.vue';
+import PlaylistPopup from '@/components/PlaylistPopup.vue';
+import Lyrics from '@/components/Lyrics.vue';
+import DownloadDialog from '@/components/DownloadDialog.vue';
+
+export default {
+    name: 'FullscreenPlayer',
+    components: {
+        TrackTile, ArtistTile, AlbumTile, PlaylistPopup, Lyrics, DownloadDialog
+    },
+    data() {
+        return {
+            //Position used in seconds, because of CPU usage
+            position: this.$root.position / 1000,
+            seeking: false,
+            tab: null,
+            inLibrary: this.$root.track.library ? true:false,
+            playlistPopup: false,
+            downloadDialog: false
+        }
+    },
+    methods: {
+        //Emit close event
+        close() {
+            this.$emit('close');
+        },
+        seek(v) {
+            this.$root.seek(v * 1000);
+            this.seeking = false;
+        },
+        //Mouse event seek
+        seekEvent(v) {
+            let seeker = this.$refs.seeker;
+            let offsetp = (v.pageX - seeker.$el.offsetLeft) / seeker.$el.clientWidth;
+            let pos = offsetp * this.$root.duration();
+            this.$root.seek(pos);
+            this.position = pos;
+            this.seeking = false;
+        },
+        //Add/Remove track from library
+        async addLibrary() {
+            if (this.inLibrary) {
+                await this.$axios.delete(`/library/track?id=` + this.$root.track.id);
+                this.inLibrary = false;
+                //Remove from cache
+                this.$root.libraryTracks.splice(this.$root.libraryTracks.indexOf(this.$root.track.id), 1);
+                return;
+            }
+            await this.$axios.put('/library/track?id=' + this.$root.track.id);
+            this.$root.libraryTracks.push(this.$root.track.id);
+            this.inLibrary = true;
+        },
+        //Download current track
+        async download() {
+            this.downloadDialog = true;
+        },
+        //Save volume
+        updateVolume(v) {
+            this.$root.volume = v;
+        }
+    },
+    mounted() {
+    },
+    computed: {
+    },
+    watch: {
+        //Update add to library button on track change
+        '$root.track'() {
+            this.inLibrary = this.$root.libraryTracks.includes(this.$root.track.id);
+        },
+        '$root.position'() {
+            if (!this.seeking) this.position = this.$root.position / 1000;
+        }
+    }
+};
+
+</script>

@@ -1,0 +1,48 @@
+{
+  "name": "freezer",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "build": "cd app && npm i && cd client && npm i && npm run build && cd .. && cd .. && npm run dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^9.2.1",
+    "electron-builder": "^22.8.0"
+  },
+  "build": {
+    "appId": "com.exttex.freezer",
+    "extraResources": [
+      {
+        "from": "app/assets/**",
+        "to": "assets/"
+      }
+    ],
+    "files": [
+      "**/*",
+      "!app/client/",
+      "app/client/dist/**"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "build/icon.ico",
+      "asarUnpack": [
+        "app/node_modules/nodeezcryptor/**"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "audio",
+      "icon": "build/icon.png"
+    }
+  }
+}
