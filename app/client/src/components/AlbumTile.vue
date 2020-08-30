@@ -13,7 +13,9 @@
         </v-hover>
         
         <v-list-item-content>
-            <v-list-item-title>{{album.title}}</v-list-item-title>
+            <v-list-item-title>
+                {{album.title}}<span v-if='album.explicit' class='red--text text-overline pl-2'>E</span>
+            </v-list-item-title>
             <v-list-item-subtitle>{{album.artistString}}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>

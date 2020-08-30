@@ -6,7 +6,7 @@
     <v-list-item-content>
         <v-list-item-title
             :class='{"primary--text": track.id == ($root.track ? $root.track : {id: null}).id}'
-        >{{track.title}}</v-list-item-title>
+        >{{track.title}}<span v-if='track.explicit' class='red--text text-overline pl-2'>E</span></v-list-item-title>
         <v-list-item-subtitle>{{track.artistString}}</v-list-item-subtitle>
     </v-list-item-content>
     <v-list-item-action>

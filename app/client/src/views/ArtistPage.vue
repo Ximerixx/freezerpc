@@ -53,18 +53,55 @@
         
     </v-list>
 
+    <!-- Normal albums -->
     <h1 class='my-2'>Albums</h1>
-    <v-list class='overflow-y-auto' style='max-height: 500px' @scroll.native="scroll">
-        <AlbumTile
-            v-for='album in artist.albums'
-            :key='album.id'
-            :album='album'
-        ></AlbumTile>
+    <v-list class='overflow-y-auto' style='max-height: 400px' @scroll.native="scroll">
+        <div
+        v-for='(album, index) in artist.albums'
+        :key='"n" + album.id'>
 
-        <div class='text-center my-2' v-if='loadingMore'>
+            <AlbumTile
+                v-if='(index < 3 || (index >= 3 && allAlbums)) && album.type == "album"'
+                :album='album'
+            ></AlbumTile>
+            
+            <!-- Show all albums -->
+            <v-list-item v-if='!allAlbums && index == 3' @click='allAlbums = true'>
+                <v-list-item-title>Show all albums</v-list-item-title>
+            </v-list-item>
+
+        </div>
+        <!-- Loading -->
+        <div class='text-center my-2' v-if='loadingMore && allAlbums'>
             <v-progress-circular indeterminate></v-progress-circular>
         </div>
     </v-list>
+
+    <!-- Singles -->
+    <h1 class='my-2'>Singles</h1>
+    <v-list class='overflow-y-auto' style='max-height: 400px' @scroll.native="scroll">
+        <div
+        v-for='(album, index) in artist.albums'
+        :key='"n" + album.id'>
+
+            <AlbumTile
+                v-if='(index < 3 || (index >= 3 && allSingles)) && album.type == "single"'
+                :album='album'
+            ></AlbumTile>
+            
+            <!-- Show all albums -->
+            <v-list-item v-if='!allSingles && index == 3' @click='showAllSingles'>
+                <v-list-item-title>Show all singles</v-list-item-title>
+            </v-list-item>
+
+        </div>
+        <!-- Loading -->
+        <div class='text-center my-2' v-if='loadingMore && allSingles'>
+            <v-progress-circular indeterminate></v-progress-circular>
+        </div>
+    </v-list>
+
+    <!-- TODO: Featured in -->
 
 </div>
 </template>
@@ -85,7 +122,9 @@ export default {
             loading: false,
             libraryLoading: false,
             allTopTracks: false,
-            loadingMore: false
+            loadingMore: false,
+            allAlbums: false,
+            allSingles: false
         }
     },
     props: {
@@ -120,6 +159,9 @@ export default {
                 }
                 this.loading = false;
             }
+
+            //Load page on background
+            this.loadMoreAlbums();
         },
         async loadMoreAlbums() {
             if (this.artist.albumCount <= this.artist.albums.length) return;
@@ -133,8 +175,14 @@ export default {
 
             this.loadingMore = false;
         },
+        showAllSingles() {
+            this.allSingles = true;
+            this.loadMoreAlbums();
+        },
         //On scroll load more albums
         scroll(event) {
+            if (!this.allAlbums && !this.allSingles) return;
+            
             let loadOffset = event.target.scrollHeight - event.target.offsetHeight - 150;
             if (event.target.scrollTop > loadOffset) {
                 if (!this.loadingMore && !this.loading) this.loadMoreAlbums();

@@ -51,6 +51,20 @@ class Album {
         this.tracks = tracksJson.data.map((t) => new Track(t));
         this.artists = (json.ARTISTS ? json.ARTISTS : [json]).map((a) => new Artist(a));
         this.releaseDate = json.DIGITAL_RELEASE_DATE;
+        
+        //Explicit
+        this.explicit = false;
+        if (json.EXPLICIT_LYRICS && json.EXPLICIT_LYRICS.toString() == "1") this.explicit = true;
+        if (json.EXPLICIT_ALBUM_CONTENT) {
+            if (json.EXPLICIT_ALBUM_CONTENT.EXPLICIT_LYRICS_STATUS == 4) this.explicit = true;
+            if (json.EXPLICIT_ALBUM_CONTENT.EXPLICIT_LYRICS_STATUS == 1) this.explicit = true;
+        }
+
+        //Type
+        this.type = 'album';
+        if (json.TYPE && json.TYPE.toString() == "0") this.type = 'single';
+        if (!json.ARTISTS_ALBUMS_IS_OFFICIAL) this.type = 'featured';
+
         //Helpers
         this.artistString = this.artists.map((a) => a.name).join(', ');
     }
