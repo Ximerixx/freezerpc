@@ -49,7 +49,7 @@ export default {
             try {
 
                 let res = await this.$axios.get(`/lyrics/${this.songId}`);
-                if (res.data) this.lyrics = res.data;
+                if (res.data && res.data.lyrics.length > 0) this.lyrics = res.data;
             
             } catch (e) {true;}
             this.loading = false;

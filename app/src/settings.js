@@ -22,6 +22,8 @@ class Settings {
         this.createAlbumFolder = true;
         this.createArtistFolder = true;
         this.downloadFilename = '%0trackNumber%. %artists% - %title%';
+
+        this.logListen = false;
     }
 
     //Based on electorn app.getPath

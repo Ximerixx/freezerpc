@@ -274,7 +274,7 @@ app.get('/stream/:info', (req, res) => {
     let dStart = start - (start % 2048);
 
     //Make request to Deezer CDN
-    https.get(url, {headers: {'Range': `bytes=${dStart}-${end}`}}, (r) => {
+    let _request = https.get(url, {headers: {'Range': `bytes=${dStart}-${end}`}}, (r) => {
         //Error from Deezer
         //TODO: Quality fallback
         if (r.statusCode < 200 || r.statusCode > 300) {
@@ -311,6 +311,13 @@ app.get('/stream/:info', (req, res) => {
         //Pipe: Deezer -> Decryptor -> Response
         decryptor.pipe(res);
         r.pipe(decryptor);
+        
+    });
+    //Internet/Request error
+    _request.on('error', (e) => {
+        //console.log('Streaming error: ' + e);
+        //HTML audio will restart automatically
+        res.destroy();
     });
 
 });
@@ -398,6 +405,27 @@ app.get('/downloads', async (req, res) => {
             return d.toDB();
         })
     });
+});
+
+//Delete singel download
+app.delete('/downloads/:index', async (req, res) => {
+    let index = parseInt(req.params.index, 10);
+    await downloads.delete(index);
+    res.status(200).end();
+});
+
+//Log listen to deezer
+app.put('/log/:id', async (req, res) => {
+    await deezer.callApi('log.listen', {
+        params: {
+            timestamp: Math.floor(new Date() / 1000),
+            ts_listen: Math.floor(new Date() / 1000),
+            type: 1,
+            stat: {seek: 0, pause: 0, sync: 0},
+            media: {id: req.params.id.toString(), type: 'song', format: 'MP3_128'}
+        }
+    });
+    res.status(200).end();
 });
 
 //Redirect to index on unknown path

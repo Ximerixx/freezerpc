@@ -156,6 +156,27 @@ class Downloads {
             fs.promises.mkdir(Settings.getTempDownloads(), {recursive: true});
         }
     }
+
+    //Remove download
+    async delete(index) {
+        //Clear all
+        if (index == -1) {
+            this.downloads = [];
+            await new Promise((res, rej) => {
+                this.db.remove({state: 0}, {}, (e) => {});
+                res();
+            })
+            return;
+        }
+
+        //Remove single
+        if (index >= this.downloads.length) return;
+        await new Promise((res, rej) => {
+            this.db.remove({_id: this.downloads[index].id}, {}, (e) => {});
+            res();
+        });
+        this.downloads.splice(index, 1);
+    }
 }
 
 class Download {
@@ -263,9 +284,11 @@ class Download {
         } catch (e) {};
 
         //Decrypt
-        decryptor.decryptFile(decryptor.getKey(this.track.id), tmp, this.path);
+        decryptor.decryptFile(decryptor.getKey(this.track.id), tmp, `${tmp}.DEC`);
+        fs.promises.copyFile(`${tmp}.DEC`, this.path);
         //Delete encrypted
         await fs.promises.unlink(tmp);
+        await fs.promises.unlink(`${tmp}.DEC`);
 
         //Tags
         await this.tagAudio(this.path, this.track);

@@ -1,7 +1,7 @@
 <template>
 <div>
 
-    <v-dialog v-model='show' max-width='420'>
+    <v-dialog v-model='dShow' max-width='420'>
         <v-card>
 
             <v-card-title class='headline'>
@@ -57,6 +57,7 @@ export default {
             ],
             qualityString: 'Settings quality',
             autostart: true,
+            dShow: this.show
         }
     },
     methods: {
@@ -97,6 +98,15 @@ export default {
             }
             return duration * this.$root.settings.downloadsQuality;
 
+        }
+    },
+    watch: {
+        //Prevent errors on closing with mouse
+        show() {
+            this.dShow = this.show;
+        },
+        dShow() {
+            if (!this.dShow) this.$emit('close');
         }
     }
 }

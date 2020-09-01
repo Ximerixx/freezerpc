@@ -20,8 +20,8 @@
     </v-card>
 
     <h1 class='pb-2'>Queue:</h1>
-    <div class='text-h6 pb-2 d-flex'>Total: {{$root.downloads.length}}
-        <v-btn @click='$root.toggleDownload' class='ml-2' color='primary'>
+    <div class='text-h6 mr-4 pb-2 d-flex'>Total: {{$root.downloads.length}}
+        <v-btn @click='$root.toggleDownload' class='ml-4' color='primary'>
             <div v-if='$root.downloading'>
                 <v-icon>mdi-stop</v-icon>
                 Stop
@@ -32,15 +32,20 @@
             </div>
         </v-btn>
         <!-- Open dir -->
-        <v-btn @click='openDir' class='ml-2' v-if='$root.settings.electron'>
+        <v-btn @click='openDir' class='ml-4' v-if='$root.settings.electron'>
             <v-icon>mdi-folder</v-icon>
             Show folder
+        </v-btn>
+        <!-- Delete all -->
+        <v-btn @click='deleteDownload(-1)' class='ml-4' color='red'>
+            <v-icon>mdi-delete</v-icon>
+            Clear queue
         </v-btn>
     </div>
 
     <!-- Downloads -->
     <v-list dense>
-        <div v-for='download in $root.downloads' :key='download.id'>
+        <div v-for='(download, index) in $root.downloads' :key='download.id'>
             <v-list-item dense>
                 <v-list-item-avatar>
                     <v-img :src='download.track.albumArt.thumb'></v-img>
@@ -49,6 +54,11 @@
                     <v-list-item-title>{{download.track.title}}</v-list-item-title>
                     <v-list-item-subtitle>{{download.track.artistString}}</v-list-item-subtitle>
                 </v-list-item-content>
+                <v-liste-item-action>
+                    <v-btn icon @click='deleteDownload(index)'>
+                        <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                </v-liste-item-action>
             </v-list-item>
         </div>
     </v-list>
@@ -65,6 +75,11 @@ export default {
         openDir() {
             const {ipcRenderer} = window.require('electron');
             ipcRenderer.send('openDownloadsDir');
+        },
+        //Remove download from queue
+        async deleteDownload(i) {
+            await this.$axios.delete(`/downloads/${i}`);
+            this.$root.getDownloads();
         }
     }
 }

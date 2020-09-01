@@ -57,6 +57,17 @@
             hint='Variables: %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%'
         ></v-text-field>
 
+        <!-- Log listening -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.logListen'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>Log track listens to Deezer</v-list-item-title>
+                <v-list-item-subtitle>This allows listening history, flow and recommendations to work properly.</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
+
         <!-- Minimize to tray -->
         <v-list-item v-if='$root.settings.electron'>
             <v-list-item-action>

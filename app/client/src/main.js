@@ -94,7 +94,10 @@ new Vue({
                 source: 'none',
                 data: 'none'
             }
-        }
+        },
+
+        //Used to prevent double listen logging
+        logListenId: null
     },
     methods: {
         // PLAYBACK METHODS
@@ -106,6 +109,8 @@ new Vue({
             if (!this.audio || this.state != 1) return;
             this.audio.play();
             this.state = 2;
+
+            this.logListen();
         },
         pause() {
             if (!this.audio || this.state != 2) return;
@@ -217,6 +222,7 @@ new Vue({
                     //Play
                     this.state = 2;
                     this.audio.play();
+                    this.logListen();
                     await this.savePlaybackInfo();
                     return;
                 }
@@ -326,6 +332,16 @@ new Vue({
         async cacheLibrary() {
             let res = await this.$axios.get(`/playlist/${this.profile.favoritesPlaylist}?full=idk`);
             this.libraryTracks = res.data.tracks.map((t) => t.id);
+        },
+
+        //Log song listened to deezer, only if allowed
+        async logListen() {
+            if (!this.settings.logListen) return;
+            if (this.logListenId == this.track.id) return;
+            if (!this.track || !this.track.id) return;
+
+            this.logListenId = this.track.id;
+            await this.$axios.put(`/log/${this.track.id}`);
         }
     },
     async created() {
