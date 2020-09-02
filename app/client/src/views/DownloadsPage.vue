@@ -54,11 +54,11 @@
                     <v-list-item-title>{{download.track.title}}</v-list-item-title>
                     <v-list-item-subtitle>{{download.track.artistString}}</v-list-item-subtitle>
                 </v-list-item-content>
-                <v-liste-item-action>
+                <v-list-item-action>
                     <v-btn icon @click='deleteDownload(index)'>
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
-                </v-liste-item-action>
+                </v-list-item-action>
             </v-list-item>
         </div>
     </v-list>
@@ -79,7 +79,6 @@ export default {
         //Remove download from queue
         async deleteDownload(i) {
             await this.$axios.delete(`/downloads/${i}`);
-            this.$root.getDownloads();
         }
     }
 }

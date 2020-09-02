@@ -193,6 +193,17 @@ app.get('/albums/:id', async (req, res) => {
     res.send(albums);
 })
 
+//Get tracks from listening history
+app.get('/history', async (req, res) => {
+    let data = await deezer.callApi('deezer.pageProfile', {
+        nb: 200,
+        tab: "history",
+        user_id: deezer.userId.toString()
+    });
+    let tracks = data.results.TAB.history.data.map((t) => new Track(t));
+    res.send(tracks);
+});
+
 //Search, q as query parameter
 app.get('/search', async (req, res) => {
     let data = await deezer.callApi('deezer.pageSearch', {query: req.query.q, nb: 100});
@@ -496,27 +507,24 @@ async function createServer(electron = false, ecb) {
                 downloads: downloads.downloads
             });
         });
-
-        //Emit download progress updates
-        setInterval(() => {
-            sockets.forEach((s) => {
-                if (!downloads.download) {
-                    s.emit('download', null);
-                    return;
-                }
-                
-                s.emit('download', {
-                    id: downloads.download.id,
-                    size: downloads.download.size,
-                    downloaded: downloads.download.downloaded,
-                    track: downloads.download.track,
-                    path: downloads.download.path
-                });
-            });
-        }, 500);
-
     });
     await downloads.load();
+    //Emit download progress updates
+    setInterval(() => {
+        sockets.forEach((s) => {
+            if (!downloads.download) {
+                s.emit('download', null);
+                return;
+            }
+            s.emit('download', {
+                id: downloads.download.id,
+                size: downloads.download.size,
+                downloaded: downloads.download.downloaded,
+                track: downloads.download.track,
+                path: downloads.download.path
+            });
+        });
+    }, 350);
 
     //Start server
     server.on('error', (e) => {

@@ -15,6 +15,9 @@
         <v-tab key='playlists'>
             Playlists
         </v-tab>
+        <v-tab key='history'>
+            History
+        </v-tab>
     </v-tabs>
 
     <v-tabs-items v-model='tab'>
@@ -37,6 +40,11 @@
         <v-tab-item key='playlists'>
             <LibraryPlaylists></LibraryPlaylists>
         </v-tab-item>
+
+        <!-- History -->
+        <v-tab-item key='history'>
+            <LibraryHistory></LibraryHistory>
+        </v-tab-item>
     </v-tabs-items>
 
 </div>
@@ -47,11 +55,12 @@ import LibraryTracks from '@/components/LibraryTracks.vue';
 import LibraryAlbums from '@/components/LibraryAlbums.vue';
 import LibraryArtists from '@/components/LibraryArtists.vue';
 import LibraryPlaylists from '@/components/LibraryPlaylists.vue';
+import LibraryHistory from '@/components/LibraryHistory.vue';
 
 export default {
     name: 'Library',
     components: {
-        LibraryTracks, LibraryAlbums, LibraryArtists, LibraryPlaylists
+        LibraryTracks, LibraryAlbums, LibraryArtists, LibraryPlaylists, LibraryHistory
     },
         props: {
         routeTab: {

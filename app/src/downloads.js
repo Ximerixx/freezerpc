@@ -163,9 +163,11 @@ class Downloads {
         if (index == -1) {
             this.downloads = [];
             await new Promise((res, rej) => {
-                this.db.remove({state: 0}, {}, (e) => {});
+                this.db.remove({state: 0}, {multi: true}, (e) => {});
                 res();
-            })
+            });
+
+            if (this.qucb) this.qucb();
             return;
         }
 
@@ -176,6 +178,8 @@ class Downloads {
             res();
         });
         this.downloads.splice(index, 1);
+
+        if (this.qucb) this.qucb();
     }
 }
 
