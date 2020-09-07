@@ -13,8 +13,8 @@ class Track {
         this.artistString = this.artists.map((a) => a.name).join(', ');
 
         this.album = new Album(json);
-        this.trackNumber = json.TRACK_NUMBER;
-        this.diskNumber = json.DISK_NUMBER;
+        this.trackNumber = parseInt((json.TRACK_NUMBER || 0).toString(), 10);
+        this.diskNumber = parseInt((json.DISK_NUMBER || 0).toString(), 10);
         this.explicit = json['EXPLICIT_LYRICS'] == 1 ? true:false;
         this.lyricsId = json.LYRICS_ID;
 
@@ -63,7 +63,7 @@ class Album {
         //Type
         this.type = 'album';
         if (json.TYPE && json.TYPE.toString() == "0") this.type = 'single';
-        if (!json.ARTISTS_ALBUMS_IS_OFFICIAL) this.type = 'featured';
+        if (json.ROLE_ID == 5) this.type = 'featured';
 
         //Helpers
         this.artistString = this.artists.map((a) => a.name).join(', ');

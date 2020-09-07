@@ -16,9 +16,15 @@ let axiosInstance = axios.create({
 Vue.prototype.$axios = axiosInstance;
 
 //Duration formatter
-Vue.prototype.$duration = (s) => {
-    let pad = (n, z = 2) => ('00' + n).slice(-z);
-    return ((s%3.6e6)/6e4 | 0) + ':' + pad((s%6e4)/1000|0);
+Vue.prototype.$duration = (ms) => {
+    if (isNaN(ms) || ms < 1) return '0:00';
+    let s = Math.floor(ms / 1000);
+    let hours = Math.floor(s / 3600);
+    s %= 3600;
+    let min = Math.floor(s / 60);
+    let sec = s % 60;
+    if (hours == 0) return `${min}:${sec.toString().padStart(2, '0')}`;
+    return `${hours}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 };
 
 //Abbrevation 
@@ -82,6 +88,11 @@ new Vue({
             track: null
         },
 
+        //Repeat & Shuffle
+        //0 - normal, 1 - repeat list, 2 - repeat track
+        repeat: 0,
+        shuffle: false,
+
         //Library cache
         libraryTracks: [],
 
@@ -109,8 +120,6 @@ new Vue({
             if (!this.audio || this.state != 1) return;
             this.audio.play();
             this.state = 2;
-
-            this.logListen();
         },
         pause() {
             if (!this.audio || this.state != 2) return;
@@ -200,13 +209,41 @@ new Vue({
 
                 //Gapless playback
                 if (this.position >= (this.duration() - 5000) && this.state == 2) {
-                    this.loadGapless();
+                    if (!this.shuffle && this.repeat != 2)
+                        this.loadGapless();
+                }
+
+                //Scrobble/LogListen
+                if (this.position >= this.duration() * 0.75) {
+                    this.logListen();
                 }
             });
             this.audio.muted = this.muted;
             this.audio.volume = this.volume;
             
             this.audio.addEventListener('ended', async () => {
+
+                //Shuffle
+                if (this.shuffle) {
+                    let index = Math.round(Math.random()*this.queue.data.length) - this.queue.index;
+                    this.skip(index);
+                    this.savePlaybackInfo();
+                    return;
+                }
+
+                //Repeat track
+                if (this.repeat == 2) {
+                    this.seek(0);
+                    this.audio.play();
+                    return;
+                }
+
+                //Repeat list
+                if (this.queue.index == this.queue.data.length - 1) {
+                    this.skip(-(this.queue.data.length - 1));
+                    return;
+                }
+
                 //Load gapless
                 if (this.gapless.promise || this.gapless.audio) {
                     this.state = 3;
@@ -222,7 +259,6 @@ new Vue({
                     //Play
                     this.state = 2;
                     this.audio.play();
-                    this.logListen();
                     await this.savePlaybackInfo();
                     return;
                 }
@@ -309,7 +345,9 @@ new Vue({
             let data = {
                 queue: this.queue,
                 position: this.position,
-                track: this.track
+                track: this.track,
+                shuffle: this.shuffle,
+                repeat: this.repeat
             }
             await this.$axios.post('/playback', data);
         },
@@ -336,12 +374,11 @@ new Vue({
 
         //Log song listened to deezer, only if allowed
         async logListen() {
-            if (!this.settings.logListen) return;
             if (this.logListenId == this.track.id) return;
             if (!this.track || !this.track.id) return;
 
             this.logListenId = this.track.id;
-            await this.$axios.put(`/log/${this.track.id}`);
+            await this.$axios.post(`/log`, this.track);
         }
     },
     async created() {
@@ -357,6 +394,8 @@ new Vue({
         if (pd.data != {}) {
             if (pd.data.queue) this.queue = pd.data.queue;
             if (pd.data.track) this.track = pd.data.track;
+            if (pd.data.shuffle) this.shuffle = pd.data.shuffle;
+            if (pd.data.repeat) this.repeat = pd.data.repeat;
             this.playTrack(this.track).then(() => {
                 this.seek(pd.data.position);
             });

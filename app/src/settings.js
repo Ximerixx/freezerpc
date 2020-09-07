@@ -24,6 +24,7 @@ class Settings {
         this.downloadFilename = '%0trackNumber%. %artists% - %title%';
 
         this.logListen = false;
+        this.lastFM = null;
     }
 
     //Based on electorn app.getPath
@@ -80,7 +81,8 @@ class Settings {
                 Object.assign(this, JSON.parse(data));
             }
         } catch (e) {
-            console.error(`Error loading settings: ${e}. Using defaults.`)
+            console.error(`Error loading settings: ${e}. Using defaults.`);
+            this.save();
         }
         this.electron = e;
 

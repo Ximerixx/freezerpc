@@ -54,7 +54,7 @@ class Downloads {
 
     generateTrackPath(track, quality) {
         //Generate filename
-        let fn = this.settings.downloadFilename + (quality == 9 ? '.flac' : '.mp3');
+        let fn = this.settings.downloadFilename;
         
         //Disable feats for single artist
         let feats = '';
@@ -108,12 +108,15 @@ class Downloads {
         //Save to DB
         if (this.download) {
             await new Promise((res, rej) => {
-                // this.db.update({_id: this.download.id}, {state: 3}, (e) => {
-                //     res();
-                // });
-                this.db.remove({_id: this.download.id}, (e) => {
+                this.db.update({_id: this.download.id}, {
+                    state: this.download.state,
+                    fallback: this.download.fallback,
+                }, (e) => {
                     res();
                 });
+                // this.db.remove({_id: this.download.id}, (e) => {
+                //     res();
+                // });
             });
         }
 
@@ -144,7 +147,7 @@ class Downloads {
                 if (!docs) return;
 
                 for (let d of docs) {
-                    if (d.state < 3) this.downloads.push(Download.fromDB(d, () => {this._downloadDone();}));
+                    if (d.state < 3 && d.state >= 0) this.downloads.push(Download.fromDB(d, () => {this._downloadDone();}));
                     //TODO: Ignore for now completed
                 }
                 res();
@@ -196,7 +199,9 @@ class Download {
         //1 - downloading
         //2 - post-processing
         //3 - done
+        //-1 - download error
         this.state = 0;
+        this.fallback = false;
 
         this._request;
         //Post Processing Promise
@@ -213,7 +218,8 @@ class Download {
             path: this.path,
             quality: this.quality,
             track: this.track,
-            state: this.state
+            state: this.state,
+            fallback: this.fallback
         }
         
     }
@@ -221,6 +227,7 @@ class Download {
     //Create download from DB document
     static fromDB(doc, onDone) {
         let d = new Download(doc.track, doc.path, doc.quality, onDone);
+        d.fallback = doc.fallback ? true : false; //Null check
         d.state = doc.state;
         return d;
     }
@@ -240,8 +247,24 @@ class Download {
 
         //Get download info
         if (!this.url) this.url = Track.getUrl(this.track.streamUrl, this.quality);
-        
         this._request = https.get(this.url, {headers: {'Range': `bytes=${start}-`}}, (r) => {
+            
+            //Error
+            if (r.statusCode >= 400) {
+                //Fallback on error
+                if (this.quality > 1) {
+                    if (this.quality == 3) this.quality = 1;
+                    if (this.quality == 9) this.quality = 3;
+                    this.url = null;
+                    this.fallback = true;
+                    return this.start();
+                };
+                //Error
+                this.state = -1;
+                console.log(`Undownloadable track ID: ${this.track.id}`);
+                return this.onDone();
+            }
+
             //On download done
             r.on('end', () => {
                 if (this.downloaded != this.size) return;
@@ -288,6 +311,7 @@ class Download {
         } catch (e) {};
 
         //Decrypt
+        this.path += (this.quality == 9) ? '.flac' : '.mp3';
         decryptor.decryptFile(decryptor.getKey(this.track.id), tmp, `${tmp}.DEC`);
         fs.promises.copyFile(`${tmp}.DEC`, this.path);
         //Delete encrypted

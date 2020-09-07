@@ -67,6 +67,13 @@
                 <v-list-item-subtitle>This allows listening history, flow and recommendations to work properly.</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
+        <!-- LastFM -->
+        <v-list-item @click='connectLastFM' v-if='!$root.settings.lastFM'>
+            <v-list-item-content>
+                <v-list-item-title>Login with LastFM</v-list-item-title>
+                <v-list-item-subtitle>Connect your LastFM account to allow scrobbling.</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
 
         <!-- Minimize to tray -->
         <v-list-item v-if='$root.settings.electron'>
@@ -166,6 +173,11 @@ export default {
             this.$root.settings.arl = null;
             await this.$root.saveSettings();
             location.reload();
+        },
+        //Redirect to lastfm login
+        async connectLastFM() {
+            let res = await this.$axios.get('/lastfm');
+            window.location.replace(res.data.url);
         }
     },
     mounted() {

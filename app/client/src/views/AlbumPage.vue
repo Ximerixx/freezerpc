@@ -41,13 +41,18 @@
 
     <h1 class='mt-2'>Tracks</h1>
     <v-list avatar v-if='album.tracks.length > 0'>
-        <TrackTile
-            v-for='(track, index) in album.tracks'
-            :key='track.id'
-            :track='track'
-            @click='playTrack(index)'
-        >
-        </TrackTile>
+        <div v-for='(track, index) in album.tracks' :key='track.id'>
+
+            <!-- Disk split -->
+            <div 
+                v-if='index == 0 || track.diskNumber != album.tracks[index-1].diskNumber'
+                class='mx-4 text-subtitle-1'
+            >
+                Disk {{track.diskNumber}}
+            </div>
+
+            <TrackTile :track='track' @click='playTrack(index)'></TrackTile>
+        </div>
     </v-list>
 
     <DownloadDialog :tracks='album.tracks' v-if='downloadDialog' @close='downloadDialog = false'></DownloadDialog>

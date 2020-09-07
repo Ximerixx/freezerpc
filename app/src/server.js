@@ -3,6 +3,7 @@ const path = require('path');
 const https = require('https');
 const fs = require('fs');
 const axios = require('axios').default;
+const LastfmAPI = require('lastfmapi');
 const {DeezerAPI, DeezerDecryptionStream} = require('./deezer');
 const {Settings} = require('./settings');
 const {Track, Album, Artist, Playlist, DeezerProfile, SearchResults, DeezerLibrary, DeezerPage, Lyrics} = require('./definitions');
@@ -21,6 +22,12 @@ app.use(express.static(path.join(__dirname, '../client', 'dist')));
 //Server
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
+//LastFM
+//plz don't steal creds, it's just lastfm
+let lastfm = new LastfmAPI({
+    api_key: 'b6ab5ae967bcd8b10b23f68f42493829',
+    secret: '861b0dff9a8a574bec747f9dab8b82bf'
+});
 
 //Get playback info
 app.get('/playback', async (req, res) => {
@@ -425,18 +432,56 @@ app.delete('/downloads/:index', async (req, res) => {
     res.status(200).end();
 });
 
-//Log listen to deezer
-app.put('/log/:id', async (req, res) => {
-    await deezer.callApi('log.listen', {
-        params: {
-            timestamp: Math.floor(new Date() / 1000),
-            ts_listen: Math.floor(new Date() / 1000),
-            type: 1,
-            stat: {seek: 0, pause: 0, sync: 0},
-            media: {id: req.params.id.toString(), type: 'song', format: 'MP3_128'}
-        }
-    });
+//Log listen to deezer & lastfm
+app.post('/log', async (req, res) => {
+    //LastFM
+    if (settings.lastFM)
+        lastfm.track.scrobble({
+            artist: req.body.artists[0].name,
+            track: req.body.title,
+            timestamp: Math.floor((new Date()).getTime() / 1000)
+        });
+
+    //Deezer
+    if (settings.logListen)
+        await deezer.callApi('log.listen', {
+            params: {
+                timestamp: Math.floor(new Date() / 1000),
+                ts_listen: Math.floor(new Date() / 1000),
+                type: 1,
+                stat: {seek: 0, pause: 0, sync: 0},
+                media: {id: req.body.id, type: 'song', format: 'MP3_128'}
+            }
+        });
     res.status(200).end();
+});
+
+//Last.FM authorization callback
+app.get('/lastfm', async (req, res) => {
+    //Got token
+    if (req.query.token) {
+        let token = req.query.token;
+        await new Promise((res, rej) => {
+            lastfm.authenticate(token, (err, sess) => {
+                if (err) res();
+                //Save to settings
+                settings.lastFM = {
+                    name: sess.username,
+                    key: sess.key
+                };
+                settings.save();
+                res();
+            });
+        });
+        authorizeLastFM();
+        //Redirect to homepage
+        return res.redirect('/');
+    }
+
+    //Get auth url
+    res.json({
+        url: lastfm.getAuthenticationUrl({cb: `http://${req.socket.remoteAddress}:${settings.port}/lastfm`})
+    }).end();
 });
 
 //Redirect to index on unknown path
@@ -490,6 +535,12 @@ async function qualityFallback(info, quality = 3) {
     }
 }
 
+//Autorize lastfm with saved credentials
+function authorizeLastFM() {
+    if (!settings.lastFM) return;
+    lastfm.setSessionCredentials(settings.lastFM.name, settings.lastFM.key);
+}
+
 //ecb = Error callback
 async function createServer(electron = false, ecb) {
     //Prepare globals
@@ -525,6 +576,9 @@ async function createServer(electron = false, ecb) {
             });
         });
     }, 350);
+
+    //LastFM
+    authorizeLastFM();
 
     //Start server
     server.on('error', (e) => {

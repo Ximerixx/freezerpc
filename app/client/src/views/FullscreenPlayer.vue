@@ -33,7 +33,7 @@
                             min='0' 
                             step='1'
                             :max='this.$root.duration() / 1000' 
-                            @click='seekEvent'
+                            @click.prevent.stop='seekEvent'
                             @start='seeking = true'
                             @end='seek'
                             :value='position'
@@ -54,12 +54,14 @@
                             <v-icon size='42px'>mdi-skip-previous</v-icon>
                         </v-btn>
                     </v-col>
+
                     <v-col>
                         <v-btn icon x-large @click='$root.toggle()'>
                             <v-icon size='56px' v-if='!$root.isPlaying()'>mdi-play</v-icon>
                             <v-icon size='56px' v-if='$root.isPlaying()'>mdi-pause</v-icon>
                         </v-btn>
                     </v-col>
+
                     <v-col>
                         <v-btn icon x-large @click='$root.skip(1)'>
                             <v-icon size='42px'>mdi-skip-next</v-icon>
@@ -68,8 +70,18 @@
                 </v-row>
 
                 <!-- Bottom actions -->
-                <div class='d-flex my-1 mx-8 '>
+                <div class='d-flex my-1 mx-2 '>
                     
+                    <v-btn icon @click='repeatClick'>
+                        <v-icon v-if='$root.repeat == 0'>mdi-repeat</v-icon>
+                        <v-icon color='primary' v-if='$root.repeat == 1'>mdi-repeat</v-icon>
+                        <v-icon color='primary' v-if='$root.repeat == 2'>mdi-repeat-once</v-icon>
+                    </v-btn>
+                    <v-btn icon @click='$root.shuffle = !$root.shuffle'>
+                        <v-icon v-if='!$root.shuffle'>mdi-shuffle</v-icon>
+                        <v-icon v-if='$root.shuffle' color='primary'>mdi-shuffle</v-icon>
+                    </v-btn>
+
                     <v-btn icon @click='addLibrary'>
                         <v-icon v-if='!inLibrary'>mdi-heart</v-icon>
                         <v-icon v-if='inLibrary'>mdi-heart-remove</v-icon>
@@ -271,6 +283,14 @@ export default {
         //Save volume
         updateVolume(v) {
             this.$root.volume = v;
+        },
+        //Repeat button click
+        repeatClick() {
+            if (this.$root.repeat == 2) {
+                this.$root.repeat = 0;
+                return;
+            }
+            this.$root.repeat += 1;
         }
     },
     mounted() {

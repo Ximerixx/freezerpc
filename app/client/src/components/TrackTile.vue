@@ -10,6 +10,12 @@
         <v-list-item-subtitle>{{track.artistString}}</v-list-item-subtitle>
     </v-list-item-content>
     <v-list-item-action>
+        <!-- Duration -->
+        <div class='text-caption mx-2'>
+            {{$duration(track.duration)}}
+        </div>
+    </v-list-item-action>
+    <v-list-item-action>
         <!-- Quick add/remoev to library -->
         <v-btn @click.stop='addLibrary' icon v-if='!isLibrary'>
             <v-icon>mdi-heart</v-icon>

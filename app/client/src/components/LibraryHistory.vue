@@ -6,7 +6,21 @@
     </div>
 
     <v-list v-if='!loading'>
-        <v-lazy v-for='(track, index) in tracks' :key='track.id' max-height='100'>
+        <v-list-item v-if='!$root.settings.logListen'>
+            <v-list-item-avatar>
+                <v-icon class='yellow--text'>mdi-alert</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <v-list-item-title>
+                    Streaming logging is disabled!
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                    Enable it in settings for history to work properly.
+                </v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
+
+        <v-lazy v-for='(track, index) in tracks' :key='track.id + "INDEX" + index.toString()' max-height='100'>
             <TrackTile :track='track' @click='play(index)'></TrackTile>
         </v-lazy>
     </v-list>
