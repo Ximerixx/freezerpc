@@ -247,7 +247,10 @@ class Lyrics {
     constructor(json) {
         this.id = json.LYRICS_ID;
         this.writer = json.LYRICS_WRITERS;
-        this.text = json.LYRICS_TEXT;
+        this.text = [];
+        if (json.LYRICS_TEXT) {
+            this.text = json.LYRICS_TEXT.replace(new RegExp('\\r', 'g'), '').split('\n');
+        }
 
         //Parse invidual lines
         this.lyrics = [];

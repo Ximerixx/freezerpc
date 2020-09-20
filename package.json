@@ -1,7 +1,7 @@
 {
   "name": "freezer",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "scripts": {
     "pack": "electron-builder --dir",
@@ -9,7 +9,6 @@
     "postinstall": "electron-builder install-app-deps",
     "build": "cd app && npm i && cd client && npm i && npm run build && cd .. && cd .. && npm run dist"
   },
-  "author": "",
   "license": "ISC",
   "devDependencies": {
     "electron": "^9.2.1",
@@ -42,7 +41,15 @@
         "AppImage"
       ],
       "category": "audio",
-      "icon": "build/icon.png"
+      "icon": "build/iconset"
+    },
+    "appImage": {
+      "desktop": {
+        "X-AppImage-Name": "Freezer",
+        "Name": "Freezer",
+        "Type": "Application",
+        "Categories": "AudioVideo"
+      }
     }
   }
 }

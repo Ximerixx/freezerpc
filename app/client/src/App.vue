@@ -2,7 +2,7 @@
   <v-app v-esc='closePlayer'>
 
     <!-- Fullscreen player overlay -->
-    <v-overlay :value='showPlayer' opacity='0.97' z-index="100">
+    <v-overlay :value='showPlayer' opacity='1.00' z-index="100">
         <FullscreenPlayer @close='closePlayer' @volumeChange='volume = $root.volume'></FullscreenPlayer>
     </v-overlay>
 
@@ -130,8 +130,10 @@
         prepend-inner-icon="mdi-magnify" 
         single-line
         solo
+        placeholder='Search or paste Deezer URL. Use "/" to quickly focus.'
         v-model="searchQuery"
         ref='searchBar'
+        :loading='searchLoading'
         @keyup='search'>
       </v-text-field>
     </v-app-bar>
@@ -191,7 +193,7 @@
                 <v-icon v-if='!$root.isPlaying()'>mdi-play</v-icon>
                 <v-icon v-if='$root.isPlaying()'>mdi-pause</v-icon>
             </v-btn>
-            <v-btn icon large @click.stop='$root.skip(1)'>
+            <v-btn icon large @click.stop='$root.skipNext'>
                 <v-icon>mdi-skip-next</v-icon>
             </v-btn>
         </v-col>
@@ -267,6 +269,7 @@ export default {
       showPlayer: false,
       position: '0.00',
       searchQuery: '',
+      searchLoading: false
     }
   },
   methods: {
@@ -283,10 +286,54 @@ export default {
     next() {
       this.$router.go(1);
     },
-    search(event) {
+    async search(event) {
       //KeyUp event, enter
       if (event.keyCode !== 13) return;
-      this.$router.push({path: '/search', query: {q: this.searchQuery}});
+
+      //Check if url
+      if (this.searchQuery.startsWith('http')) {
+        this.searchLoading = true;
+        let url = new URL(this.searchQuery);
+
+        //Normal link
+        if (url.hostname == 'www.deezer.com' || url.hostname == 'deezer.com' || url.hostname == 'deezer.page.link') {
+
+          //Share link
+          if (url.hostname == 'deezer.page.link') {
+            let res = await this.$axios.get('/fullurl?url=' + encodeURIComponent(this.searchQuery));
+            url = new URL(res.data.url);
+          }
+
+          let supported = ['track', 'artist', 'album', 'playlist'];
+
+          let path = url.pathname.substring(1).split('/');
+          if (path.length == 3) path = path.slice(1);
+          let type = path[0];
+          if (supported.includes(type)) {
+
+            //Dirty lol
+            let res = await this.$axios('/' + path.join('/'));
+            if (res.data) {
+              //Add to queue
+              if (type == 'track') {
+                this.$root.queue.data.splice(this.$root.queue.index + 1, 0, res.data);
+                this.$root.skip(1);
+              }
+              //Show details page
+              if (type == 'artist' || type == 'album' || type == 'playlist') {
+                let query = {};
+                query[type] = JSON.stringify(res.data);
+                this.$router.push({path: `/${type}`, query: query});
+              }
+            }
+          }
+        }
+        
+        this.searchLoading = false;
+      } else {
+        //Normal search
+        this.$router.push({path: '/search', query: {q: this.searchQuery}});
+      }
     },
     seek(val) {
       this.$root.seek(Math.round((val / 100) * this.$root.duration()));
@@ -314,7 +361,7 @@ export default {
       if (event.keyCode != 47) return;
       this.$refs.searchBar.focus();
       setTimeout(() => {
-        this.searchQuery = this.searchQuery.replace(new RegExp('/', 'g'), '');
+        if (this.searchQuery.startsWith('/')) this.searchQuery = this.searchQuery.substring(1);
       }, 40);
     });
 

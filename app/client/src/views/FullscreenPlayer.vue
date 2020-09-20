@@ -63,7 +63,7 @@
                     </v-col>
 
                     <v-col>
-                        <v-btn icon x-large @click='$root.skip(1)'>
+                        <v-btn icon x-large @click='$root.skipNext'>
                             <v-icon size='42px'>mdi-skip-next</v-icon>
                         </v-btn>
                     </v-col>

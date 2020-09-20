@@ -167,6 +167,17 @@ new Vue({
             if (newIndex < 0 || newIndex >= this.queue.data.length) return;
             this.playIndex(newIndex);
         },
+        //Skip wrapper with shuffle 
+        skipNext() {
+            if (this.shuffle) {
+                let index = Math.round(Math.random()*this.queue.data.length) - this.queue.index;
+                this.skip(index);
+                this.savePlaybackInfo();
+                return;
+            }
+            this.skip(1);
+            this.savePlaybackInfo();
+        },
         toggleMute() {
             if (this.audio) this.audio.muted = !this.audio.muted;
             this.muted = !this.muted;
@@ -200,6 +211,9 @@ new Vue({
             this.configureAudio();
             this.state = 1;
             if (autoplay) this.play();
+            
+            //Loads more tracks if end of list
+            this.loadSTL();
         },
         //Configure html audio element
         configureAudio() {
@@ -223,18 +237,18 @@ new Vue({
             
             this.audio.addEventListener('ended', async () => {
 
+                //Repeat track
+                if (this.repeat == 2) {
+                    this.seek(0);
+                    this.audio.play();
+                    return;
+                }
+
                 //Shuffle
                 if (this.shuffle) {
                     let index = Math.round(Math.random()*this.queue.data.length) - this.queue.index;
                     this.skip(index);
                     this.savePlaybackInfo();
-                    return;
-                }
-
-                //Repeat track
-                if (this.repeat == 2) {
-                    this.seek(0);
-                    this.audio.play();
                     return;
                 }
 
@@ -284,7 +298,7 @@ new Vue({
             //Controls
             navigator.mediaSession.setActionHandler('play', this.play);
             navigator.mediaSession.setActionHandler('pause', this.pause);
-            navigator.mediaSession.setActionHandler('nexttrack', () => this.skip(1));
+            navigator.mediaSession.setActionHandler('nexttrack', this.skipNext);
             navigator.mediaSession.setActionHandler('previoustrack', () => this.skip(-1));
         },
         //Get Deezer CDN image url
@@ -327,6 +341,16 @@ new Vue({
 
             //Might get canceled
             if (this.gapless.promise) resolve();
+        },
+        //Load more SmartTrackList tracks
+        async loadSTL() {
+            if (this.queue.data.length - 1 == this.queue.index && this.queue.source.source == 'smarttracklist') {
+                let data = await this.$axios.get('/smarttracklist/' + this.queue.source.data);
+                if (data.data) {
+                    this.queue.data = this.queue.data.concat(data.data);
+                }
+                this.savePlaybackInfo();
+            }
         },
 
         //Update & save settings

@@ -4,7 +4,7 @@
         <v-progress-circular indeterminate v-if='loading'></v-progress-circular>
     </div>
     
-    <div v-if='!loading && lyrics' class='text-center'>
+    <div v-if='!loading && lyrics && lyrics.lyrics.length > 0' class='text-center'>
         <div v-for='(lyric, index) in lyrics.lyrics' :key='lyric.offset' class='my-8 mx-4'>
             <span 
             class='my-8'
@@ -16,8 +16,18 @@
         </div>
     </div>
 
+    <!-- Unsynchronized -->
+    <div v-if='!loading && lyrics && lyrics.text.length > 0 && lyrics.lyrics.length == 0' class='text-center'>
+        <span v-for='(lyric, index) in lyrics.text' :key='"US" + index' class='my-8 mx-4'>
+            <span class='my-8 text-h6 font-weight-regular'>
+                {{lyric}}
+            </span>
+            <br>
+        </span>
+    </div>
+
     <!-- Error -->
-    <div v-if='!loading && !lyrics' class='pa-4 text-center'>
+    <div v-if='!loading && !lyrics && lyrics.text.length == 0 && lyrics.lyrics.length == 0' class='pa-4 text-center'>
         <span class='red--text text-h5'>
             Error loading lyrics or lyrics not found!
         </span>
@@ -49,7 +59,7 @@ export default {
             try {
 
                 let res = await this.$axios.get(`/lyrics/${this.songId}`);
-                if (res.data && res.data.lyrics.length > 0) this.lyrics = res.data;
+                if (res.data && res.data.lyrics) this.lyrics = res.data;
             
             } catch (e) {true;}
             this.loading = false;

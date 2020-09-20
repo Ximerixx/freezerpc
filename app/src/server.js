@@ -102,40 +102,15 @@ app.get('/artist/:id', async (req, res) => {
 //start & full query parameters
 app.get('/playlist/:id', async (req, res) => {
     //Set anything to `full` query parameter to get entire playlist
-    if (!req.query.full) {
-        let data = await deezer.callApi('deezer.pagePlaylist', {
-            playlist_id: req.params.id.toString(),
-            lang: 'us',
-            nb: 50,
-            start: req.query.start ? parseInt(req.query.start, 10) : 0,
-            tags: true
-        });
-        return res.send(new Playlist(data.results.DATA, data.results.SONGS));
-    }
-
-    //Entire playlist
-    let chunk = 200;
+    let nb = req.query.full ? 100000 : 50;
     let data = await deezer.callApi('deezer.pagePlaylist', {
-        playlist_id: req.params.id.toString(), 
-        lang: 'us', 
-        nb: chunk, 
-        start: 0,
+        playlist_id: req.params.id.toString(),
+        lang: 'us',
+        nb: nb,
+        start: req.query.start ? parseInt(req.query.start, 10) : 0,
         tags: true
     });
-    let playlist = new Playlist(data.results.DATA, data.results.SONGS);
-    let missingChunks = Math.ceil((playlist.trackCount - playlist.tracks.length)/chunk);
-    //Extend playlist
-    for(let i=0; i<missingChunks; i++) {
-        let d = await deezer.callApi('deezer.pagePlaylist', {
-            playlist_id: id.toString(), 
-            lang: 'us', 
-            nb: chunk, 
-            start: (i+1)*chunk,
-            tags: true
-        });
-        playlist.extend(d.results.SONGS);
-    }
-    res.send(playlist);
+    return res.send(new Playlist(data.results.DATA, data.results.SONGS));
 });
 
 //DELETE playlist
@@ -482,6 +457,13 @@ app.get('/lastfm', async (req, res) => {
     res.json({
         url: lastfm.getAuthenticationUrl({cb: `http://${req.socket.remoteAddress}:${settings.port}/lastfm`})
     }).end();
+});
+
+//Get URL from deezer.page.link
+app.get('/fullurl', async (req, res) => {
+    let url = req.query.url;
+    let r = await axios.get(url, {validateStatus: null});
+    res.json({url: r.request.res.responseUrl});
 });
 
 //Redirect to index on unknown path
