@@ -28,6 +28,17 @@
             append-icon='mdi-open-in-app'
             @click:append='selectDownloadPath'
         ></v-text-field>
+        
+        <!-- Download dialog -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.downloadDialog'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>Show download dialog</v-list-item-title>
+                <v-list-item-subtitle>Always show download confirm dialog before downloading.</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
 
         <!-- Create artist folder -->
         <v-list-item>
@@ -57,6 +68,10 @@
             hint='Variables: %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%'
         ></v-text-field>
 
+        <!-- Accounts -->
+        <v-subheader>Integrations</v-subheader>
+        <v-divider></v-divider>
+
         <!-- Log listening -->
         <v-list-item>
             <v-list-item-action>
@@ -69,11 +84,46 @@
         </v-list-item>
         <!-- LastFM -->
         <v-list-item @click='connectLastFM' v-if='!$root.settings.lastFM'>
+            <v-list-item-avatar>
+                <v-img src='lastfm.svg'></v-img>
+            </v-list-item-avatar>
             <v-list-item-content>
                 <v-list-item-title>Login with LastFM</v-list-item-title>
                 <v-list-item-subtitle>Connect your LastFM account to allow scrobbling.</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
+        <v-list-item v-if='$root.settings.lastFM' @click='disconnectLastFM'>
+            <v-list-item-avatar>
+                <v-icon>mdi-logout</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <v-list-item-title class='red--text'>Disconnect LastFM</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
+        <!-- Discord -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.enableDiscord' @click='snackbarText = "Requires restart to apply!"; snackbar = true'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>Discord Rich Presence</v-list-item-title>
+                <v-list-item-subtitle>Enable Discord Rich Presence, requires restart to toggle!</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
+        <!-- Discord Join Button -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.discordJoin' @click='snackbarText = "Requires restart to apply!"; snackbar = true'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>Discord Join Button</v-list-item-title>
+                <v-list-item-subtitle>Enable Discord join button for syncing tracks, requires restart to toggle!</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
+
+        <!-- Misc -->
+        <v-subheader>Other</v-subheader>
+        <v-divider></v-divider>
 
         <!-- Minimize to tray -->
         <v-list-item v-if='$root.settings.electron'>
@@ -108,6 +158,22 @@
         Save
     </v-btn>
 
+    <!-- Info snackbar -->
+    <v-snackbar v-model="snackbar">
+      {{ snackbarText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="primary"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Dismiss
+        </v-btn>
+      </template>
+    </v-snackbar>
+
 </div>
 </template>
 
@@ -124,7 +190,9 @@ export default {
             ],
             streamingQuality: null,
             downloadQuality: null,
-            devToolsCounter: 0
+            devToolsCounter: 0,
+            snackbarText: null,
+            snackbar: false
         }
     },
     methods: {
@@ -178,6 +246,12 @@ export default {
         async connectLastFM() {
             let res = await this.$axios.get('/lastfm');
             window.location.replace(res.data.url);
+        },
+        //Disconnect LastFM
+        async disconnectLastFM() {
+            this.$root.settings.lastFM = null;
+            await this.$root.saveSettings();
+            window.location.reload();
         }
     },
     mounted() {

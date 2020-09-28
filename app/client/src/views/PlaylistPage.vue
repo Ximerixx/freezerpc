@@ -87,9 +87,8 @@ export default {
     methods: {
         async playIndex(index) {
             //Load tracks
-            if (this.playlist.tracks.length < this.playlist.trackCount) {
+            if (this.playlist.tracks.length == 0)
                 await this.loadAllTracks();
-            }
             
             this.$root.queue.source = {
                 text: this.playlist.title,
@@ -98,6 +97,13 @@ export default {
             };
             this.$root.replaceQueue(this.playlist.tracks);
             this.$root.playIndex(index);
+
+            //Load rest of tracks on background
+            if (this.playlist.tracks.length < this.playlist.trackCount) {
+                this.loadAllTracks().then(() => {
+                    this.$root.replaceQueue(this.playlist.tracks);
+                });
+            }
         },
         play() {
             this.playIndex(0);

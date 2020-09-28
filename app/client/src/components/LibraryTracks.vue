@@ -74,10 +74,6 @@ export default {
         },
         //Play track
         async play(index) {
-            if (this.tracks.length < this.count) {
-                await this.loadAll();
-            }
-
             this.$root.queue.source = {
                 text: 'Loved tracks',
                 source: 'playlist',
@@ -85,6 +81,15 @@ export default {
             };
             this.$root.replaceQueue(this.tracks);
             this.$root.playIndex(index);
+
+            //Load all tracks
+            if (this.tracks.length < this.count) {
+                this.loadAll().then(() => {
+                    this.$root.replaceQueue(this.tracks);
+                });
+            }
+
+            
         },
         removedTrack(index) {
             this.tracks.splice(index, 1);

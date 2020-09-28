@@ -108,6 +108,17 @@ export default {
         dShow() {
             if (!this.dShow) this.$emit('close');
         }
+    },
+    mounted() {
+        //Auto download
+        if (!this.$root.settings.downloadDialog) {
+            this.download();
+            setInterval(() => {
+                this.$emit('close');
+                this.dShow = false;
+            }, 50);
+            
+        }
     }
 }
 </script>

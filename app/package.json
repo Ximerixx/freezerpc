@@ -1,7 +1,7 @@
 {
   "name": "freezer",
   "private": true,
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "background.js",
   "scripts": {
@@ -12,13 +12,17 @@
   "dependencies": {
     "axios": "^0.19.2",
     "browser-id3-writer": "^4.4.0",
+    "discord-rpc": "^3.1.4",
     "express": "^4.17.1",
     "lastfmapi": "^0.1.1",
     "metaflac-js2": "^1.0.7",
     "nedb": "^1.8.0",
     "nodeezcryptor": "git+https://notabug.org/xefglm/nodeezcryptor",
     "sanitize-filename": "^1.6.3",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "winston": "^3.3.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^7.10.0"
+  }
 }

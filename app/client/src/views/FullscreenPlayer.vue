@@ -144,6 +144,7 @@
                                 ><TrackTile
                                     :track='track'
                                     @click='$root.playIndex(index)'
+                                    @redirect='close'
                                 ></TrackTile>
                             </v-lazy>
 
@@ -161,14 +162,13 @@
                             ></AlbumTile>
                             <!-- Artists -->
                             <h3>Artists:</h3>
-                            <v-list dense>
+                            <v-list>
                                 <ArtistTile
                                     v-for='(artist, index) in $root.track.artists'
                                     :artist='artist'
                                     :key="index + 'a' + artist.id"
                                     @clicked='$emit("close")'
                                     tiny
-                                    class='text-left'
                                 ></ArtistTile>
                             </v-list>
                             <!-- Meta -->
@@ -179,6 +179,7 @@
                             <h3>Source: {{$root.playbackInfo.source}}</h3>
                             <h3>Format: {{$root.playbackInfo.format}}</h3>
                             <h3>Quality: {{$root.playbackInfo.quality}}</h3>
+                            <h3>ID: {{$root.track.id}}</h3>
                         </v-list>
                     </v-tab-item>
                     <!-- Lyrics -->

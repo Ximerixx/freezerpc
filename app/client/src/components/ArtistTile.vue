@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-list-item @click='click' v-if='!card' :class='{dense: tiny}'>
+    <v-list-item @click='click' v-if='!card'>
         <v-list-item-avatar>
             <v-img :src='artist.picture.thumb'></v-img>
         </v-list-item-avatar>

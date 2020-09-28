@@ -131,9 +131,11 @@ new Vue({
             this.play();
         },
         seek(t) {
-            if (!this.audio) return;
+            if (!this.audio || isNaN(t) || !t) return;
             //ms -> s
             this.audio.currentTime = (t / 1000);
+
+            this.updateState();
         },
 
         //Current track duration
@@ -161,11 +163,11 @@ new Vue({
             this.savePlaybackInfo();
         },
         //Skip n tracks, can be negative
-        skip(n) {
+        async skip(n) {
             let newIndex = this.queue.index + n;
             //Out of bounds
             if (newIndex < 0 || newIndex >= this.queue.data.length) return;
-            this.playIndex(newIndex);
+            await this.playIndex(newIndex);
         },
         //Skip wrapper with shuffle 
         skipNext() {
@@ -253,7 +255,7 @@ new Vue({
                 }
 
                 //Repeat list
-                if (this.queue.index == this.queue.data.length - 1) {
+                if (this.repeat == 1 && this.queue.index == this.queue.data.length - 1) {
                     this.skip(-(this.queue.data.length - 1));
                     return;
                 }
@@ -403,6 +405,18 @@ new Vue({
 
             this.logListenId = this.track.id;
             await this.$axios.post(`/log`, this.track);
+        },
+        //Send state update to integrations
+        async updateState() {
+            //Wait for duration
+            if (this.state == 2 && (this.duration() == null || isNaN(this.duration()))) 
+                await new Promise((res) => setTimeout(res, 1000));
+            this.$socket.emit('stateChange', {
+                position: this.position,
+                duration: this.duration(),
+                state: this.state,
+                track: this.track 
+            });
         }
     },
     async created() {
@@ -471,6 +485,12 @@ new Vue({
         this.sockets.subscribe('download', (data) => {
             this.download = data;
         });
+        //Play at offset (for integrations)
+        this.sockets.subscribe('playOffset', async (data) => {
+            this.queue.data.splice(this.queue.index + 1, 0, data.track);
+            await this.skip(1);
+            this.seek(data.position);
+        });
 
         r();
     },
@@ -498,6 +518,12 @@ new Vue({
             //J -10s (from YT)
             if (e.keyCode === 106 || e.keyCode === 74) this.$root.seek((this.position - 10000));
         });
+    },
+    watch: {
+        //Watch state for integrations
+        state() {
+            this.updateState();
+        }
     },
 
     router,

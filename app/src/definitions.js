@@ -1,5 +1,3 @@
-const {DeezerAPI} = require('./deezer');
-
 //Datatypes, constructor parameters = gw_light API call.
 class Track {
     constructor(json) {
@@ -32,13 +30,12 @@ class Track {
     }
 
     //Get Deezer CDN url by streamUrl
-    static getUrl(info, quality = 3) {
+    static getUrlInfo(info) {
         let md5origin = info.substring(0, 32);
         if (info.charAt(32) == '1') md5origin += '.mp3';
         let mediaVersion = parseInt(info.substring(33, 34)).toString();
         let trackId = info.substring(35);
-        let url = DeezerAPI.getUrl(trackId, md5origin, mediaVersion, quality);
-        return url;
+        return {trackId, md5origin, mediaVersion};
     }
 }
 
@@ -124,6 +121,8 @@ class DeezerImage {
     }
 
     url(size = 256) {
+        if (!this.hash)
+            return `https://e-cdns-images.dzcdn.net/images/${this.type}/${size}x${size}-000000-80-0-0.jpg`;
         return `https://e-cdns-images.dzcdn.net/images/${this.type}/${this.hash}/${size}x${size}-000000-80-0-0.jpg`;
     }
 }

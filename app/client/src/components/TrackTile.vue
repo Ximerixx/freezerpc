@@ -180,12 +180,14 @@ export default {
             this.$axios.put(`/library/tracks?id=${this.track.id}`);
         },
         goAlbum() {
+            this.$emit('redirect')
             this.$router.push({
                 path: '/album',
                 query: {album: JSON.stringify(this.track.album)}
             });
         },
         goArtist(a) {
+            this.$emit('redirect');
             this.$router.push({
                 path: '/artist',
                 query: {artist: JSON.stringify(a)}

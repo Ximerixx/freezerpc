@@ -85,7 +85,7 @@ export default {
         },
         //Scroll to currently playing lyric
         scrollLyric() {
-            if (!this.lyrics) return;
+            if (!this.lyrics || !this.lyrics.lyrics || this.lyrics.lyrics.length == 0) return;
 
             //Prevent janky scrolling
             if (this.currentLyricIndex == this.currentLyric()) return;

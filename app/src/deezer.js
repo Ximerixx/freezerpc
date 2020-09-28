@@ -3,6 +3,8 @@ const axios = require('axios');
 const decryptor = require('nodeezcryptor');
 const querystring = require('querystring');
 const {Transform} = require('stream');
+const {Track} = require('./definitions');
+const logger = require('./winston');
 
 class DeezerAPI {
 
@@ -161,6 +163,45 @@ class DeezerAPI {
         let step3 = Buffer.concat([aesCipher.update(step2, 'binary'), aesCipher.final()]).toString('hex').toLowerCase();
 
         return `https://e-cdns-proxy-${md5origin.substring(0, 1)}.dzcdn.net/mobile/1/${step3}`;
+    }
+
+    //Quality fallback
+    async qualityFallback(info, quality = 3) {
+        if (quality == 1) return {
+            quality: '128kbps',
+            format: 'MP3',
+            source: 'stream',
+            url: `/stream/${info}?q=1`
+        };
+        try {
+            let tdata = Track.getUrlInfo(info);
+            let res = await axios.head(DeezerAPI.getUrl(tdata.trackId, tdata.md5origin, tdata.mediaVersion, quality));
+            if (quality == 3) {
+                return {
+                    quality: '320kbps',
+                    format: 'MP3',
+                    source: 'stream',
+                    url: `/stream/${info}?q=3`
+                }
+            }
+            //Bitrate will be calculated in client
+            return {
+                quality: res.headers['content-length'],
+                format: 'FLAC',
+                source: 'stream',
+                url: `/stream/${info}?q=9`
+            }
+        } catch (e) {
+            logger.warning('Qualiy fallback: ' + e);
+            //Fallback
+            //9 - FLAC
+            //3 - MP3 320
+            //1 - MP3 128
+            let q = quality;
+            if (quality == 9) q = 3;
+            if (quality == 3) q = 1;
+            return this.qualityFallback(info, q);
+        }
     }
 }
 

@@ -22,9 +22,12 @@ class Settings {
         this.createAlbumFolder = true;
         this.createArtistFolder = true;
         this.downloadFilename = '%0trackNumber%. %artists% - %title%';
+        this.downloadDialog = true;
 
         this.logListen = false;
         this.lastFM = null;
+        this.enableDiscord = false;
+        this.discordJoin = false;
     }
 
     //Based on electorn app.getPath

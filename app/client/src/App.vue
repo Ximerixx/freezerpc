@@ -124,18 +124,24 @@
         <v-icon>mdi-arrow-right</v-icon>
       </v-btn>
 
-      <v-text-field 
-        hide-details 
-        flat 
-        prepend-inner-icon="mdi-magnify" 
+      <!-- Search -->
+      <v-autocomplete
+        hide-details
+        prepend-inner-icon="mdi-magnify"
+        flat
         single-line
         solo
+        clearable
+        hide-no-data
         placeholder='Search or paste Deezer URL. Use "/" to quickly focus.'
-        v-model="searchQuery"
-        ref='searchBar'
         :loading='searchLoading'
-        @keyup='search'>
-      </v-text-field>
+        @keyup='search'
+        ref='searchBar'
+        v-model='searchQuery'
+        :search-input.sync='searchInput'
+        :items='suggestions'
+      ></v-autocomplete>
+
     </v-app-bar>
     
     <!-- Main -->
@@ -269,7 +275,10 @@ export default {
       showPlayer: false,
       position: '0.00',
       searchQuery: '',
-      searchLoading: false
+      searchLoading: false,
+      searchInput: null,
+      suggestions: [],
+      preventDoubleEnter: false
     }
   },
   methods: {
@@ -288,19 +297,24 @@ export default {
     },
     async search(event) {
       //KeyUp event, enter
-      if (event.keyCode !== 13) return;
+      if (event && event.keyCode !== 13) return;
+      //Prevent double navigation
+      if (this.preventDoubleEnter) return;
+      this.preventDoubleEnter = true;
+      setInterval(() => {this.preventDoubleEnter = false}, 50);
 
       //Check if url
-      if (this.searchQuery.startsWith('http')) {
+      let query = this.searchInput;
+      if (query.startsWith('http')) {
         this.searchLoading = true;
-        let url = new URL(this.searchQuery);
+        let url = new URL(query);
 
         //Normal link
         if (url.hostname == 'www.deezer.com' || url.hostname == 'deezer.com' || url.hostname == 'deezer.page.link') {
 
           //Share link
           if (url.hostname == 'deezer.page.link') {
-            let res = await this.$axios.get('/fullurl?url=' + encodeURIComponent(this.searchQuery));
+            let res = await this.$axios.get('/fullurl?url=' + encodeURIComponent(query));
             url = new URL(res.data.url);
           }
 
@@ -332,7 +346,7 @@ export default {
         this.searchLoading = false;
       } else {
         //Normal search
-        this.$router.push({path: '/search', query: {q: this.searchQuery}});
+        this.$router.push({path: '/search', query: {q: query}});
       }
     },
     seek(val) {
@@ -383,6 +397,33 @@ export default {
     //Update position
     '$root.position'() {
       this.position = (this.$root.position / this.$root.duration()) * 100;
+    },
+    //Autofill
+    searchInput(query) {
+      //Filters
+      if (query && query.startsWith('/')) {
+        query = query.substring(1);
+        this.searchInput = query;
+      }
+      if (!query || (query && query.startsWith('http'))) {
+        this.searchLoading = false;
+        this.suggestions = [];
+        return;
+      }
+      this.searchLoading = true;
+      //Prevent spam
+      setTimeout(() => {
+        if (query != this.searchInput) return;
+        this.$axios.get('/suggestions/' + encodeURIComponent(query)).then((res) => {
+          if (query != this.searchInput) return;
+          this.suggestions = res.data;
+          this.searchLoading = false;
+        });
+      }, 300); 
+    },
+    searchQuery(q) {
+      this.searchInput = q;
+      this.search(null);
     }
   }
 };

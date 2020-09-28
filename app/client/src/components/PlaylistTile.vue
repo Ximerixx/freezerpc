@@ -109,14 +109,12 @@ export default {
     methods: {
         async play() {
             let playlist = this.playlist;
-            //Load playlist tracks
-            if (playlist.tracks.length != playlist.trackCount) {
-                let data = await this.$axios.get(`/playlist/${playlist.id}?full=iguess`);
-                playlist = data.data;
-            }
-            //Error handling
+            //Load if no tracks
+            if (!playlist || playlist.tracks.length == 0)
+                playlist = (await this.$axios.get(`/playlist/${playlist.id}?full=iguess`)).data;
             if (!playlist) return;
-            
+
+            //Play
             this.$root.queue.source = {
                 text: playlist.title,
                 source: 'playlist',
@@ -124,6 +122,12 @@ export default {
             };
             this.$root.replaceQueue(playlist.tracks);
             this.$root.playIndex(0);
+
+            //Load all tracks
+            if (playlist.tracks.length != playlist.trackCount) {
+                let data = await this.$axios.get(`/playlist/${playlist.id}?full=iguess`);
+                playlist = data.data;
+            }
         },
         //On click navigate to details
         click() {

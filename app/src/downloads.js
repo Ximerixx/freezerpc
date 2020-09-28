@@ -3,11 +3,13 @@ const {Track} = require('./definitions');
 const decryptor = require('nodeezcryptor');
 const fs = require('fs');
 const path = require('path');
+const logger = require('./winston');
 const https = require('https');
 const Datastore = require('nedb');
 const ID3Writer = require('browser-id3-writer');
 const Metaflac = require('metaflac-js2');
 const sanitize = require("sanitize-filename");
+const { DeezerAPI } = require('./deezer');
 
 class Downloads {
     constructor(settings, qucb) {
@@ -246,9 +248,12 @@ class Download {
         this.downloaded = start;
 
         //Get download info
-        if (!this.url) this.url = Track.getUrl(this.track.streamUrl, this.quality);
+        if (!this.url) {
+            let streamInfo = Track.getUrlInfo(this.track.streamUrl);
+            this.url = DeezerAPI.getUrl(streamInfo.trackId, streamInfo.md5origin, streamInfo.mediaVersion, this.quality);
+        }
         this._request = https.get(this.url, {headers: {'Range': `bytes=${start}-`}}, (r) => {
-            
+            let skip = false;
             //Error
             if (r.statusCode >= 400) {
                 //Fallback on error
@@ -261,12 +266,31 @@ class Download {
                 };
                 //Error
                 this.state = -1;
-                console.log(`Undownloadable track ID: ${this.track.id}`);
+                logger.error(`Undownloadable track ID: ${this.track.id}`);
                 return this.onDone();
+            } else {
+                this.path += (this.quality == 9) ? '.flac' : '.mp3';
+                
+                //Check if file exits
+                fs.access(this.path, (err) => {
+                    if (err) {
+                        //Pipe data to file
+                        r.pipe(fs.createWriteStream(tmp, {flags: 'a'}));
+                        
+                    } else {
+                        logger.warn('File already exists! Skipping...');
+                        skip = true;
+                        this._request.end();
+                        this.state = 3;
+                        return this.onDone();
+                    }
+                    
+                })
             }
 
             //On download done
             r.on('end', () => {
+                if (skip) return;
                 if (this.downloaded != this.size) return;
                 this._finished(tmp);
             });
@@ -276,15 +300,13 @@ class Download {
             });
 
             r.on('error', (e) => {
-                console.log(`Download error: ${e}`);
+                logger.error(`Download error: ${e}`);
                 //TODO: Download error handling
             })
 
             //Save size
             this.size = parseInt(r.headers['content-length'], 10) + start;
-
-            //Pipe data to file
-            r.pipe(fs.createWriteStream(tmp, {flags: 'a'}));
+            
         });
     }
 
@@ -311,7 +333,7 @@ class Download {
         } catch (e) {};
 
         //Decrypt
-        this.path += (this.quality == 9) ? '.flac' : '.mp3';
+        //this.path += (this.quality == 9) ? '.flac' : '.mp3';
         decryptor.decryptFile(decryptor.getKey(this.track.id), tmp, `${tmp}.DEC`);
         fs.promises.copyFile(`${tmp}.DEC`, this.path);
         //Delete encrypted
