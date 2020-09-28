@@ -371,8 +371,8 @@ export default {
     });
 
     // /search
-    document.addEventListener('keypress', (event) => {
-      if (event.keyCode != 47) return;
+    document.addEventListener('keypress', (e) => {
+      if (e.keyCode != 47) return;
       this.$refs.searchBar.focus();
       setTimeout(() => {
         if (this.searchQuery.startsWith('/')) this.searchQuery = this.searchQuery.substring(1);
@@ -393,6 +393,9 @@ export default {
     volume() {
       if (this.$root.audio) this.$root.audio.volume = this.volume;
       this.$root.volume = this.volume;
+    },
+    '$root.volume'() {
+      this.volume = this.$root.volume;
     },
     //Update position
     '$root.position'() {

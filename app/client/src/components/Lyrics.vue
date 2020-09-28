@@ -5,7 +5,12 @@
     </div>
     
     <div v-if='!loading && lyrics && lyrics.lyrics.length > 0' class='text-center'>
-        <div v-for='(lyric, index) in lyrics.lyrics' :key='lyric.offset' class='my-8 mx-4'>
+        <div 
+        v-for='(lyric, index) in lyrics.lyrics' 
+        :key='lyric.offset' 
+        class='my-6 mx-4 pa-2 rounded' 
+        :class='{"grey darken-3": playingNow(index)}'
+        @click='seekTo(index)'>
             <span 
             class='my-8'
             :class='{"text-h6 font-weight-regular": !playingNow(index), "text-h5 font-weight-bold": playingNow(index)}'
@@ -27,7 +32,7 @@
     </div>
 
     <!-- Error -->
-    <div v-if='!loading && !lyrics && lyrics.text.length == 0 && lyrics.lyrics.length == 0' class='pa-4 text-center'>
+    <div v-if='!loading && (!lyrics || (lyrics.text.length == 0 && lyrics.lyrics.length == 0))' class='pa-4 text-center'>
         <span class='red--text text-h5'>
             Error loading lyrics or lyrics not found!
         </span>
@@ -94,10 +99,15 @@ export default {
             //Roughly middle
             let offset = window.innerHeight / 2 - 500;
 
+            if (!this.$refs["l"+this.currentLyricIndex]) return;
             this.$refs.content.scrollTo({
                 top: this.$refs["l"+this.currentLyricIndex][0].offsetTop + offset,
                 behavior: 'smooth'
             });
+        },
+        //Seek to lyric in song
+        seekTo(i) {
+            this.$root.seek(this.lyrics.lyrics[i].offset);
         }
     },
     mounted() {

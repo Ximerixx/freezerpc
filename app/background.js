@@ -7,6 +7,7 @@ let tray;
 let settings;
 
 let shouldExit = false;
+let playing = false;
 
 //Get path to asset
 function assetPath(a) {
@@ -74,26 +75,38 @@ async function createWindow() {
         return false;
     });
 
+    //Thumbnail Toolbars
+    setThumbarButtons();
 }
 
 //Create window
 app.on('ready', async () => {
     createWindow();
 
-    //Create tray
+    //Create Tray
     tray = new Tray(assetPath("icon-taskbar.png"));
     tray.on('double-click', () => win.show());
     tray.on('click', () => win.show());
 
-    //Tray menu
+    setTray();
+});
+
+//Update tray context menu
+function setTray() {
     const contextMenu = Menu.buildFromTemplate([
         {
             label: 'Restore', 
             type: 'normal',
             click: () => win.show()
         },
+        playing ?
         {
-            label: 'Play/Pause',
+            label: 'Pause',
+            type: 'normal',
+            click: () => win.webContents.send('togglePlayback')
+        }
+        : {
+            label: 'Play',
             type: 'normal',
             click: () => win.webContents.send('togglePlayback')
         },
@@ -117,6 +130,42 @@ app.on('ready', async () => {
         }
     ]);
     tray.setContextMenu(contextMenu);
+}
+
+//Update Thumbnail Toolbars (Windows)
+function setThumbarButtons() {
+    win.setThumbarButtons([
+        {
+            tooltip: 'Skip Previous',
+            icon: assetPath('skip-previous.png'),
+            click: () => win.webContents.send('skipPrev')
+        },
+        //Play/Pause
+        playing ?
+        {
+            tooltip: 'Pause',
+            icon: assetPath('pause.png'),
+            click: () => win.webContents.send('togglePlayback')
+        } :
+        {
+            tooltip: 'Play',
+            icon: assetPath('play.png'),
+            click: () => win.webContents.send('togglePlayback')
+        },
+        //Skip next
+        {
+            tooltip: 'Skip Next',
+            icon: assetPath('skip-next.png'),
+            click: () => win.webContents.send('skipNext')
+        },
+    ]);
+}
+
+//Playing state change from UI
+ipcMain.on('playing', (event, args) => {
+    playing = args;
+    setThumbarButtons();
+    setTray();
 });
 
 //Update settings from ui

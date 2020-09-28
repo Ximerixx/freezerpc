@@ -213,6 +213,8 @@ new Vue({
             this.configureAudio();
             this.state = 1;
             if (autoplay) this.play();
+            //MediaSession
+            this.updateMediaSession();
             
             //Loads more tracks if end of list
             this.loadSTL();
@@ -275,6 +277,7 @@ new Vue({
                     //Play
                     this.state = 2;
                     this.audio.play();
+                    this.updateMediaSession();
                     await this.savePlaybackInfo();
                     return;
                 }
@@ -282,7 +285,6 @@ new Vue({
                 this.skip(1);
                 this.savePlaybackInfo();
             });
-            this.updateMediaSession();
         },
         //Update media session with current track metadata
         updateMediaSession() {
@@ -417,6 +419,12 @@ new Vue({
                 state: this.state,
                 track: this.track 
             });
+
+            //Update in electron 
+            if (this.settings.electron) {
+                const {ipcRenderer} = window.require('electron');
+                ipcRenderer.send('playing', this.state == 2);
+            }
         }
     },
     async created() {
@@ -511,17 +519,40 @@ new Vue({
             //Don't handle keystrokes in text fields
             if (e.target.tagName == "INPUT") return;
             //K toggle playback
-            //e.keyCode === 32 
-            if (e.keyCode === 75 || e.keyCode === 107) this.$root.toggle();
+            if (e.code == "KeyK" || e.code == "Space") this.$root.toggle();
             //L +10s (from YT)
-            if (e.keyCode === 108 || e.keyCode === 76) this.$root.seek((this.position + 10000));
+            if (e.code == "KeyL") this.$root.seek((this.position + 10000));
             //J -10s (from YT)
-            if (e.keyCode === 106 || e.keyCode === 74) this.$root.seek((this.position - 10000));
+            if (e.code == "KeyJ") this.$root.seek((this.position - 10000));
+            //-> +5s (from YT)
+            if (e.code == "ArrowRight") this.$root.seek((this.position + 5000));
+            //<- -5s (from YT)
+            if (e.code == "ArrowLeft") this.$root.seek((this.position - 5000));
+            // ^ v - Volume 
+            if (e.code == 'ArrowUp' && this.audio) {
+                if ((this.audio.volume + 0.05) > 1) {
+                    this.audio.volume = 1.00;
+                    this.volume = 1.00;
+                    return;
+                }
+                this.audio.volume += 0.05;
+                this.volume = this.audio.volume;
+            }
+            if (e.code == 'ArrowDown' && this.audio) {
+                if ((this.audio.volume - 0.05) < 0) {
+                    this.audio.volume = 0.00;
+                    this.volume = 0.00;
+                    return;
+                }
+                this.audio.volume -= 0.05;
+                this.volume = this.audio.volume;
+            }
         });
     },
     watch: {
         //Watch state for integrations
         state() {
+            this.updateMediaSession();
             this.updateState();
         }
     },

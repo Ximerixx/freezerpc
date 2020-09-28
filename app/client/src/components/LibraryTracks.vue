@@ -1,19 +1,35 @@
 <template>
-<v-list :height='height' class='overflow-y-auto' v-scroll.self='scroll'>
-    <v-lazy
-        v-for='(track, index) in tracks'
-        :key='index + "t" + track.id'
-        max-height="100"
-    ><TrackTile :track='track' @click='play(index)' @remove='removedTrack(index)'>
-        </TrackTile>
-    </v-lazy>
-
-    <div class='text-center' v-if='loading'>
-        <v-progress-circular indeterminate></v-progress-circular>
+<div v-scroll.self='scroll'>
+    <div class='px-4 pt-2 d-flex' style='max-height: 50px;'>
+        <div class='text-overline px-2 pt-1'>
+            {{count}} TRACKS.
+        </div>
+        <div style="max-width: 200px;" class='d-flex mx-2'>
+            <v-select class='px-2' dense solo :items='sortTypes' @change='sort' label='Sort By'>
+            </v-select>
+        </div>
+        <div class='px-2' @click='reverseSort'>
+            <v-btn icon>
+                <v-icon v-if='isReversed'>mdi-sort-reverse-variant</v-icon>
+                <v-icon v-if='!isReversed'>mdi-sort-variant</v-icon>
+            </v-btn>
+        </div>
     </div>
-    
 
-</v-list>
+    <v-list :height='height' class='overflow-y-auto'>
+        <v-lazy
+            v-for='(track, index) in tracks'
+            :key='index + "t" + track.id'
+            max-height="100"
+        ><TrackTile :track='track' @click='play(index)' @remove='removedTrack(index)'>
+            </TrackTile>
+        </v-lazy>
+
+        <div class='text-center' v-if='loading'>
+            <v-progress-circular indeterminate></v-progress-circular>
+        </div>
+    </v-list>
+</div>
 </template>
 
 <script>
@@ -28,7 +44,15 @@ export default {
         return {
             loading: false,
             tracks: [],
-            count: 0
+            count: 0,
+            sortTypes: [
+                'Date Added',
+                'Name (A-Z)',
+                'Artist (A-Z)',
+                'Album (A-Z)'
+            ],
+            tracksUnsorted: null,
+            isReversed: false
         }
     },
     props: {
@@ -88,8 +112,44 @@ export default {
                     this.$root.replaceQueue(this.tracks);
                 });
             }
-
+        },
+        //Sort changed
+        async sort(type) {
+            let index = this.sortTypes.indexOf(type);
+            //Preload all tracks
+            if (this.tracks.length < this.count) 
+                await this.loadAll();
+            //Copy original
+            if (!this.tracksUnsorted)
+                this.tracksUnsorted = JSON.parse(JSON.stringify(this.tracks));
             
+            //Using indexes, so it can be translated later
+            this.isReversed = false;
+            switch (index) {
+                //Default
+                case 0:
+                    this.tracks = JSON.parse(JSON.stringify(this.tracksUnsorted));
+                    break;
+                //Name
+                case 1:
+                    this.tracks = this.tracks.sort((a, b) => {return a.title.localeCompare(b.title);});
+                    break;
+                //Artist
+                case 2:
+                    this.tracks = this.tracks.sort((a, b) => {return a.artistString.localeCompare(b.artistString);});
+                    break;
+                //Album
+                case 3:
+                    this.tracks = this.tracks.sort((a, b) => {return a.album.title.localeCompare(b.album.title);});
+                    break;
+            }
+        },
+        async reverseSort() {
+            //Preload tracks if not sorted yet
+            if (this.tracks.length < this.count) 
+                await this.sort(0);
+            this.isReversed = !this.isReversed;
+            this.tracks.reverse();
         },
         removedTrack(index) {
             this.tracks.splice(index, 1);

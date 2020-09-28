@@ -192,7 +192,7 @@ class DeezerAPI {
                 url: `/stream/${info}?q=9`
             }
         } catch (e) {
-            logger.warning('Qualiy fallback: ' + e);
+            logger.warn('Qualiy fallback: ' + e);
             //Fallback
             //9 - FLAC
             //3 - MP3 320

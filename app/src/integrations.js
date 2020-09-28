@@ -80,7 +80,7 @@ class Integrations extends EventEmitter {
                 //Always accept join requests
                 this.discordRPC.subscribe('ACTIVITY_JOIN_REQUEST', (user) => {
                     this.discordRPC.sendJoinInvite(user.user).catch((e) => {
-                        logger.warning('Unable to accept Discord invite: ' + e);
+                        logger.warn('Unable to accept Discord invite: ' + e);
                     });
                 });
                 //Joined
@@ -93,7 +93,6 @@ class Integrations extends EventEmitter {
         });
         //Connect to discord
         this.discordRPC.login({clientId: CLIENTID}).catch(() => {
-            logger.info('Error connecting to Discord!');
             //Wait 5s to retry
             setTimeout(() => {
                 if (!this.discordReady)
