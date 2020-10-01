@@ -101,7 +101,7 @@
                         :prepend-icon='$root.muted ? "mdi-volume-off" : "mdi-volume-high"'
                         max='1.00'
                         step='0.01'
-                        v-model='$root.audio.volume'
+                        v-model='$root.volume'
                         class='px-8'
                         style='padding-top: 2px;'
                         @change='updateVolume'
@@ -283,6 +283,7 @@ export default {
         },
         //Save volume
         updateVolume(v) {
+            if (this.$root.audio) this.$root.audio.volume = v;
             this.$root.volume = v;
         },
         //Repeat button click
@@ -305,7 +306,7 @@ export default {
         },
         '$root.position'() {
             if (!this.seeking) this.position = this.$root.position / 1000;
-        }
+        },
     }
 };
 

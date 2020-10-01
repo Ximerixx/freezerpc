@@ -18,6 +18,6 @@ process.on('uncaughtException', (err) => {
 });
 process.on('unhandledRejection', (err) => {
     logger.error('Unhandled Rejection: ' + err + "\nStack: " + err.stack);
-})
+});
 
 module.exports = logger;

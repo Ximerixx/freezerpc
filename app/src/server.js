@@ -351,6 +351,12 @@ app.get('/smarttracklist/:id', async (req, res) => {
     let data = await deezer.callApi('smartTracklist.getSongs', {
         smartTracklist_id: id
     });
+    //No more tracks
+    if (!data.results.data) {
+        logger.warn('No more STL tracks: ' + JSON.stringify(data.error));
+        return res.send([]);
+    }
+
     let tracks = data.results.data.map((t) => new Track(t));
     return res.send(tracks);
 });

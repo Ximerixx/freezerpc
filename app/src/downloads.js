@@ -248,11 +248,10 @@ class Download {
         this.downloaded = start;
 
         //Get download info
-        if (!this.url) {
-            let streamInfo = Track.getUrlInfo(this.track.streamUrl);
-            this.url = DeezerAPI.getUrl(streamInfo.trackId, streamInfo.md5origin, streamInfo.mediaVersion, this.quality);
-        }
+        let streamInfo = Track.getUrlInfo(this.track.streamUrl);
+        this.url = DeezerAPI.getUrl(streamInfo.trackId, streamInfo.md5origin, streamInfo.mediaVersion, this.quality);
         this._request = https.get(this.url, {headers: {'Range': `bytes=${start}-`}}, (r) => {
+            let outFile = fs.createWriteStream(tmp, {flags: 'a'});
             let skip = false;
             //Error
             if (r.statusCode >= 400) {
@@ -274,11 +273,10 @@ class Download {
                 //Check if file exits
                 fs.access(this.path, (err) => {
                     if (err) {
-                        //Pipe data to file
-                        r.pipe(fs.createWriteStream(tmp, {flags: 'a'}));
-                        
+
                     } else {
                         logger.warn('File already exists! Skipping...');
+                        outFile.close();
                         skip = true;
                         this._request.end();
                         this.state = 3;
@@ -292,10 +290,14 @@ class Download {
             r.on('end', () => {
                 if (skip) return;
                 if (this.downloaded != this.size) return;
-                this._finished(tmp);
+
+                outFile.close(() => {
+                    this._finished(tmp);
+                });
             });
             //Progress
             r.on('data', (c) => {
+                outFile.write(c);
                 this.downloaded += c.length;
             });
 
@@ -335,7 +337,7 @@ class Download {
         //Decrypt
         //this.path += (this.quality == 9) ? '.flac' : '.mp3';
         decryptor.decryptFile(decryptor.getKey(this.track.id), tmp, `${tmp}.DEC`);
-        fs.promises.copyFile(`${tmp}.DEC`, this.path);
+        await fs.promises.copyFile(`${tmp}.DEC`, this.path);
         //Delete encrypted
         await fs.promises.unlink(tmp);
         await fs.promises.unlink(`${tmp}.DEC`);

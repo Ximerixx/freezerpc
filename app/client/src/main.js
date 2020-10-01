@@ -7,6 +7,7 @@ import VueEsc from 'vue-esc';
 import VueSocketIO from 'vue-socket.io';
 
 //Globals
+let ipcRenderer;
 //Axios
 let axiosInstance = axios.create({
     baseURL: `${window.location.origin}`,
@@ -226,7 +227,7 @@ new Vue({
                 this.position = this.audio.currentTime * 1000;
 
                 //Gapless playback
-                if (this.position >= (this.duration() - 5000) && this.state == 2) {
+                if (this.position >= (this.duration() - 7000) && this.state == 2) {
                     if (!this.shuffle && this.repeat != 2)
                         this.loadGapless();
                 }
@@ -364,7 +365,6 @@ new Vue({
 
             //Update settings in electron
             if (this.settings.electron) {
-                const {ipcRenderer} = window.require('electron');
                 ipcRenderer.send('updateSettings', this.settings);
             }
         },
@@ -422,7 +422,6 @@ new Vue({
 
             //Update in electron 
             if (this.settings.electron) {
-                const {ipcRenderer} = window.require('electron');
                 ipcRenderer.send('playing', this.state == 2);
             }
         }
@@ -455,11 +454,11 @@ new Vue({
                 typeof navigator === 'object' && typeof navigator.userAgent === 'string' && 
                 navigator.userAgent.indexOf('Electron') >= 0
         ));
+        if (this.settings.electron)
+            ipcRenderer = window.require('electron').ipcRenderer;
 
         //Setup electron callbacks
         if (this.settings.electron) {
-            const {ipcRenderer} = window.require('electron');
-
             //Save files on exit
             ipcRenderer.on('onExit', async () => {
                 this.pause();

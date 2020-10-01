@@ -14,8 +14,7 @@ function assetPath(a) {
     return path.join(__dirname, 'assets', a);
 }
 
-async function createWindow() {
-    //Start server
+async function startServer() {
     settings = await createServer(true, (e) => {
         //Server error
         shouldExit = true;
@@ -28,7 +27,9 @@ async function createWindow() {
             buttons: ['Close']
         });
     });
+}
 
+async function createWindow() {
     //Create window
     win = new BrowserWindow({
         width: settings.width,
@@ -62,6 +63,7 @@ async function createWindow() {
         if (shouldExit) {
             win = null;
             tray = null;
+            app.quit();
             return true;
         }
 
@@ -81,15 +83,22 @@ async function createWindow() {
 
 //Create window
 app.on('ready', async () => {
+    await startServer();
     createWindow();
 
     //Create Tray
     tray = new Tray(assetPath("icon-taskbar.png"));
-    tray.on('double-click', () => win.show());
-    tray.on('click', () => win.show());
+    tray.on('double-click', () => restoreWindow());
+    tray.on('click', () => restoreWindow());
 
     setTray();
 });
+
+//Restore or create new window
+function restoreWindow() {
+    if (win) return win.show();
+    createWindow();
+}
 
 //Update tray context menu
 function setTray() {
@@ -97,7 +106,7 @@ function setTray() {
         {
             label: 'Restore', 
             type: 'normal',
-            click: () => win.show()
+            click: () => restoreWindow()
         },
         playing ?
         {
@@ -125,6 +134,7 @@ function setTray() {
             type: 'normal',
             click: () => {
                 shouldExit = true;
+                if (!win) return app.quit();
                 win.close();
             }
         }
