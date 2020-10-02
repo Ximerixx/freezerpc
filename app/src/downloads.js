@@ -291,9 +291,12 @@ class Download {
                 if (skip) return;
                 if (this.downloaded != this.size) return;
 
-                outFile.close(() => {
-                    this._finished(tmp);
+                outFile.on('finish', () => {
+                    outFile.close(() => {
+                        this._finished(tmp);
+                    });
                 });
+                outFile.end();
             });
             //Progress
             r.on('data', (c) => {
