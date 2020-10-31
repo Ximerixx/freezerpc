@@ -1,7 +1,7 @@
 {
   "name": "freezer",
   "private": true,
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "",
   "main": "background.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "lastfmapi": "^0.1.1",
     "metaflac-js2": "^1.0.7",
     "nedb": "^1.8.0",
-    "nodeezcryptor": "git+https://notabug.org/xefglm/nodeezcryptor",
+    "nodeezcryptor": "git+https://codeberg.org/exttex/nodeezcryptor",
     "sanitize-filename": "^1.6.3",
     "socket.io": "^2.3.0",
     "winston": "^3.3.3"

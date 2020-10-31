@@ -33,7 +33,7 @@
                             <v-icon>mdi-play</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>Play</v-list-item-title>
+                            <v-list-item-title>{{$t("Play")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                     <!-- Add to library -->
@@ -42,7 +42,7 @@
                             <v-icon>mdi-heart</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>Add to library</v-list-item-title>
+                            <v-list-item-title>{{$t("Add to library")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                     <!-- Download -->
@@ -51,7 +51,7 @@
                             <v-icon>mdi-download</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>Download</v-list-item-title>
+                            <v-list-item-title>{{$t("Download")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
 

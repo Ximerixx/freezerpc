@@ -1,29 +1,29 @@
 <template>
 <div>
-    <h1>Library</h1>
+    <h1>{{$t("Library")}}</h1>
 
     <v-tabs v-model='tab'>
         <v-tab key='tracks'>
-            Tracks
+            {{$t("Tracks")}}
         </v-tab>
         <v-tab key='albums'>
-            Albums
+            {{$t("Albums")}}
         </v-tab>
         <v-tab key='artists'>
-            Artists
+            {{$t("Artists")}}
         </v-tab>
         <v-tab key='playlists'>
-            Playlists
+            {{$t("Playlists")}}
         </v-tab>
         <v-tab key='history'>
-            History
+            {{$t("History")}}
         </v-tab>
     </v-tabs>
 
     <v-tabs-items v-model='tab'>
         <!-- Tracks -->
         <v-tab-item key='tracks'>
-            <LibraryTracks height='calc(100vh - 240px)'></LibraryTracks>
+            <LibraryTracks height='calc(100vh - 290px)'></LibraryTracks>
         </v-tab-item>
 
         <!-- Albums -->

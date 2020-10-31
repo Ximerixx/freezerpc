@@ -15,7 +15,7 @@
 
         <v-list-item-content>
             <v-list-item-title>{{playlist.title}}</v-list-item-title>
-            <v-list-item-subtitle>{{$numberString(playlist.trackCount)}} tracks</v-list-item-subtitle>
+            <v-list-item-subtitle>{{$numberString(playlist.trackCount)}} {{$t("tracks")}}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
             <!-- Context menu -->
@@ -32,7 +32,7 @@
                             <v-icon>mdi-play</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>Play</v-list-item-title>
+                            <v-list-item-title>{{$t('Play')}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
 
@@ -42,7 +42,7 @@
                             <v-icon>mdi-playlist-remove</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>Remove</v-list-item-title>
+                            <v-list-item-title>{{$t('Remove')}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                     
@@ -52,7 +52,7 @@
                             <v-icon>mdi-download</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>Download</v-list-item-title>
+                            <v-list-item-title>{{$t('Download')}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
 

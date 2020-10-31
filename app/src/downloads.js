@@ -1,158 +1,46 @@
-const {Settings} = require('./settings');
-const {Track} = require('./definitions');
-const decryptor = require('nodeezcryptor');
-const fs = require('fs');
-const path = require('path');
-const logger = require('./winston');
-const https = require('https');
+const {DeezerAPI} = require('./deezer');
 const Datastore = require('nedb');
+const {Settings} = require('./settings');
+const fs = require('fs');
+const https = require('https');
+const logger = require('./winston');
+const path = require('path');
+const decryptor = require('nodeezcryptor');
+const sanitize = require('sanitize-filename');
 const ID3Writer = require('browser-id3-writer');
 const Metaflac = require('metaflac-js2');
-const sanitize = require("sanitize-filename");
-const { DeezerAPI } = require('./deezer');
+const { Track, Lyrics } = require('./definitions');
 
-class Downloads {
-    constructor(settings, qucb) {
-        this.downloads = [];
-        this.downloading = false;
-        this.download;
+let deezer;
 
+class DownloadManager {
+
+    constructor(settings, callback) {
         this.settings = settings;
-        //Queue update callback
-        this.qucb = qucb;
-    }
-
-    //Add track to queue
-    async add(track, quality = null) {
-        if (this.downloads.filter((e => e.id == track.id)).length > 0) {
-            //Track already in queue
-            return;
-        }
-
-        //Sanitize quality
-        let q = this.settings.downloadsQuality;
-        if (quality) q = parseInt(quality.toString(), 10);
-
-        //Create download
-        let outpath = this.generateTrackPath(track, q); 
-        let d = new Download(
-            track, 
-            outpath, 
-            q, 
-            () => {this._downloadDone();}
-        );
-        this.downloads.push(d);
-
-        //Update callback
-        if (this.qucb) this.qucb();
-
-        //Save to DB
-        await new Promise((res, rej) => {
-            this.db.insert(d.toDB(), (e) => {
-                res();
-            });
-        });
-    }
-
-    generateTrackPath(track, quality) {
-        //Generate filename
-        let fn = this.settings.downloadFilename;
-        
-        //Disable feats for single artist
-        let feats = '';
-        if (track.artists.length >= 2) feats = track.artists.slice(1).map((a) => a.name).join(', ');
-        
-        let props = {
-            '%title%': track.title,
-            '%artists%': track.artistString,
-            '%artist%': track.artists[0].name,
-            '%feats%': feats,
-            '%trackNumber%': (track.trackNumber ? track.trackNumber : 1).toString(),
-            '%0trackNumber%': (track.trackNumber ? track.trackNumber : 1).toString().padStart(2, '0'),
-            '%album%': track.album.title
-        };
-        for (let k of Object.keys(props)) {
-            fn = fn.replace(new RegExp(k, 'g'), sanitize(props[k]));
-        }
-        //Generate folders
-        let p = this.settings.downloadsPath;
-        if (this.settings.createArtistFolder) p = path.join(p, sanitize(track.artists[0].name));
-        if (this.settings.createAlbumFolder) p = path.join(p, sanitize(track.album.title));
-
-        return path.join(p, fn);
-    }
-
-    async start() {
-        //Already downloading
-        if (this.download || this.downloads.length == 0) return;
-        
-        this.downloading = true;
-        await this._downloadDone();
-    }
-
-    async stop() {
-        //Not downloading
-        if (!this.download || !this.downloading) return;
         this.downloading = false;
-        await this.download.stop();
+        this.callback = callback;
 
-        //Back to queue if undone
-        if (this.download.state < 3) this.downloads.unshift(this.download);
-        
-        this.download = null;
+        this.queue = [];
+        this.threads = [];
 
-        //Update callback
-        if (this.qucb) this.qucb();
+        this.updateRequests = 0;
     }
 
-    //On download finished
-    async _downloadDone() {
-        //Save to DB
-        if (this.download) {
-            await new Promise((res, rej) => {
-                this.db.update({_id: this.download.id}, {
-                    state: this.download.state,
-                    fallback: this.download.fallback,
-                }, (e) => {
-                    res();
-                });
-                // this.db.remove({_id: this.download.id}, (e) => {
-                //     res();
-                // });
-            });
-        }
-
-        this.download = null;
-
-        //All downloads done
-        if (this.downloads.length == 0 || this.downloading == false) {
-            this.downloading = false;
-            if (this.qucb) this.qucb();
-            return;
-        }
-
-        this.download = this.downloads[0];
-        this.downloads = this.downloads.slice(1);
-        this.download.start();
-
-        //Update callback
-        if (this.qucb) this.qucb();
+    //Update DeezerAPI global
+    setDeezer(d) {
+        deezer = d;
     }
 
-    //Load downloads info
     async load() {
         this.db = new Datastore({filename: Settings.getDownloadsDB(), autoload: true});
-        //Load downloads
-        await new Promise((res, rej) => {
-            this.db.find({}, (err, docs) => {
-                if (err) return rej();
-                if (!docs) return;
 
-                for (let d of docs) {
-                    if (d.state < 3 && d.state >= 0) this.downloads.push(Download.fromDB(d, () => {this._downloadDone();}));
-                    //TODO: Ignore for now completed
+        //Load from DB
+        await new Promise((resolve) => {
+            this.db.find({state: 0}, (err, docs) => {
+                if (!err) {
+                    this.queue = docs.map(d => Download.fromDB(d));
                 }
-                res();
+                resolve();
             });
         });
 
@@ -162,138 +50,211 @@ class Downloads {
         }
     }
 
-    //Remove download
-    async delete(index) {
-        //Clear all
-        if (index == -1) {
-            this.downloads = [];
-            await new Promise((res, rej) => {
-                this.db.remove({state: 0}, {multi: true}, (e) => {});
-                res();
-            });
+    async start() {
+        this.downloading = true;
+        await this.updateQueue();
+    }
 
-            if (this.qucb) this.qucb();
+    async stop() {
+        this.downloading = false;
+        //Stop all threads
+        let nThreads = this.threads.length;
+        for (let i=nThreads-1; i>=0; i--) {
+            await this.threads[i].stop();
+        }
+        this.updateQueue();
+    }
+
+    async add(track, quality) {
+        //Sanitize quality
+        let q = this.settings.downloadsQuality;
+        if (quality) 
+            q = parseInt(quality.toString(), 10);
+        let download = new Download(track, q, 0);
+
+        //Check if in queue
+        if (this.queue.some(d => d.track.id == track.id)) {
             return;
         }
 
-        //Remove single
-        if (index >= this.downloads.length) return;
-        await new Promise((res, rej) => {
-            this.db.remove({_id: this.downloads[index].id}, {}, (e) => {});
-            res();
-        });
-        this.downloads.splice(index, 1);
+        //Check if in DB
+        let dbDownload = await new Promise((resolve) => {
+            this.db.find({_id: download.track.id}, (err, docs) => {
+                if (err) return resolve(null);
+                if (docs.length == 0) return resolve(null);
 
-        if (this.qucb) this.qucb();
+                //Update download as not done, will be skipped while downloading
+                this.db.update({_id: download.track.id}, {state: 0, quality: download.quality}, {}, () => {
+                    resolve(Download.fromDB(docs[0]));
+                });
+            });
+        });
+
+        //Insert to DB
+        if (!dbDownload) {
+            await new Promise((resolve) => {
+                this.db.insert(download.toDB(), () => {
+                    resolve();
+                });
+            });
+        }
+
+        //Queue
+        this.queue.push(download);
+        this.updateQueue();
+    }
+
+    async delete(index) {
+        //-1 = Delete all
+        if (index == -1) {
+            let ids = this.queue.map(q => q.track.id);
+            this.queue = [];
+            //Remove from DB
+            await new Promise((res) => {
+                this.db.remove({_id: {$in: ids}}, {multi: true}, () => {
+                    res();
+                })
+            });
+            this.updateQueue();
+            return;
+        }
+
+        //Remove single item
+        let id = this.queue[index].track.id;
+        this.queue.splice(index, 1);
+        await new Promise((res) => {
+            this.db.remove({_id: id}, {}, () => {
+                res();
+            })
+        })
+        this.updateQueue();
+    }
+
+    //Thread safe update
+    async updateQueue() {
+        this.updateRequests++;
+        if (this._updatePromise) return;
+        this._updatePromise = this._updateQueue();
+        await this._updatePromise;
+        this._updatePromise = null;
+        this.updateRequests--;
+        if (this.updateRequests > 0) {
+            this.updateRequests--;
+            this.updateQueue();
+        }
+    }
+
+    async _updateQueue() {
+        //Finished downloads
+        if (this.threads.length > 0) {
+            for (let i=this.threads.length-1; i>=0; i--) {
+                if (this.threads[i].download.state == 3 || this.threads[i].download.state == -1) {
+                    //Update DB
+                    await new Promise((resolve) => {
+                        this.db.update({_id: this.threads[i].download.track.id}, {state: this.threads[i].download.state}, {}, () => {
+                            resolve();
+                        });
+                    });
+                    this.threads.splice(i, 1);
+                } else {
+                    //Remove if stopped
+                    if (this.threads[i].stopped) {
+                        this.queue.unshift(this.threads[i].download);
+                        this.threads.splice(i, 1);
+                    }
+                }    
+            }
+        }
+        //Create new threads
+        if (this.downloading) {
+            let nThreads = this.settings.downloadThreads - this.threads.length;
+            for (let i=0; i<nThreads; i++) {
+                if (this.queue.length > 0) {
+                    let thread = new DownloadThread(this.queue[0], () => {this.updateQueue();}, this.settings);
+                    thread.start();
+                    this.threads.push(thread);
+                    this.queue.splice(0, 1);
+                }
+            }
+        }
+        //Stop downloading if queues empty
+        if (this.queue.length == 0 && this.threads.length == 0 && this.downloading)
+            this.downloading = false;
+
+        //Update UI
+        if (this.callback)
+            this.callback();
     }
 }
 
-class Download {
-    constructor(track, path, quality, onDone) {
-        this.track = track;
-        this.id = track.id;
-        this.path = path;
-        this.quality = quality;
-        this.onDone = onDone;
-
-        //States:
-        //0 - none/stopped
-        //1 - downloading
-        //2 - post-processing
-        //3 - done
-        //-1 - download error
-        this.state = 0;
-        this.fallback = false;
-
-        this._request;
-        //Post Processing Promise
-        this._ppp;
-
-        this.downloaded = 0;
-        this.size = 0;
+class DownloadThread {
+    constructor (download, callback, settings) {
+        this.download = download;
+        this.callback = callback;
+        this.settings = settings;
+        this.stopped = true;
+        this.isUserUploaded = download.track.id.toString().startsWith('-');
     }
 
-    //Serialize to database json
-    toDB() {
-        return {
-            _id: this.id,
-            path: this.path,
-            quality: this.quality,
-            track: this.track,
-            state: this.state,
-            fallback: this.fallback
-        }
-        
-    }
-
-    //Create download from DB document
-    static fromDB(doc, onDone) {
-        let d = new Download(doc.track, doc.path, doc.quality, onDone);
-        d.fallback = doc.fallback ? true : false; //Null check
-        d.state = doc.state;
-        return d;
+    //Callback wrapper
+    _cb() {
+        if (this.callback) this.callback();
     }
 
     async start() {
-        this.state = 1;
+        this.download.state = 1;
+        this.stopped = false;
 
+        //Fallback
+        this.qualityInfo = await deezer.fallback(this.download.track.streamUrl, this.download.quality);
+        if (!this.qualityInfo) {
+            this.download.state = -1;
+            return;
+        }
+
+        //Get track info
+        if (!this.isUserUploaded) {
+            this.rawTrack = await deezer.callApi('deezer.pageTrack', {'sng_id': this.download.track.id});
+            this.track = new Track(this.rawTrack.results.DATA);
+            this.publicTrack = await deezer.callPublicApi('track', this.track.id);
+            this.publicAlbum = await deezer.callPublicApi('album', this.track.album.id);
+        }
+
+        //Check if exists
+        let outPath = this.generatePath(this.qualityInfo.quality);
+        try {
+            await fs.promises.access(outPath, fs.constants.R_OK);
+            //File exists
+            this.download.state = 3;
+            return this._cb();
+        } catch (_) {}
+        
         //Path to temp file
-        let tmp = path.join(Settings.getTempDownloads(), `${this.track.id}.ENC`);
+        let tmp = path.join(Settings.getTempDownloads(), `${this.download.track.id}.ENC`);
         //Get start offset
         let start = 0;
         try {
             let stat = await fs.promises.stat(tmp);
             if (stat.size) start = stat.size;
+        
+        // eslint-disable-next-line no-empty
         } catch (e) {}
-        this.downloaded = start;
+        this.download.downloaded = start;
 
-        //Get download info
-        let streamInfo = Track.getUrlInfo(this.track.streamUrl);
-        this.url = DeezerAPI.getUrl(streamInfo.trackId, streamInfo.md5origin, streamInfo.mediaVersion, this.quality);
-        this._request = https.get(this.url, {headers: {'Range': `bytes=${start}-`}}, (r) => {
+        //Download
+        let url = DeezerAPI.getUrl(this.qualityInfo.trackId, this.qualityInfo.md5origin, this.qualityInfo.mediaVersion, this.qualityInfo.quality);
+        if (this.stopped) return;
+        this._request = https.get(url, {headers: {'Range': `bytes=${start}-`}}, (r) => {
+            this._response = r;
             let outFile = fs.createWriteStream(tmp, {flags: 'a'});
-            let skip = false;
-            //Error
-            if (r.statusCode >= 400) {
-                //Fallback on error
-                if (this.quality > 1) {
-                    if (this.quality == 3) this.quality = 1;
-                    if (this.quality == 9) this.quality = 3;
-                    this.url = null;
-                    this.fallback = true;
-                    return this.start();
-                };
-                //Error
-                this.state = -1;
-                logger.error(`Undownloadable track ID: ${this.track.id}`);
-                return this.onDone();
-            } else {
-                this.path += (this.quality == 9) ? '.flac' : '.mp3';
-                
-                //Check if file exits
-                fs.access(this.path, (err) => {
-                    if (err) {
-
-                    } else {
-                        logger.warn('File already exists! Skipping...');
-                        outFile.close();
-                        skip = true;
-                        this._request.end();
-                        this.state = 3;
-                        return this.onDone();
-                    }
-                    
-                })
-            }
-
+            
             //On download done
             r.on('end', () => {
-                if (skip) return;
-                if (this.downloaded != this.size) return;
+                if (this.download.size != this.download.downloaded) return;
 
                 outFile.on('finish', () => {
                     outFile.close(() => {
-                        this._finished(tmp);
+                        this.postPromise = this._post(tmp);
                     });
                 });
                 outFile.end();
@@ -301,7 +262,7 @@ class Download {
             //Progress
             r.on('data', (c) => {
                 outFile.write(c);
-                this.downloaded += c.length;
+                this.download.downloaded += c.length;
             });
 
             r.on('error', (e) => {
@@ -311,53 +272,136 @@ class Download {
 
             //Save size
             this.size = parseInt(r.headers['content-length'], 10) + start;
-            
+            this.download.size = this.size;
         });
     }
 
-    //Stop current request
     async stop() {
-        this._request.destroy();
-        this._request = null;
-        this.state = 0;
-        if (this._ppp) await this._ppp;
+        //If post processing, wait for it
+        if (this.postPromise) {
+            await this._postPromise;
+            return this._cb();
+        }
+
+        //Cancel download
+        if (this._response)
+            this._response.destroy();
+        if (this._request)
+            this._request.destroy();
+
+        // this._response = null;
+        // this._request = null;
+        
+        this.stopped = true;
+        this.download.state = 0;
+        this._cb();
     }
 
-    async _finished(tmp) {
-        this.state = 2;
-        
-        //Create post processing promise
-        let resolve;
-        this._ppp = new Promise((res, rej) => {
-            resolve = res;
-        });
-
-        //Prepare output directory
-        try {
-            await fs.promises.mkdir(path.dirname(this.path), {recursive: true})
-        } catch (e) {};
+    async _post(tmp) {
+        this.download.state = 2;
 
         //Decrypt
-        //this.path += (this.quality == 9) ? '.flac' : '.mp3';
-        decryptor.decryptFile(decryptor.getKey(this.track.id), tmp, `${tmp}.DEC`);
-        await fs.promises.copyFile(`${tmp}.DEC`, this.path);
-        //Delete encrypted
-        await fs.promises.unlink(tmp);
+        decryptor.decryptFile(decryptor.getKey(this.qualityInfo.trackId), tmp, `${tmp}.DEC`);
+        let outPath = this.generatePath(this.qualityInfo.quality);
+        await fs.promises.mkdir(path.dirname(outPath), {recursive: true});
+        await fs.promises.copyFile(`${tmp}.DEC`, outPath);
         await fs.promises.unlink(`${tmp}.DEC`);
+        await fs.promises.unlink(tmp);
 
-        //Tags
-        await this.tagAudio(this.path, this.track);
+        if (!this.isUserUploaded) {
+            //Tag
+            await this.tagTrack(outPath);
 
-        //Finish
-        this.state = 3;
-        resolve();
-        this._ppp = null;
-        this.onDone();
+            //Lyrics
+            if (this.settings.downloadLyrics) {
+                let lrcFile = outPath.split('.').slice(0, -1).join('.') + '.lrc';
+                let lrc;
+                try {
+                    lrc = this.generateLRC();
+                } catch (e) {
+                    logger.warn('Error getting lyrics! ' + e);
+                }
+                if (lrc) {
+                    await fs.promises.writeFile(lrcFile, lrc, {encoding: 'utf-8'});
+                }
+            }
+        }
+        
+
+        this.download.state = 3;
+        this._cb();
     }
 
-    //Download cover to buffer
+    async tagTrack(path) {
+        let cover;
+        try {
+            cover = await this.downloadCover(this.track.albumArt.full);
+        } catch (e) {}
+        
+        //Genre tag
+        let genres = [];
+        if (this.publicAlbum.genres && this.publicAlbum.genres.data)
+            genres = this.publicAlbum.genres.data.map(g => g.name);
+        
+        if (path.toLowerCase().endsWith('.mp3')) {
+            //Load
+            const audioData = await fs.promises.readFile(path);
+            const writer = new ID3Writer(audioData);
+
+            writer.setFrame('TIT2', this.track.title);
+            writer.setFrame('TPE1', this.track.artists.map((a) => a.name));
+            if (this.publicAlbum.artist) writer.setFrame('TPE2', this.publicAlbum.artist.name);
+            writer.setFrame('TALB', this.track.album.title);
+            writer.setFrame('TRCK', this.track.trackNumber);
+            writer.setFrame('TPOS', this.track.diskNumber);
+            writer.setFrame('TCON', genres);
+            let date = new Date(this.publicTrack.release_date);
+            writer.setFrame('TYER', date.getFullYear());
+            writer.setFrame('TDAT', `${date.getMonth().toString().padStart(2, '0')}${date.getDay().toString().padStart(2, '0')}`);
+            if (this.publicTrack.bpm > 2) writer.setFrame('TBPM', this.publicTrack.bpm);
+            if (this.publicAlbum.label) writer.setFrame('TPUB', this.publicAlbum.label);
+            writer.setFrame('TSRC', this.publicTrack.isrc);
+            if (this.rawTrack.results.LYRICS) writer.setFrame('USLT', {
+                lyrics: this.rawTrack.results.LYRICS.LYRICS_TEXT,
+                language: 'eng',
+                description: 'Unsychronised lyrics'
+            });
+            
+            if (cover) writer.setFrame('APIC', {type: 3, data: cover, description: 'Cover'});
+            writer.addTag();
+
+            //Write
+            await fs.promises.writeFile(path, Buffer.from(writer.arrayBuffer));
+            return;
+        }
+
+        //Tag FLAC
+        if (path.toLowerCase().endsWith('.flac')) {
+            const flac = new Metaflac(path);
+            flac.removeAllTags();
+
+            flac.setTag(`TITLE=${this.track.title}`);
+            flac.setTag(`ALBUM=${this.track.album.title}`);
+            flac.setTag(`ARTIST=${this.track.artistString}`);
+            flac.setTag(`TRACKNUMBER=${this.track.trackNumber}`);
+            flac.setTag(`DISCNUMBER=${this.track.diskNumber}`);
+            if (this.publicAlbum.artist) flac.setTag(`ALBUMARTIST=${this.publicAlbum.artist.name}`);
+            flac.setTag(`GENRE=${genres.join(", ")}`);
+            flac.setTag(`DATE=${this.publicTrack.release_date}`);
+            if (this.publicTrack.bpm > 2) flac.setTag(`BPM=${this.publicTrack.bpm}`);
+            if (this.publicAlbum.label) flac.setTag(`LABEL=${this.publicAlbum.label}`);
+            flac.setTag(`ISRC=${this.publicTrack.isrc}`);
+            if (this.publicAlbum.upc) flac.setTag(`BARCODE=${this.publicAlbum.upc}`);
+            if (this.rawTrack.results.LYRICS) flac.setTag(`LYRICS=${this.rawTrack.results.LYRICS.LYRICS_TEXT}`);
+
+            if (cover) flac.importPicture(cover);
+
+            flac.save();
+        }
+    }
+
     async downloadCover(url) {
-        return await new Promise((res, rej) => {
+        return await new Promise((res) => {
             let out = Buffer.alloc(0);
             https.get(url, (r) => {
                 r.on('data', (d) => {
@@ -370,49 +414,105 @@ class Download {
         });
     }
 
-    //Write tags to audio file
-    async tagAudio(path, track) {
-        let cover;
-        try {
-            cover = await this.downloadCover(track.albumArt.full);
-        } catch (e) {}
+    generateLRC() {
+        //Check if exists
+        if (!this.rawTrack.results.LYRICS || !this.rawTrack.results.LYRICS.LYRICS_SYNC_JSON) return;
+        let lyrics = new Lyrics(this.rawTrack.results.LYRICS);
+        if (lyrics.lyrics.length == 0) return;
+        //Metadata
+        let out = `[ar:${this.track.artistString}]\r\n[al:${this.track.album.title}]\r\n[ti:${this.track.title}]\r\n`;
+        //Lyrics
+        for (let l of lyrics.lyrics) {
+            if (l.lrcTimestamp && l.text)
+                out += `${l.lrcTimestamp}${l.text}\r\n`;
+        }
+        return out;
+    }
+
+    generatePath(quality) {
+        //User uploaded mp3s
+        if (this.isUserUploaded) {          
+            //Generate path
+            let p = this.settings.downloadsPath;
+            if (this.settings.createArtistFolder && this.download.track.artists[0].name.length > 0)
+                p = path.join(p, sanitize(this.download.track.artists[0].name));
+            if (this.settings.createAlbumFolder && this.download.track.album.title.length > 0)
+                p = path.join(p, sanitize(this.download.track.album.title));
+            //Filename
+            let out = path.join(p, sanitize(this.download.track.title));
+            if (!out.includes('.'))
+                out += '.mp3';
+            return out;
+        }
+
+        //Generate filename
+        let fn = this.settings.downloadFilename;
         
+        //Disable feats for single artist
+        let feats = '';
+        if (this.track.artists.length >= 2) 
+            feats = this.track.artists.slice(1).map((a) => a.name).join(', ');
 
-        if (path.toLowerCase().endsWith('.mp3')) {
-            //Load
-            const audioData = await fs.promises.readFile(path);
-            const writer = new ID3Writer(audioData);
-
-            writer.setFrame('TIT2', track.title);
-            if (track.artists) writer.setFrame('TPE1', track.artists.map((a) => a.name));
-            if (track.album) writer.setFrame('TALB', track.album.title);
-            if (track.trackNumber) writer.setFrame('TRCK', track.trackNumber);
-            if (cover) writer.setFrame('APIC', {
-                    type: 3,
-                    data: cover,
-                    description: 'Cover'
-                });
-            writer.addTag();
-
-            //Write
-            await fs.promises.writeFile(path, Buffer.from(writer.arrayBuffer));
+        //Date
+        let date = new Date(this.publicTrack.release_date);
+        
+        let props = {
+            '%title%': this.track.title,
+            '%artists%': this.track.artistString,
+            '%artist%': this.track.artists[0].name,
+            '%feats%': feats,
+            '%trackNumber%': (this.track.trackNumber ? this.track.trackNumber : 1).toString(),
+            '%0trackNumber%': (this.track.trackNumber ? this.track.trackNumber : 1).toString().padStart(2, '0'),
+            '%album%': this.track.album.title,
+            '%year%': date.getFullYear().toString(),
+        };
+        for (let k of Object.keys(props)) {
+            fn = fn.replace(new RegExp(k, 'g'), sanitize(props[k]));
         }
-        //Tag FLAC
-        if (path.toLowerCase().endsWith('.flac')) {
-            const flac = new Metaflac(path);
-            flac.removeAllTags();
+        //Generate folders
+        let p = this.settings.downloadsPath;
+        if (this.settings.createArtistFolder) p = path.join(p, sanitize(this.track.artists[0].name));
+        if (this.settings.createAlbumFolder) p = path.join(p, sanitize(this.track.album.title));
 
-            flac.setTag(`TITLE=${track.title}`);
-            if (track.album)flac.setTag(`ALBUM=${track.album.title}`);
-            if (track.trackNumber) flac.setTag(`TRACKNUMBER=${track.trackNumber}`);
-            if (track.artistString) flac.setTag(`ARTIST=${track.artistString}`);
-            if (cover) flac.importPicture(cover);
-
-            flac.save();
+        //Extension
+        if (quality.toString() == '9') {
+            fn += '.flac';
+        } else {
+            fn += '.mp3';
         }
 
+        return path.join(p, fn);
     }
 }
 
+class Download {
+    constructor (track, quality, state) {
+        this.track = track;
+        this.quality = quality;
+        // 0 - none
+        // 1 - downloading
+        // 2 - postprocess
+        // 3 - done
+        // -1 - error
+        this.state = state;
 
-module.exports = {Downloads, Download};
+        //Updated from threads
+        this.downloaded = 0;
+        this.size = 1;
+    }
+
+    toDB() {
+        return {
+            _id: this.track.id,
+            track: this.track,
+            quality: this.quality,
+            state: this.state
+        }
+    }
+
+    static fromDB(json) {
+        return new Download(json.track, json.quality, json.state);
+    }
+}
+
+module.exports = {DownloadManager}

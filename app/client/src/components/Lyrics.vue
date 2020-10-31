@@ -34,7 +34,7 @@
     <!-- Error -->
     <div v-if='!loading && (!lyrics || (lyrics.text.length == 0 && lyrics.lyrics.length == 0))' class='pa-4 text-center'>
         <span class='red--text text-h5'>
-            Error loading lyrics or lyrics not found!
+            {{$t("Error loading lyrics or lyrics not found!")}}
         </span>
     </div>
 

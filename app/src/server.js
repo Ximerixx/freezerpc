@@ -4,15 +4,15 @@ const https = require('https');
 const fs = require('fs');
 const axios = require('axios').default;
 const logger = require('./winston');
-const {DeezerAPI, DeezerDecryptionStream} = require('./deezer');
+const {DeezerAPI, DeezerStream} = require('./deezer');
 const {Settings} = require('./settings');
 const {Track, Album, Artist, Playlist, DeezerProfile, SearchResults, DeezerLibrary, DeezerPage, Lyrics} = require('./definitions');
-const {Downloads} = require('./downloads');
+const {DownloadManager} = require('./downloads');
 const {Integrations} = require('./integrations');
 
 let settings;
 let deezer;
-let downloads;
+let downloadManager;
 let integrations;
 
 let sockets = [];
@@ -23,13 +23,16 @@ app.use(express.json({limit: '50mb'}));
 app.use(express.static(path.join(__dirname, '../client', 'dist')));
 //Server
 const server = require('http').createServer(app);
-const io = require('socket.io').listen(server);
+const io = require('socket.io').listen(server, {
+    path: '/socket',
+});
 
 //Get playback info
 app.get('/playback', async (req, res) => {
     try {
         let data = await fs.promises.readFile(Settings.getPlaybackInfoPath(), 'utf-8');
         return res.json(data);
+    // eslint-disable-next-line no-empty
     } catch (e) {}
     
     return res.json({});
@@ -53,7 +56,7 @@ app.get('/settings', (req, res) => {
 app.post('/settings', async (req, res) => {
     if (req.body) {
         Object.assign(settings, req.body);
-        downloads.settings = settings;
+        downloadManager.settings = settings;
         integrations.updateSettings(settings);
         await settings.save();
     }
@@ -70,6 +73,9 @@ app.post('/authorize', async (req, res) => {
     settings.arl = req.body.arl;
 
     if (await (deezer.authorize())) {
+        //Update download manager
+        downloadManager.setDeezer(deezer);
+
         res.status(200).send('OK');
         return;
     }
@@ -238,16 +244,22 @@ app.put('/library/:type', async (req, res) => {
 app.get('/streaminfo/:info', async (req, res) => {
     let info = req.params.info;
     let quality = req.query.q ? req.query.q : 3;
-    return res.json(await deezer.qualityFallback(info, quality));
+    let qualityInfo = await deezer.fallback(info, quality);
+
+    if (qualityInfo == null)
+        return res.sendStatus(404).end();
+        
+    //Generate stream URL before sending
+    qualityInfo.generateUrl();
+    return res.json(qualityInfo);
 });
 
 // S T R E A M I N G
-app.get('/stream/:info', (req, res) => {
+app.get('/stream/:info', async (req, res) => {
     //Parse stream info
     let quality = req.query.q ? req.query.q : 3;
     let streamInfo = Track.getUrlInfo(req.params.info);
-    let url = DeezerAPI.getUrl(streamInfo.trackId, streamInfo.md5origin, streamInfo.mediaVersion, quality);
-    let trackId = req.params.info.substring(35);
+    streamInfo.quality = quality;
 
     //MIME type of audio
     let mime = 'audio/mp3';
@@ -258,59 +270,38 @@ app.get('/stream/:info', (req, res) => {
     if (req.headers.range) range = req.headers.range;
     let rangeParts = range.replace(/bytes=/, '').split('-');
     let start = parseInt(rangeParts[0], 10);
-    let end = '';
+    let end = -1;
     if (rangeParts.length >= 2) end = rangeParts[1];
+    if (end == '' || end == ' ') end = -1;
 
-    //Round to 2048 for deezer
-    let dStart = start - (start % 2048);
+    //Create Stream
+    let stream = new DeezerStream(streamInfo, {});
+    await stream.open(start, end);
 
-    //Make request to Deezer CDN
-    let _request = https.get(url, {headers: {'Range': `bytes=${dStart}-${end}`}}, (r) => {
-        //Error from Deezer
-        //TODO: Quality fallback
-        if (r.statusCode < 200 || r.statusCode > 300) {
-            res.status(404);
-            return res.end();
-        }
+    //Range header
+    if (req.headers.range) {
+        end = (end == -1) ? stream.size - 1 : end;
+        res.writeHead(206, {
+            'Content-Range': `bytes ${start}-${end}/${stream.size}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': stream.size - start,
+            'Content-Type': mime
+        });
+    
+    //Normal (non range) request
+    } else {
+        res.writeHead(200, {
+            'Content-Length': stream.size,
+            'Content-Type': mime
+        });
+    }
 
-        let decryptor = new DeezerDecryptionStream(trackId, {offset: start});
-
-        //Get total size
-        let chunkSize = parseInt(r.headers["content-length"], 10)
-        let total = chunkSize;
-        if (start > 0) total += start;
-
-        //Ranged request
-        if (req.headers.range) {
-            end = total - 1
-
-            res.writeHead(206, {
-                'Content-Range': `bytes ${start}-${end}/${total}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunkSize,
-                'Content-Type': mime
-            });
-        
-        //Normal (non range) request
-        } else {
-            res.writeHead(200, {
-                'Content-Length': total,
-                'Content-Type': mime
-            });
-        }
-
-        //Pipe: Deezer -> Decryptor -> Response
-        decryptor.pipe(res);
-        r.pipe(decryptor);
-        
-    });
-    //Internet/Request error
-    _request.on('error', () => {
-        //console.log('Streaming error: ' + e);
-        //HTML audio will restart automatically
+    //Should force HTML5 to retry
+    stream.on('error', () => {
         res.destroy();
     });
 
+    stream.pipe(res);
 });
 
 //Get deezer page
@@ -361,6 +352,18 @@ app.get('/smarttracklist/:id', async (req, res) => {
     return res.send(tracks);
 });
 
+//Artist smart radio
+app.get('/smartradio/:id', async (req, res) => {
+    let data = await deezer.callApi('smart.getSmartRadio', {art_id: req.params.id});
+    res.send(data.results.data.map(t => new Track(t)));
+});
+
+//Track Mix
+app.get('/trackmix/:id', async (req, res) => {
+    let data = await deezer.callApi('song.getContextualTrackMix', {sng_ids: [req.params.id]});
+    res.send(data.results.data.map(t => new Track(t)));
+});
+
 //Load lyrics, ID = SONG ID
 app.get('/lyrics/:id', async (req, res) => {
     let data = await deezer.callApi('song.getLyrics', {
@@ -390,7 +393,7 @@ app.post('/downloads', async (req, res) => {
     let tracks = req.body;
     let quality = req.query.q;
     for (let track of tracks) {
-        downloads.add(track, quality);
+        downloadManager.add(track, quality);
     }
 
     res.status(200).send('OK');
@@ -398,30 +401,29 @@ app.post('/downloads', async (req, res) => {
 
 //PUT to /download to start
 app.put('/download', async (req, res) => {
-    await downloads.start();
+    await downloadManager.start();
     res.status(200).send('OK');
 });
 
 //DELETE to /download to stop/pause
 app.delete('/download', async (req, res) => {
-    await downloads.stop();
+    await downloadManager.stop();
     res.status(200).send('OK');
 })
 
 //Get all downloads
 app.get('/downloads', async (req, res) => {
     res.json({
-        downloading: downloads.downloading,
-        downloads: downloads.downloads.map((d) => {
-            return d.toDB();
-        })
+        downloading: downloadManager.downloading,
+        queue: downloadManager.queue,
+        threads: downloadManager.threads.map(t => t.download)
     });
 });
 
-//Delete singel download
+//Delete single download
 app.delete('/downloads/:index', async (req, res) => {
     let index = parseInt(req.params.index, 10);
-    await downloads.delete(index);
+    await downloadManager.delete(index);
     res.status(200).end();
 });
 
@@ -499,32 +501,27 @@ async function createServer(electron = false, ecb) {
     deezer = new DeezerAPI(settings.arl, electron);
 
     //Prepare downloads
-    downloads = new Downloads(settings, () => {
+    downloadManager = new DownloadManager(settings, () => {
         //Emit queue change to socket
         sockets.forEach((s) => {
             s.emit('downloads', {
-                downloading: downloads.downloading,
-                downloads: downloads.downloads
+                downloading: downloadManager.downloading,
+                queue: downloadManager.queue,
+                threads: downloadManager.threads.map(t => t.download)
             });
         });
     });
-    await downloads.load();
+    await downloadManager.load();
+    downloadManager.setDeezer(deezer);
     //Emit download progress updates
     setInterval(() => {
         sockets.forEach((s) => {
-            if (!downloads.download) {
-                s.emit('download', null);
-                return;
-            }
-            s.emit('download', {
-                id: downloads.download.id,
-                size: downloads.download.size,
-                downloaded: downloads.download.downloaded,
-                track: downloads.download.track,
-                path: downloads.download.path
-            });
+            if (!downloadManager.downloading && downloadManager.threads.length == 0)
+                return; 
+
+            s.emit('currentlyDownloading', downloadManager.threads.map(t => t.download));
         });
-    }, 350);
+    }, 400);
 
     //Integrations (lastfm, discord)
     integrations = new Integrations(settings);

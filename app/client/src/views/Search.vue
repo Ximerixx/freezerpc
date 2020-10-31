@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <h1 class='pb-2'>Search results for: "{{query}}"</h1>
+    <h1 class='pb-2'>{{$t('Search results for:')}} "{{query}}"</h1>
 
     <!-- Loading overlay -->
     <v-overlay opacity='0.9' :value='loading' z-index='3'>
@@ -12,24 +12,24 @@
 
     <!-- Error overlay -->
     <v-overlay opacity='0.9' :value='error' z-index="3">
-      <h1 class='red--text'>Error loading data!</h1><br>
-      <h3>Try again later!</h3>
+      <h1 class='red--text'>{{$t("Error loading data!")}}</h1><br>
+      <h3>{{$t("Try again later!")}}</h3>
     </v-overlay>
 
     <!-- Tabs -->
     <v-tabs v-model="tab">
       <v-tabs-slider></v-tabs-slider>
       <v-tab key="tracks">
-        <v-icon left>mdi-music-note</v-icon>Tracks
+        <v-icon left>mdi-music-note</v-icon>{{$t("Tracks")}}
       </v-tab>
       <v-tab>
-        <v-icon left>mdi-album</v-icon>Albums
+        <v-icon left>mdi-album</v-icon>{{$t("Albums")}}
       </v-tab>
       <v-tab>
-          <v-icon left>mdi-account-music</v-icon>Artists
+          <v-icon left>mdi-account-music</v-icon>{{$t("Artists")}}
       </v-tab>
       <v-tab>
-          <v-icon left>mdi-playlist-music</v-icon>Playlists
+          <v-icon left>mdi-playlist-music</v-icon>{{$t("Playlists")}}
       </v-tab>
     </v-tabs>
 
@@ -130,7 +130,7 @@ export default {
     //On click for track tile
     playTrack(i) {
       this.$root.queue.source = {
-        text: "Search",
+        text: this.$t("Search"),
         source: "search",
         data: this.query
       };

@@ -5,29 +5,29 @@
         <v-card>
 
             <v-card-title class='headline'>
-                Download {{tracks.length}} tracks
+                {{$t("Download")}} {{tracks.length}} {{$t("tracks")}}
             </v-card-title>
             <v-card-text class='pb-0'>
 
                 <v-select 
-                    label='Quality' 
+                    :label='$t("Quality")' 
                     persistent-hint
                     :items='qualities'
                     v-model='qualityString'
-                    :hint='"Estimated size: " + $filesize(estimatedSize)'
+                    :hint='$t("Estimated size:") + " " + $filesize(estimatedSize)'
                 ></v-select>
 
                 <v-checkbox
                     v-model='autostart'
-                    label='Start downloading'
+                    :label='$t("Start downloading")'
                 ></v-checkbox>
 
             </v-card-text>
 
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text @click='$emit("close")'>Cancel</v-btn>
-                <v-btn text @click='download'>Download</v-btn>
+                <v-btn text @click='$emit("close")'>{{$t("Cancel")}}</v-btn>
+                <v-btn text @click='download'>{{$t("Download")}}</v-btn>
             </v-card-actions>
 
         </v-card>

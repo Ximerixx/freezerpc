@@ -6,3 +6,4 @@ app/dist/
 app/client/node_modules/
 electron_dist/
 freezer-*.tgz
+translations.zip

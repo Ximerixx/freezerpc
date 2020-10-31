@@ -9,11 +9,11 @@
 
     <!-- Error -->
     <v-card class='text-center pa-4' v-if='error'>
-        <h1 class='text--red'>Error logging in!</h1>
-        <h3>Please try again later, or try another account.</h3>
+        <h1 class='text--red'>{{$t("Error logging in!")}}</h1>
+        <h3>{{$t("Please try again later, or try another account.")}}</h3>
         <v-btn large class='my-4' @click='logout'>
             <v-icon left>mdi-logout-variant</v-icon>
-            Logout
+            {{$t("Logout")}}
         </v-btn>
     </v-card>
 
@@ -21,23 +21,24 @@
     <div v-if='showForm' class='text-center'>
         <v-img src='banner.png' contain max-width='400px' class='py-8'></v-img>
 
-        <h3>Please login using your Deezer account:</h3>
+        <h3>{{$t("Please login using your Deezer account:")}}</h3>
         <v-btn large class='my-2 mb-4 primary' @click='browserLogin'>
             <v-icon left>mdi-open-in-app</v-icon>
-            Login using browser
+            {{$t("Login using browser")}}
         </v-btn>
 
-        <h3 class='mt-4'>...or paste your ARL/Token below:</h3>
-        <v-text-field label='ARL/Token' v-model='arl'>
+        <h3 class='mt-4'>{{$t("...or paste your ARL/Token below:")}}</h3>
+        <v-text-field :label='$t("ARL/Token")' v-model='arl'>
         </v-text-field>
 
         <v-btn large class='my-4 primary' :loading='authorizing' @click='login'>
-            <v-icon left>mdi-login-variant</v-icon>Login
+            <v-icon left>mdi-login-variant</v-icon>
+            {{$t("Login")}}
         </v-btn>
 
         <br>
         <span class='mt-8 text-caption'>
-            By using this program, you disagree with Deezer's ToS.
+            {{$t("By using this program, you disagree with Deezer's ToS.")}}
         </span>
     </div>
 
@@ -99,7 +100,7 @@ export default {
         },
         //Login using browser
         browserLogin() {
-            if (!this.$root.settings.electron) return alert('Only in Electron version!');
+            if (!this.$root.settings.electron) return alert(this.$t('Only in Electron version!'));
 
             const {ipcRenderer} = window.require('electron');
             ipcRenderer.on('browserLogin', (event, newArl) => {

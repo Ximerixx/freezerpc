@@ -12,10 +12,10 @@
             </v-list-item-avatar>
             <v-list-item-content>
                 <v-list-item-title>
-                    Streaming logging is disabled!
+                    {{$t("Stream logging is disabled!")}}
                 </v-list-item-title>
                 <v-list-item-subtitle>
-                    Enable it in settings for history to work properly.
+                    {{$t("Enable it in settings for history to work properly.")}}
                 </v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
@@ -56,7 +56,7 @@ export default {
         //Load as queue and play
         play(index) {
             this.$root.queue.source = {
-                text: 'History',
+                text: this.$t('History'),
                 source: 'history',
                 data: null
             };

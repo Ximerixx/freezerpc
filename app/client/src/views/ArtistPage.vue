@@ -16,18 +16,22 @@
             </v-overlay>
             <h1>{{artist.name}}</h1>
             <div class='mt-2' v-if='!loading'>
-                <span class='text-subtitle-2'>{{artist.albumCount}} albums</span><br>
-                <span class='text-subtitle-2'>{{$numberString(artist.fans)}} fans</span><br>
+                <span class='text-subtitle-2'>{{artist.albumCount}} {{$t("albums")}}</span><br>
+                <span class='text-subtitle-2'>{{$numberString(artist.fans)}} {{$t("fans")}}</span><br>
             </div>
             
             <div class='my-2'>
                 <v-btn color='primary' class='mx-1' @click='play'>
                     <v-icon left>mdi-play</v-icon>
-                    Play top
+                    {{$t("Play top")}}
                 </v-btn>
                 <v-btn color='red' class='mx-1' @click='library' :loading='libraryLoading'>
                     <v-icon left>mdi-heart</v-icon>
-                    Library
+                    {{$t("Library")}}
+                </v-btn>
+                <v-btn color='green' class='mx-1' @click='radio' v-if='artist.radio'>
+                    <v-icon left>mdi-radio</v-icon>
+                    {{$t("Radio")}}
                 </v-btn>
             </div>
         </div>
@@ -67,7 +71,7 @@
             
             <!-- Show all albums -->
             <v-list-item v-if='!allAlbums && index == 3' @click='allAlbums = true'>
-                <v-list-item-title>Show all albums</v-list-item-title>
+                <v-list-item-title>{{$t("Show all albums")}}</v-list-item-title>
             </v-list-item>
 
         </div>
@@ -91,7 +95,7 @@
             
             <!-- Show all albums -->
             <v-list-item v-if='!allSingles && index == 3' @click='showAllSingles'>
-                <v-list-item-title>Show all singles</v-list-item-title>
+                <v-list-item-title>{{$t('Show all singles')}}</v-list-item-title>
             </v-list-item>
 
         </div>
@@ -178,6 +182,19 @@ export default {
         showAllSingles() {
             this.allSingles = true;
             this.loadMoreAlbums();
+        },
+        async radio() {
+            //Load
+            let res = await this.$axios.get('/smartradio/' + this.artist.id);
+            if (res.data) {
+                this.$root.queue.source = {
+                    text: this.artist.name,
+                    source: 'radio',
+                    data: this.artist.id
+                };
+                this.$root.replaceQueue(res.data);
+                this.$root.playIndex(0);
+            }
         },
         //On scroll load more albums
         scroll(event) {

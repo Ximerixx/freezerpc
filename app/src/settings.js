@@ -28,6 +28,12 @@ class Settings {
         this.lastFM = null;
         this.enableDiscord = false;
         this.discordJoin = false;
+
+        this.showAutocomplete = true;
+        this.downloadThreads = 4;
+        this.downloadLyrics = true;
+        this.primaryColor = '#2196F3';
+        this.language = 'en';
     }
 
     //Based on electorn app.getPath
@@ -57,7 +63,12 @@ class Settings {
     }
     //Get path to downloads database
     static getDownloadsDB() {
-        return path.join(Settings.getDir(), 'downloads.db');
+        //Delete old DB if exists
+        let oldPath = path.join(Settings.getDir(), 'downloads.db');
+        if (fs.existsSync(oldPath))
+            fs.unlink(oldPath, () => {});
+
+        return path.join(Settings.getDir(), 'downloads2.db');
     }
     //Get path to temporary / unfinished downlaods
     static getTempDownloads() {

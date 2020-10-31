@@ -4,7 +4,7 @@
     <!-- Create playlist -->
     <v-card class='text-center pa-2' v-if='!addToPlaylist'> 
         <v-card-text>
-            <p primary-title class='display-1'>Create playlist</p>
+            <p primary-title class='display-1'>{{$t("Create playlist")}}</p>
             <v-text-field label='Title' class='ma-2' v-model='title'></v-text-field>
             <v-textarea class='mx-2' v-model='description' label='Description' rows='1' auto-grow></v-textarea>
             <v-select class='mx-2' v-model='type' :items='types' label='Type'></v-select>
@@ -12,17 +12,17 @@
 
         <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn class='primary' :loading='createLoading' @click='create'>Create</v-btn>
+            <v-btn class='primary' :loading='createLoading' @click='create'>{{$t("Create")}}</v-btn>
         </v-card-actions>
     </v-card>
 
     <!-- Add to playlist -->
     <v-card class='text-center pa-2' v-if='addToPlaylist'>
         <v-card-text>
-            <p primary-title class='display-1'>Add to playlist</p>
+            <p primary-title class='display-1'>{{$t("Add to playlist")}}</p>
             <v-btn block class='mb-1' @click='addToPlaylist = false'>
                 <v-icon left>mdi-playlist-plus</v-icon>
-                Create New
+                {{$t("Create new")}}
             </v-btn>
             <v-list>
                 <div v-for='playlist in playlists' :key='playlist.id'>

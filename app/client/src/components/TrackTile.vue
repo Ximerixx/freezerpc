@@ -45,7 +45,7 @@
                         <v-icon>mdi-playlist-plus</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Play next</v-list-item-title>
+                        <v-list-item-title>{{$t("Play next")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- Add to end of queue -->
@@ -54,7 +54,7 @@
                         <v-icon>mdi-playlist-plus</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Add to queue</v-list-item-title>
+                        <v-list-item-title>{{$t("Add to queue")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- Add to library -->
@@ -63,7 +63,7 @@
                         <v-icon>mdi-heart</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Add to library</v-list-item-title>
+                        <v-list-item-title>{{$t("Add to library")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- Remove from library -->
@@ -72,7 +72,7 @@
                         <v-icon>mdi-heart-remove</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Remove from library</v-list-item-title>
+                        <v-list-item-title>{{$t("Remove from library")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- Add to playlist -->
@@ -81,7 +81,7 @@
                         <v-icon>mdi-playlist-plus</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Add to playlist</v-list-item-title>
+                        <v-list-item-title>{{$t("Add to playlist")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- Remove from playlist -->
@@ -90,7 +90,16 @@
                         <v-icon>mdi-playlist-remove</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Remove from playlist</v-list-item-title>
+                        <v-list-item-title>{{$t("Remove from playlist")}}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+                <!-- Play track mix -->
+                <v-list-item dense @click='trackMix'>
+                    <v-list-item-icon>
+                        <v-icon>mdi-playlist-music</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title>{{$t("Play track mix")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- Go to album -->
@@ -99,7 +108,7 @@
                         <v-icon>mdi-album</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Go to "{{track.album.title}}"</v-list-item-title>
+                        <v-list-item-title>{{$t("Go to")}} "{{track.album.title}}"</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <!-- Go to artists -->
@@ -113,7 +122,7 @@
                         <v-icon>mdi-account-music</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Go to "{{artist.name}}"</v-list-item-title>
+                        <v-list-item-title>{{$t("Go to")}} "{{artist.name}}"</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
 
@@ -123,7 +132,7 @@
                         <v-icon>mdi-download</v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
-                        <v-list-item-title>Download</v-list-item-title>
+                        <v-list-item-title>{{$t("Download")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
 
@@ -207,8 +216,18 @@ export default {
             this.$emit('remove');
         },
         //Download track
-        async download() {
+        download() {
             this.downloadDialog = true;
+        },
+        async trackMix() {
+            let res = await this.$axios.get('/trackmix/' + this.track.id);
+            this.$root.queue.source = {
+                text: this.$t('Track Mix'),
+                source: 'trackmix',
+                data: this.track.id
+            };
+            this.$root.replaceQueue(res.data);
+            this.$root.playIndex(0);
         }
     }
 }

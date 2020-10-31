@@ -17,23 +17,23 @@
             <h3>{{playlist.user.name}}</h3>
             <h5>{{playlist.description}}</h5>
             <div class='mt-2' v-if='!loading'>
-                <span class='text-subtitle-2'>{{playlist.trackCount}} tracks</span><br>
-                <span class='text-subtitle-2'>Duration: {{$duration(playlist.duration)}}</span><br>
-                <span class='text-subtitle-2'>{{$numberString(playlist.fans)}} fans</span><br>
+                <span class='text-subtitle-2'>{{playlist.trackCount}} {{$t("tracks")}}</span><br>
+                <span class='text-subtitle-2'>{{$t("Duration")}}: {{$duration(playlist.duration)}}</span><br>
+                <span class='text-subtitle-2'>{{$numberString(playlist.fans)}} {{$t('fans')}}</span><br>
             </div>
             
             <div class='my-1'>
                 <v-btn color='primary' class='mr-1' @click='play'>
                     <v-icon left>mdi-play</v-icon>
-                    Play
+                    {{$t('Play')}}
                 </v-btn>
                 <v-btn color='red' class='mx-1' @click='library' :loading='libraryLoading'>
                     <v-icon left>mdi-heart</v-icon>
-                    Library
+                    {{$t('Library')}}
                 </v-btn>
                 <v-btn color='green' class='mx-1' @click='download'>
                     <v-icon left>mdi-download</v-icon>
-                    Download
+                    {{$t('Download')}}
                 </v-btn>
             </div>
         </div>

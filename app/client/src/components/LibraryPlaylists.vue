@@ -8,7 +8,7 @@
     <!-- Create playlist -->
     <v-btn class='ma-2 ml-3' color='primary' @click='popup = true'>
         <v-icon left>mdi-playlist-plus</v-icon>
-        Create new playlist
+        {{$t("Create new playlist")}}
     </v-btn>
 
     <v-dialog max-width="400px" v-model='popup'>

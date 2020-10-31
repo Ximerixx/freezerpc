@@ -2,7 +2,8 @@ const crypto = require('crypto');
 const axios = require('axios');
 const decryptor = require('nodeezcryptor');
 const querystring = require('querystring');
-const {Transform} = require('stream');
+const https = require('https');
+const {Transform, Readable} = require('stream');
 const {Track} = require('./definitions');
 const logger = require('./winston');
 
@@ -63,6 +64,11 @@ class DeezerAPI {
             }
         }
 
+        //Invalid CSRF
+        if (data.data.error && data.data.error.VALID_TOKEN_REQUIRED) {
+            await this.callApi('deezer.getUserData');
+            return await this.callApi(method, args, gatewayInput);
+        }
 
         return data.data;
     }
@@ -118,6 +124,13 @@ class DeezerAPI {
         });
 
         data = JSON.parse(data.toString('utf-8'));
+
+        //Invalid CSRF
+        if (data.error && data.error.VALID_TOKEN_REQUIRED) {
+            await this.callApi('deezer.getUserData');
+            return await this.callApi(method, args, gatewayInput);
+        }
+
         return data;
     }
 
@@ -129,6 +142,15 @@ class DeezerAPI {
 
         if (!this.userId || this.userId == 0 || !this.token) return false;
         return true;
+    }
+
+    async callPublicApi(path, params) {
+        let res = await axios({
+            url: `https://api.deezer.com/${encodeURIComponent(path)}/${encodeURIComponent(params)}`,
+            responseType: 'json',
+            method: 'GET'
+        });
+        return res.data;
     }
 
     //Get track URL
@@ -165,44 +187,116 @@ class DeezerAPI {
         return `https://e-cdns-proxy-${md5origin.substring(0, 1)}.dzcdn.net/mobile/1/${step3}`;
     }
 
-    //Quality fallback
-    async qualityFallback(info, quality = 3) {
-        if (quality == 1) return {
-            quality: '128kbps',
-            format: 'MP3',
-            source: 'stream',
-            url: `/stream/${info}?q=1`
-        };
+
+    async fallback(info, quality = 3) {
+        let qualityInfo = Track.getUrlInfo(info);
+
+        //User uploaded MP3s
+        if (qualityInfo.trackId.startsWith('-')) {
+            qualityInfo.quality = 3;
+            return qualityInfo;
+        }
+
+        //Quality fallback
+        let newQuality = await this.qualityFallback(qualityInfo, quality);
+        if (newQuality != null) {
+            return qualityInfo;
+        }
+        //ID Fallback
+        let trackData = await this.callApi('deezer.pageTrack', {sng_id: qualityInfo.trackId});
         try {
-            let tdata = Track.getUrlInfo(info);
-            let res = await axios.head(DeezerAPI.getUrl(tdata.trackId, tdata.md5origin, tdata.mediaVersion, quality));
-            if (quality == 3) {
-                return {
-                    quality: '320kbps',
-                    format: 'MP3',
-                    source: 'stream',
-                    url: `/stream/${info}?q=3`
-                }
-            }
-            //Bitrate will be calculated in client
-            return {
-                quality: res.headers['content-length'],
-                format: 'FLAC',
-                source: 'stream',
-                url: `/stream/${info}?q=9`
+            if (trackData.results.DATA.FALLBACK.SNG_ID.toString() != qualityInfo.trackId) {
+                let newId = trackData.results.DATA.FALLBACK.SNG_ID.toString();
+                let newTrackData = await this.callApi('deezer.pageTrack', {sng_id: newId});
+                let newTrack = new Track(newTrackData.results.DATA);
+                return this.fallback(newTrack.streamUrl);
             }
         } catch (e) {
-            logger.warn('Qualiy fallback: ' + e);
+            logger.warn('TrackID Fallback failed: ' + e);
+        }
+        //ISRC Fallback
+        try {
+            let publicTrack = this.callPublicApi('track', 'isrc:' + trackData.results.DATA.ISRC);
+            let newId = publicTrack.id.toString();
+            let newTrackData = await this.callApi('deezer.pageTrack', {sng_id: newId});
+            let newTrack = new Track(newTrackData.results.DATA);
+            return this.fallback(newTrack.streamUrl);
+        } catch (e) {
+            logger.warn('ISRC Fallback failed: ' + e);
+        }
+        return null;
+    }
+
+    //Fallback thru available qualities, -1 if none work
+    async qualityFallback(info, quality = 3) {
+        try {
+            let res = await axios.head(DeezerAPI.getUrl(info.trackId, info.md5origin, info.mediaVersion, quality));
+            if (res.status > 400) throw new Error(`Status code: ${res.status}`);
+            //Make sure it's an int
+            info.quality = parseInt(quality.toString(), 10);
+            info.size = parseInt(res.headers['content-length'], 10);
+            return info;
+        } catch (e) {
+            logger.warn('Quality fallback: ' + e);
             //Fallback
             //9 - FLAC
             //3 - MP3 320
             //1 - MP3 128
-            let q = quality;
-            if (quality == 9) q = 3;
-            if (quality == 3) q = 1;
-            return this.qualityFallback(info, q);
+            let nq = -1;
+            if (quality == 3) nq = 1;
+            if (quality == 9) nq = 3;
+            if (quality == 1) return null;
+            return this.qualityFallback(info, nq);
         }
     }
+}
+
+class DeezerStream extends Readable {
+    constructor(qualityInfo, options) {
+        super(options);
+        this.qualityInfo = qualityInfo;
+        this.ended = false;
+    }
+
+
+    async open(offset, end) {
+        //Prepare decryptor
+        this.decryptor = new DeezerDecryptionStream(this.qualityInfo.trackId, {offset});
+        this.decryptor.on('end', () => {
+            this.ended = true;
+        });
+
+        //Calculate headers
+        let offsetBytes = offset - (offset % 2048);
+        end = (end == -1) ? '' : end;
+        let url = DeezerAPI.getUrl(this.qualityInfo.trackId, this.qualityInfo.md5origin, this.qualityInfo.mediaVersion, this.qualityInfo.quality);
+        
+        //Open request
+        await new Promise((res) => {
+            this.request = https.get(url, {headers: {'Range': `bytes=${offsetBytes}-${end}`}}, (r) => {
+                r.pipe(this.decryptor);
+                this.size = parseInt(r.headers['content-length'], 10) + offsetBytes;
+                res();
+            });
+        });
+    }
+
+    async _read() {
+        //Decryptor ended
+        if (this.ended)
+            return this.push(null);
+
+        this.decryptor.once('readable', () => {
+            this.push(this.decryptor.read());
+        });
+    }
+
+    _destroy(err, callback) {
+        this.request.destroy();
+        this.decryptor.destroy();
+        callback();
+    }
+
 }
 
 class DeezerDecryptionStream extends Transform {
@@ -258,4 +352,4 @@ class DeezerDecryptionStream extends Transform {
 }
 
 
-module.exports = {DeezerAPI, DeezerDecryptionStream};
+module.exports = {DeezerAPI, DeezerDecryptionStream, DeezerStream};

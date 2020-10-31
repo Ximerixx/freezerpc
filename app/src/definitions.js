@@ -1,3 +1,4 @@
+
 //Datatypes, constructor parameters = gw_light API call.
 class Track {
     constructor(json) {
@@ -11,8 +12,8 @@ class Track {
         this.artistString = this.artists.map((a) => a.name).join(', ');
 
         this.album = new Album(json);
-        this.trackNumber = parseInt((json.TRACK_NUMBER || 0).toString(), 10);
-        this.diskNumber = parseInt((json.DISK_NUMBER || 0).toString(), 10);
+        this.trackNumber = parseInt((json.TRACK_NUMBER || 1).toString(), 10);
+        this.diskNumber = parseInt((json.DISK_NUMBER || 1).toString(), 10);
         this.explicit = json['EXPLICIT_LYRICS'] == 1 ? true:false;
         this.lyricsId = json.LYRICS_ID;
 
@@ -35,7 +36,7 @@ class Track {
         if (info.charAt(32) == '1') md5origin += '.mp3';
         let mediaVersion = parseInt(info.substring(33, 34)).toString();
         let trackId = info.substring(35);
-        return {trackId, md5origin, mediaVersion};
+        return new QualityInfo(md5origin, mediaVersion, trackId);
     }
 }
 
@@ -76,6 +77,7 @@ class Artist {
         this.albumCount = albumsJson.total;
         this.albums = albumsJson.data.map((a) => new Album(a));
         this.topTracks = topJson.data.map((t) => new Track(t));
+        this.radio = json.SMARTRADIO;
     }
 }
 
@@ -274,6 +276,28 @@ class Lyric {
     static parseJson(json) {
         if (!json.milliseconds || !json.line || json.line == '') return;
         return new Lyric(json.milliseconds, json.line, json.lrc_timestamp);
+    }
+}
+
+class QualityInfo {
+    constructor(md5origin, mediaVersion, trackId, quality = 1, source='stream') {
+        this.md5origin = md5origin;
+        this.mediaVersion = mediaVersion;
+        this.trackId = trackId;
+        this.quality = quality;
+        this.source = source;
+        //For FLAC bitrate calculation
+        this.size = 1;
+
+        this.url = '';
+    }
+
+    //Generate direct stream URL
+    generateUrl() {
+        let md5 = this.md5origin.replace('.mp3', '');
+        let md5mp3bit = this.md5origin.includes('.mp3') ? '1' : '0';
+        let mv = this.mediaVersion.toString().padStart(2, '0');
+        this.url = `/stream/${md5}${md5mp3bit}${mv}${this.trackId}?q=${this.quality}`;
     }
 }
 

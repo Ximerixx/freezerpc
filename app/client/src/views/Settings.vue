@@ -1,10 +1,10 @@
 <template>
 <div>
-    <h1 class='pb-2'>Settings</h1>
+    <h1 class='pb-2'>{{$t('Settings')}}</h1>
     <v-list>
         <v-select 
             class='px-4'
-            label='Streaming Quality' 
+            :label='$t("Streaming Quality")' 
             persistent-hint
             :items='qualities'
             @change='updateStreamingQuality'
@@ -13,7 +13,7 @@
 
         <v-select 
             class='px-4'
-            label='Download Quality' 
+            :label='$t("Download Quality")' 
             persistent-hint
             :items='qualities'
             @change='updateDownloadQuality'
@@ -23,11 +23,23 @@
         <!-- Download path -->
         <v-text-field 
             class='px-4' 
-            label='Downloads Directory'
+            :label='$t("Downloads Directory")'
             v-model='$root.settings.downloadsPath'
             append-icon='mdi-open-in-app'
             @click:append='selectDownloadPath'
         ></v-text-field>
+
+        <!-- Download threads -->
+        <v-slider
+            :label='$t("Simultaneous downloads")'
+            min='1'
+            max='16'
+            thumb-label
+            step='1'
+            ticks
+            class='px-4'
+            v-model='$root.settings.downloadThreads'
+        ></v-slider>
         
         <!-- Download dialog -->
         <v-list-item>
@@ -35,8 +47,8 @@
                 <v-checkbox v-model='$root.settings.downloadDialog'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Show download dialog</v-list-item-title>
-                <v-list-item-subtitle>Always show download confirm dialog before downloading.</v-list-item-subtitle>
+                <v-list-item-title>{{$t("Show download dialog")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("Always show download confirm dialog before downloading.")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
 
@@ -46,7 +58,7 @@
                 <v-checkbox v-model='$root.settings.createArtistFolder'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Create folders for artists</v-list-item-title>
+                <v-list-item-title>{{$t("Create folders for artists")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
         <!-- Create album folder -->
@@ -55,9 +67,19 @@
                 <v-checkbox v-model='$root.settings.createAlbumFolder'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Create folders for albums</v-list-item-title>
+                <v-list-item-title>{{$t("Create folders for albums")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
+        <!-- Download lyrics -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.downloadLyrics'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Download lyrics")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
+
 
         <!-- Download naming -->
         <v-text-field
@@ -65,11 +87,34 @@
             label='Download Filename'
             persistent-hint
             v-model='$root.settings.downloadFilename'
-            hint='Variables: %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%'
+            :hint='$t("Variables") + ": %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%, %year%"'
         ></v-text-field>
 
+        <!-- UI -->
+        <v-subheader>{{$t("UI")}}</v-subheader>
+        <v-divider></v-divider>
+
+        <!-- Language -->
+        <v-select 
+            class='mt-2 px-4'
+            label='Language' 
+            persistent-hint
+            :items='languageNames'
+            @change='updateLanguage'
+        ></v-select>
+
+        <!-- Autocomplete -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.showAutocomplete'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Show autocomplete in search")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
+        
         <!-- Accounts -->
-        <v-subheader>Integrations</v-subheader>
+        <v-subheader>{{$t("Integrations")}}</v-subheader>
         <v-divider></v-divider>
 
         <!-- Log listening -->
@@ -78,8 +123,8 @@
                 <v-checkbox v-model='$root.settings.logListen'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Log track listens to Deezer</v-list-item-title>
-                <v-list-item-subtitle>This allows listening history, flow and recommendations to work properly.</v-list-item-subtitle>
+                <v-list-item-title>{{$t("Log track listens to Deezer")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("This allows listening history, flow and recommendations to work properly.")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
         <!-- LastFM -->
@@ -88,8 +133,8 @@
                 <v-img src='lastfm.svg'></v-img>
             </v-list-item-avatar>
             <v-list-item-content>
-                <v-list-item-title>Login with LastFM</v-list-item-title>
-                <v-list-item-subtitle>Connect your LastFM account to allow scrobbling.</v-list-item-subtitle>
+                <v-list-item-title>{{$t("Login with LastFM")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("Connect your LastFM account to allow scrobbling.")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
         <v-list-item v-if='$root.settings.lastFM' @click='disconnectLastFM'>
@@ -97,32 +142,32 @@
                 <v-icon>mdi-logout</v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-                <v-list-item-title class='red--text'>Disconnect LastFM</v-list-item-title>
+                <v-list-item-title class='red--text'>{{$t("Disconnect LastFM")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
         <!-- Discord -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.enableDiscord' @click='snackbarText = "Requires restart to apply!"; snackbar = true'></v-checkbox>
+                <v-checkbox v-model='$root.settings.enableDiscord' @click='snackbarText = $t("Requires restart to apply!"); snackbar = true'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Discord Rich Presence</v-list-item-title>
-                <v-list-item-subtitle>Enable Discord Rich Presence, requires restart to toggle!</v-list-item-subtitle>
+                <v-list-item-title>{{$t("Discord Rich Presence")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("Enable Discord Rich Presence, requires restart to toggle!")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
         <!-- Discord Join Button -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.discordJoin' @click='snackbarText = "Requires restart to apply!"; snackbar = true'></v-checkbox>
+                <v-checkbox v-model='$root.settings.discordJoin' @click='snackbarText = $t("Requires restart to apply!"); snackbar = true'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Discord Join Button</v-list-item-title>
-                <v-list-item-subtitle>Enable Discord join button for syncing tracks, requires restart to toggle!</v-list-item-subtitle>
+                <v-list-item-title>{{$t("Discord Join Button")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("Enable Discord join button for syncing tracks, requires restart to toggle!")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
 
         <!-- Misc -->
-        <v-subheader>Other</v-subheader>
+        <v-subheader>{{$t("Other")}}</v-subheader>
         <v-divider></v-divider>
 
         <!-- Minimize to tray -->
@@ -131,7 +176,7 @@
                 <v-checkbox v-model='$root.settings.minimizeToTray'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Minimize to tray</v-list-item-title>
+                <v-list-item-title>{{$t("Minimize to tray")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
         <!-- Close on exit -->
@@ -140,22 +185,21 @@
                 <v-checkbox v-model='$root.settings.closeOnExit'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
-                <v-list-item-title>Close on exit</v-list-item-title>
-                <v-list-item-subtitle>Don't minimize to tray</v-list-item-subtitle>
+                <v-list-item-title>{{$t("Close on exit")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("Don't minimize to tray")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
 
         <!-- Logout -->
         <v-btn block color='red' class='mt-4' @click='logout'>
             <v-icon>mdi-logout</v-icon>
-            Logout
+            {{$t("Logout")}}
         </v-btn>
 
     </v-list>
 
-    <v-btn class='my-4' large color='primary' :loading='saving' block @click='save'>
+    <v-btn fab color='primary' absolute bottom right class='mb-12' @click='save' :loading='saving'>
         <v-icon>mdi-content-save</v-icon>
-        Save
     </v-btn>
 
     <!-- Info snackbar -->
@@ -192,7 +236,17 @@ export default {
             downloadQuality: null,
             devToolsCounter: 0,
             snackbarText: null,
-            snackbar: false
+            snackbar: false,
+            language: 'en',
+            languages: [
+                {code: 'en', name: 'English'},
+                {code: 'ar', name: 'Arabic'},
+                {code: 'de', name: 'German'},
+            ],
+            primaryColorIndex: 0,
+            primaries: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', 
+                '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
+                '#795548', '#607D8B', '#9E9E9E', '#333333', '#000000']
         }
     },
     methods: {
@@ -202,6 +256,8 @@ export default {
             this.$root.saveSettings();
             //Artificial wait to make it seem like something happened.
             setTimeout(() => {this.saving = false;}, 500);
+            this.snackbarText = this.$t("Settings saved!");
+            this.snackbar = true;
         },
         getQuality(v) {
             let i = this.qualities.indexOf(v);
@@ -228,7 +284,7 @@ export default {
         selectDownloadPath() {
             //Electron check
             if (!this.$root.settings.electron) {
-                alert('Available only in Electron version!');
+                alert(this.$t("Available only in Electron version!"));
                 return;
             }
             const {ipcRenderer} = window.require('electron');
@@ -252,6 +308,24 @@ export default {
             this.$root.settings.lastFM = null;
             await this.$root.saveSettings();
             window.location.reload();
+        },
+        changeColor() {
+            this.$vuetify.theme.themes.dark.primary = this.primaries[this.primaryColorIndex];
+            this.$root.settings.primaryColor = this.primaries[this.primaryColorIndex];
+            this.primaryColorIndex++;
+            if (this.primaryColorIndex == this.primaries.length)
+                this.primaryColorIndex = 0;
+        },
+        updateLanguage(l) {
+            let code = this.languages.filter(lang => lang.name == l)[0].code;
+            this.language = code;
+            this.$root.updateLanguage(code);
+            this.$root.settings.language = code;
+        }
+    },
+    computed: {
+        languageNames() {
+            return this.languages.map(l => l.name);
         }
     },
     mounted() {
@@ -271,6 +345,18 @@ export default {
                     const {remote} = window.require('electron');
                     remote.getCurrentWindow().toggleDevTools();
                 }
+            }
+
+            //Shhhhhh
+            if (event.code == 'KeyC' && event.shiftKey) {
+                this.changeColor();
+            }
+
+            //SSHHSHSHHSH
+            if (event.code == 'KeyG' && event.shiftKey && event.altKey) {
+                setInterval(() => {
+                    this.changeColor();
+                }, 400);
             }
         });
     }

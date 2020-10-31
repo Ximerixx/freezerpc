@@ -1,51 +1,51 @@
 <template>
 <div>
 
-    <h1 class='pb-2'>Downloads</h1>
-
-    <v-card v-if='$root.download' max-width='100%'>
-        
-        <v-list-item three-line>
-            <v-list-item-avatar>
-                <v-img :src='$root.download.track.albumArt.thumb'></v-img>
-            </v-list-item-avatar>
-            <v-list-item-content>
-                <v-list-item-title>{{$root.download.track.title}}</v-list-item-title>
-                <v-list-item-subtitle>
-                    Downloaded: {{$filesize($root.download.downloaded)}} / {{$filesize($root.download.size)}}<br>
-                    Path: {{$root.download.path}}
-                </v-list-item-subtitle>
-            </v-list-item-content>
+    <h1 class='pb-2'>{{$t("Downloads")}}</h1>
+    <div v-if='$root.downloads.downloading'>
+        <v-card v-for='(download, index) in $root.downloads.threads' :key='"t" + index.toString()' max-width='100%'>
+            <v-list-item>
+                <v-list-item-avatar>
+                    <v-img :src='download.track.albumArt.thumb'></v-img>
+                </v-list-item-avatar>
+                <v-list-item-content>
+                    <v-list-item-title>{{download.track.title}}</v-list-item-title>
+                    <v-list-item-subtitle>
+                        {{$t('Downloaded')}}: {{$filesize(download.downloaded)}} / {{$filesize(download.size)}}<br>
+                    </v-list-item-subtitle>
+                </v-list-item-content>
         </v-list-item>
-    </v-card>
 
-    <h1 class='pb-2'>Queue:</h1>
-    <div class='text-h6 mr-4 pb-2 d-flex'>Total: {{$root.downloads.length}}
+        </v-card>
+    </div>
+
+    <h1 class='pb-2'>{{$t("Queue")}}:</h1>
+    <div class='text-h6 mr-4 pb-2 d-flex'>{{$t("Total")}}: {{$root.downloads.queue.length}}
         <v-btn @click='$root.toggleDownload' class='ml-4' color='primary'>
-            <div v-if='$root.downloading'>
+            <div v-if='$root.downloads.downloading'>
                 <v-icon>mdi-stop</v-icon>
-                Stop
+                {{$t("Stop")}}
             </div>
-            <div v-if='!$root.downloading'>
+            <div v-if='!$root.downloads.downloading'>
                 <v-icon>mdi-download</v-icon>
-                Start
+                {{$t("Start")}}
             </div>
         </v-btn>
         <!-- Open dir -->
         <v-btn @click='openDir' class='ml-4' v-if='$root.settings.electron'>
             <v-icon>mdi-folder</v-icon>
-            Show folder
+            {{$t("Show folder")}}
         </v-btn>
         <!-- Delete all -->
         <v-btn @click='deleteDownload(-1)' class='ml-4' color='red'>
             <v-icon>mdi-delete</v-icon>
-            Clear queue
+            {{$t("Clear queue")}}
         </v-btn>
     </div>
 
-    <!-- Downloads -->
+    <!-- Queue -->
     <v-list dense>
-        <div v-for='(download, index) in $root.downloads' :key='download.id'>
+        <div v-for='(download, index) in $root.downloads.queue' :key='download.id'>
             <v-list-item dense>
                 <v-list-item-avatar>
                     <v-img :src='download.track.albumArt.thumb'></v-img>

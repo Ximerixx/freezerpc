@@ -23,7 +23,7 @@
                 </div>
                 <div v-if='section.hasMore' class='mx-2 align-center justify-center d-flex'>
                     <v-btn @click='showMore(section)' color='primary'>
-                        Show more
+                        {{$t("Show more")}}
                     </v-btn>
                 </div>
             </div>

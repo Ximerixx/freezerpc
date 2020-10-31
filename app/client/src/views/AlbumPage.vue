@@ -16,24 +16,24 @@
             <h1>{{album.title}}</h1>
             <h3>{{album.artistString}}</h3>
             <div class='mt-2' v-if='!loading'>
-                <span class='text-subtitle-2'>{{album.tracks.length}} tracks</span><br>
-                <span class='text-subtitle-2'>Duration: {{duration}}</span><br>
+                <span class='text-subtitle-2'>{{album.tracks.length}} {{$t("tracks")}}</span><br>
+                <span class='text-subtitle-2'>{{$t("Duration")}}: {{duration}}</span><br>
                 <span class='text-subtitle-2'>{{$numberString(album.fans)}} fans</span><br>
-                <span class='text-subtitle-2'>Released: {{album.releaseDate}}</span><br>
+                <span class='text-subtitle-2'>{{$t("Released")}}: {{album.releaseDate}}</span><br>
             </div>
             
             <div class='my-2'>
                 <v-btn color='primary' class='mx-1' @click='play'>
                     <v-icon left>mdi-play</v-icon>
-                    Play
+                    {{$t("Play")}}
                 </v-btn>
                 <v-btn color='red' class='mx-1' @click='library' :loading='libraryLoading'>
                     <v-icon left>mdi-heart</v-icon>
-                    Library
+                    {{$t("Library")}}
                 </v-btn>
                 <v-btn color='green' class='mx-1' @click='download'>
                     <v-icon left>mdi-download</v-icon>
-                    Download
+                    {{$t("Download")}}
                 </v-btn>
             </div>
         </div>
@@ -48,7 +48,7 @@
                 v-if='index == 0 || track.diskNumber != album.tracks[index-1].diskNumber'
                 class='mx-4 text-subtitle-1'
             >
-                Disk {{track.diskNumber}}
+                {{$t("Disk")}} {{track.diskNumber}}
             </div>
 
             <TrackTile :track='track' @click='playTrack(index)'></TrackTile>

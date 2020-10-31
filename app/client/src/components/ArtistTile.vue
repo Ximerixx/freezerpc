@@ -6,7 +6,7 @@
         </v-list-item-avatar>
         <v-list-item-content>
             <v-list-item-title>{{artist.name}}</v-list-item-title>
-            <v-list-item-subtitle v-if='!tiny'>{{$abbreviation(artist.fans)}} fans</v-list-item-subtitle>
+            <v-list-item-subtitle v-if='!tiny'>{{$abbreviation(artist.fans)}} {{$t("fans")}}</v-list-item-subtitle>
         </v-list-item-content>
         <v-list-item-action>
             <!-- Context menu -->
@@ -23,7 +23,7 @@
                             <v-icon>mdi-heart</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>Add to library</v-list-item-title>
+                            <v-list-item-title>{{$t("Add to library")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>

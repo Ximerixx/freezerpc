@@ -2,10 +2,10 @@
 <div v-scroll.self='scroll'>
     <div class='px-4 pt-2 d-flex' style='max-height: 50px;'>
         <div class='text-overline px-2 pt-1'>
-            {{count}} TRACKS.
+            {{count}} {{$t("TRACKS")}}
         </div>
         <div style="max-width: 200px;" class='d-flex mx-2'>
-            <v-select class='px-2' dense solo :items='sortTypes' @change='sort' label='Sort By'>
+            <v-select class='px-2' dense solo :items='sortTypes' @change='sort' :label='$t("Sort by")'>
             </v-select>
         </div>
         <div class='px-2' @click='reverseSort'>
@@ -46,10 +46,10 @@ export default {
             tracks: [],
             count: 0,
             sortTypes: [
-                'Date Added',
-                'Name (A-Z)',
-                'Artist (A-Z)',
-                'Album (A-Z)'
+                this.$t('Date Added'),
+                this.$t('Name (A-Z)'),
+                this.$t('Artist (A-Z)'),
+                this.$t('Album (A-Z)')
             ],
             tracksUnsorted: null,
             isReversed: false

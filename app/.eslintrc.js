@@ -10,6 +10,6 @@ module.exports = {
         "ecmaVersion": 12
     },
     "rules": {
-        "allowEmptyCatch": true
+        "allowEmptyCatch": 0
     }
 };

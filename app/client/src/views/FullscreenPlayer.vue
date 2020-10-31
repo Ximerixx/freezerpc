@@ -5,7 +5,7 @@
             <v-btn icon @click='close'>
                 <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title>Playing from: {{$root.queue.source.text}}</v-toolbar-title>
+            <v-toolbar-title>{{$t("Playing from")}}: {{$root.queue.source.text}}</v-toolbar-title>
         </v-app-bar>
         
         <!-- Split to half -->
@@ -122,13 +122,13 @@
             <v-col class='col-6 pt-4'>
                 <v-tabs v-model='tab'>
                     <v-tab key='queue'>
-                        Queue
+                        {{$t("Queue")}}
                     </v-tab>
                     <v-tab key='info'>
-                        Info
+                        {{$t("Info")}}
                     </v-tab>
                     <v-tab key='lyrics'>
-                        Lyrics
+                        {{$t("Lyrics")}}
                     </v-tab>
                 </v-tabs>
 
@@ -172,14 +172,13 @@
                                 ></ArtistTile>
                             </v-list>
                             <!-- Meta -->
-                            <h3>Duration: <span>{{$duration($root.track.duration)}}</span></h3>
-                            <h3>Track number: {{$root.track.trackNumber}}</h3>
-                            <h3>Disk number: {{$root.track.diskNumber}}</h3>
-                            <h3>Explicit: {{$root.track.explicit?"Yes":"No"}}</h3>
-                            <h3>Source: {{$root.playbackInfo.source}}</h3>
-                            <h3>Format: {{$root.playbackInfo.format}}</h3>
-                            <h3>Quality: {{$root.playbackInfo.quality}}</h3>
-                            <h3>ID: {{$root.track.id}}</h3>
+                            <h3>{{$t("Duration")}}: <span>{{$duration($root.track.duration)}}</span></h3>
+                            <h3>{{$t("Track number")}}: {{$root.track.trackNumber}}</h3>
+                            <h3>{{$t("Disk number")}}: {{$root.track.diskNumber}}</h3>
+                            <h3>{{$t("Explicit")}}: {{$root.track.explicit?"Yes":"No"}}</h3>
+                            <h3>{{$t("Source")}}: {{$root.playbackInfo.source}}</h3>
+                            <h3>{{$t("Quality")}}: {{$root.playbackInfo.qualityString}}</h3>
+                            <h3>{{$t("ID")}}: {{$root.track.id}}</h3>
                         </v-list>
                     </v-tab-item>
                     <!-- Lyrics -->
@@ -261,7 +260,7 @@ export default {
             let offsetp = (v.pageX - seeker.$el.offsetLeft) / seeker.$el.clientWidth;
             let pos = offsetp * this.$root.duration();
             this.$root.seek(pos);
-            this.position = pos;
+            this.position = pos / 1000;
             this.seeking = false;
         },
         //Add/Remove track from library
@@ -305,7 +304,9 @@ export default {
             this.inLibrary = this.$root.libraryTracks.includes(this.$root.track.id);
         },
         '$root.position'() {
-            if (!this.seeking) this.position = this.$root.position / 1000;
+            if (!this.seeking) {
+                this.position = this.$root.position / 1000;
+            }
         },
     }
 };

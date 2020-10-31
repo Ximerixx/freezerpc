@@ -31,7 +31,7 @@
           <v-list-item-icon>
             <v-icon>mdi-home</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Home</v-list-item-title>
+          <v-list-item-title>{{$t('Home')}}</v-list-item-title>
         </v-list-item>
 
         <!-- Browse link -->
@@ -39,10 +39,10 @@
           <v-list-item-icon>
             <v-icon>mdi-earth</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Browse</v-list-item-title>
+          <v-list-item-title>{{$t('Browse')}}</v-list-item-title>
         </v-list-item>
 
-        <v-subheader inset>Library</v-subheader>
+        <v-subheader inset>{{$t('Library')}}</v-subheader>
         <v-divider></v-divider>
 
         <!-- Tracks -->
@@ -50,7 +50,7 @@
           <v-list-item-icon>
             <v-icon>mdi-music-note</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Tracks</v-list-item-title>
+          <v-list-item-title>{{$t('Tracks')}}</v-list-item-title>
         </v-list-item>
 
         <!-- Playlists -->
@@ -58,7 +58,7 @@
           <v-list-item-icon>
             <v-icon>mdi-playlist-music</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Playlists</v-list-item-title>
+          <v-list-item-title>{{$t('Playlists')}}</v-list-item-title>
         </v-list-item>
 
         <!-- Albums -->
@@ -66,7 +66,7 @@
           <v-list-item-icon>
             <v-icon>mdi-album</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Albums</v-list-item-title>
+          <v-list-item-title>{{$t('Albums')}}</v-list-item-title>
         </v-list-item>
 
         <!-- Artists -->
@@ -74,10 +74,10 @@
           <v-list-item-icon>
             <v-icon>mdi-account-music</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Artists</v-list-item-title>
+          <v-list-item-title>{{$t('Artists')}}</v-list-item-title>
         </v-list-item>
 
-        <v-subheader inset>More</v-subheader>
+        <v-subheader inset>{{$t('More')}}</v-subheader>
         <v-divider></v-divider>
 
         <!-- Settings -->
@@ -85,30 +85,30 @@
           <v-list-item-icon>
             <v-icon>mdi-cog</v-icon>
           </v-list-item-icon>
-          <v-list-item-title>Settings</v-list-item-title>
+          <v-list-item-title>{{$t('Settings')}}</v-list-item-title>
         </v-list-item>
 
-        <!-- Downloads -->
-        <v-list-item link to='/downloads'>
+        <!-- Downloads, shitty hack if downloads not yet loaded -->
+        <v-list-item link to='/downloads' v-if='$root.downloads.queue'>
           
           <!-- Download icon -->
-          <v-list-item-icon v-if='!$root.download && $root.downloads.length == 0'>
+          <v-list-item-icon v-if='!$root.downloads.downloading && $root.downloads.queue.length == 0'>
             <v-icon>mdi-download</v-icon>
           </v-list-item-icon>
 
           <!-- Paused download -->
-          <v-list-item-icon v-if='!$root.download && $root.downloads.length > 0'>
+          <v-list-item-icon v-if='!$root.downloads.downloading && $root.downloads.queue.length > 0'>
             <v-icon>mdi-pause</v-icon>
           </v-list-item-icon>
 
           <!-- Download in progress -->
-          <v-list-item-icon v-if='$root.download'>
+          <v-list-item-icon v-if='$root.downloads.downloading'>
             <v-progress-circular :value='downloadPercentage' style='top: -2px' class='text-caption'>
-              {{$root.downloads.length + 1}}
+              {{$root.downloads.queue.length + $root.downloads.threads.length}}
             </v-progress-circular>
           </v-list-item-icon>
 
-          <v-list-item-title>Downloads</v-list-item-title>
+          <v-list-item-title>{{$t('Downloads')}}</v-list-item-title>
         </v-list-item>
 
       </v-list>
@@ -133,7 +133,7 @@
         solo
         clearable
         hide-no-data
-        placeholder='Search or paste Deezer URL. Use "/" to quickly focus.'
+        :placeholder='$t("Search or paste Deezer URL. Use / to quickly focus.")'
         :loading='searchLoading'
         @keyup='search'
         ref='searchBar'
@@ -141,6 +141,7 @@
         :search-input.sync='searchInput'
         :items='suggestions'
       ></v-autocomplete>
+      
 
     </v-app-bar>
     
@@ -355,12 +356,19 @@ export default {
   },
   computed: {
     qualityText() {
-      return `${this.$root.playbackInfo.format} ${this.$root.playbackInfo.quality}`;
+      return `${this.$root.playbackInfo.qualityString}`;
     },
     downloadPercentage() {
-      if (!this.$root.download) return 0;
-      let p = (this.$root.download.downloaded / this.$root.download.size) * 100;
-      if (isNaN(p)) return 0;
+      if (!this.$root.downloads.downloading) return 0;
+
+      let downloaded = this.$root.downloads.threads.reduce((a, b) => a + b.downloaded, 0);
+      let size = this.$root.downloads.threads.reduce((a, b) => a + b.size, 0);
+      if (size == 0)
+        size = 1;
+
+      let p = (downloaded / size) * 100;
+      if (p > 100)
+        p = 100;
       return Math.round(p);
     }
   },
@@ -413,6 +421,8 @@ export default {
         this.suggestions = [];
         return;
       }
+      
+      if (!this.$root.settings.showAutocomplete) return;
       this.searchLoading = true;
       //Prevent spam
       setTimeout(() => {

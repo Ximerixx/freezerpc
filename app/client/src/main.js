@@ -5,6 +5,7 @@ import vuetify from './js/vuetify';
 import axios from 'axios';
 import VueEsc from 'vue-esc';
 import VueSocketIO from 'vue-socket.io';
+import i18n from './js/i18n';
 
 //Globals
 let ipcRenderer;
@@ -52,7 +53,8 @@ Vue.prototype.$filesize = (bytes) => {
 
 //Sockets
 Vue.use(new VueSocketIO({
-    connection: window.location.origin
+    connection: window.location.toString(),
+    options: {path: '/socket'}
 }));
 
 Vue.config.productionTip = false;
@@ -66,10 +68,7 @@ new Vue({
         authorized: false,
         loadingPromise: null,
 
-        //Downloads
-        downloading: false,
-        downloads: [],
-        download: null,
+        downloads: {},
 
         //Player
         track: null,
@@ -111,6 +110,7 @@ new Vue({
         //Used to prevent double listen logging
         logListenId: null
     },
+
     methods: {
         // PLAYBACK METHODS
         isPlaying() {
@@ -199,7 +199,12 @@ new Vue({
             if (this.audio) this.audio.currentTime = 0;
             
             //Load track meta
-            this.playbackInfo = await this.loadPlaybackInfo(track.streamUrl, track.duration);
+            let playbackInfo = await this.loadPlaybackInfo(track.streamUrl, track.duration);
+            if (!playbackInfo) {
+                this.skipNext();
+                return;
+            }
+            this.playbackInfo = playbackInfo;
 
             //Stream URL
             let url = `${window.location.origin}${this.playbackInfo.url}`;
@@ -290,6 +295,7 @@ new Vue({
         //Update media session with current track metadata
         updateMediaSession() {
             if (!this.track || !('mediaSession' in navigator)) return;
+
             // eslint-disable-next-line no-undef
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: this.track.title,
@@ -315,11 +321,25 @@ new Vue({
             //Get playback info
             let quality = this.settings.streamQuality;
             let infoUrl = `/streaminfo/${streamUrl}?q=${quality}`;
-            let res = await this.$axios.get(infoUrl);
+            let res;
+            try {
+                res = await this.$axios.get(infoUrl);
+            } catch (_) {
+                return null;
+            }
+            
             let info = res.data;
-            //Calculate flac bitrate
-            if (!info.quality.includes('kbps')) {
-                info.quality = Math.round((parseInt(info.quality, 10)*8) / duration) + 'kbps';
+            //Generate qualityString
+            switch (info.quality) {
+                case 9:
+                    info.qualityString = 'FLAC ' + Math.round((info.size*8) / duration) + 'kbps';
+                    break;
+                case 3:
+                    info.qualityString = 'MP3 320kbps';
+                    break;
+                case 1:
+                    info.qualityString = 'MP3 128kbps';
+                    break;
             }
             return info;
         },
@@ -341,6 +361,10 @@ new Vue({
             //Load meta
             this.gapless.track = this.queue.data[this.queue.index + 1];
             let info = await this.loadPlaybackInfo(this.gapless.track.streamUrl, this.gapless.track.duration);
+            if (!info) {
+                this.resetGapless();
+                if (this.gapless.promise) resolve();
+            }
             this.gapless.info = info
             this.gapless.audio = new Audio(`${window.location.origin}${info.url}`);
 
@@ -382,12 +406,12 @@ new Vue({
         //Get downloads from server
         async getDownloads() {
             let res = await this.$axios.get('/downloads');
-            this.downloading = res.data.downloading;
-            this.downloads = res.data.downloads;
+            if (res.data)
+                this.downloads = res.data;
         },
         //Start stop downloading
         async toggleDownload() {
-            if (this.downloading) {
+            if (this.downloads.downloading) {
                 await this.$axios.delete('/download');
             } else {
                 await this.$axios.put('/download');
@@ -411,8 +435,12 @@ new Vue({
         //Send state update to integrations
         async updateState() {
             //Wait for duration
-            if (this.state == 2 && (this.duration() == null || isNaN(this.duration()))) 
-                await new Promise((res) => setTimeout(res, 1000));
+            if (this.state == 2 && (this.duration() == null || isNaN(this.duration()))) {
+                setTimeout(() => {
+                    this.updateState();
+                }, 500);
+                return;
+            }
             this.$socket.emit('stateChange', {
                 position: this.position,
                 duration: this.duration(),
@@ -424,14 +452,20 @@ new Vue({
             if (this.settings.electron) {
                 ipcRenderer.send('playing', this.state == 2);
             }
+        },
+        updateLanguage(l) {
+            i18n.locale = l;
         }
     },
+
     async created() {
         //Load settings, create promise so `/login` can await it
         let r;
         this.loadingPromise = new Promise((resolve) => r = resolve);
         let res = await this.$axios.get('/settings');
         this.settings = res.data;
+        this.$vuetify.theme.themes.dark.primary = this.settings.primaryColor;
+        i18n.locale = this.settings.language;
         this.volume = this.settings.volume;
 
         //Restore playback data
@@ -480,17 +514,17 @@ new Vue({
         }
 
         //Get downloads
-        this.getDownloads();
+        await this.getDownloads();
 
         //Sockets
+
         //Queue change
         this.sockets.subscribe('downloads', (data) => {
-            this.downloading = data.downloading;
-            this.downloads = data.downloads;
+            this.downloads = data;
         });
         //Current download change
-        this.sockets.subscribe('download', (data) => {
-            this.download = data;
+        this.sockets.subscribe('currentlyDownloading', (data) => {
+            this.downloads.threads = data;
         });
         //Play at offset (for integrations)
         this.sockets.subscribe('playOffset', async (data) => {
@@ -501,6 +535,7 @@ new Vue({
 
         r();
     },
+
     mounted() {
         //Save settings on unload
         window.addEventListener('beforeunload', () => {
@@ -548,6 +583,7 @@ new Vue({
             }
         });
     },
+
     watch: {
         //Watch state for integrations
         state() {
@@ -558,5 +594,6 @@ new Vue({
 
     router,
     vuetify,
+    i18n,
     render: function (h) { return h(App) }
 }).$mount('#app');
