@@ -353,7 +353,8 @@ export default {
             }
 
             //SSHHSHSHHSH
-            if (event.code == 'KeyG' && event.shiftKey && event.altKey) {
+            console.log(event);
+            if (event.code == 'KeyG' && event.ctrlKey && event.altKey) {
                 setInterval(() => {
                     this.changeColor();
                 }, 400);
