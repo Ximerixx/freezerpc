@@ -14,7 +14,11 @@
                 <v-progress-circular indeterminate></v-progress-circular>
             </v-overlay>
             <h1>{{album.title}}</h1>
-            <h3>{{album.artistString}}</h3>
+            <h3>
+                <span v-for='(artist, index) in album.artists' :key='"artist"+index' @click='goArtist(artist)'>
+                    {{artist.name}}<span v-if='index != album.artists.length - 1'>, </span> 
+                </span>
+            </h3>
             <div class='mt-2' v-if='!loading'>
                 <span class='text-subtitle-2'>{{album.tracks.length}} {{$t("tracks")}}</span><br>
                 <span class='text-subtitle-2'>{{$t("Duration")}}: {{duration}}</span><br>
@@ -104,6 +108,12 @@ export default {
         },
         async download() {
             this.downloadDialog = true;
+        },
+        goArtist(artist) {
+            this.$router.push({
+                path: '/artist',
+                query: {artist: JSON.stringify(artist)}
+            });
         }
     },
     async mounted() {

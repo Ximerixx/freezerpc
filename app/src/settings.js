@@ -34,6 +34,10 @@ class Settings {
         this.downloadLyrics = true;
         this.primaryColor = '#2196F3';
         this.language = 'en';
+
+        this.crossfadeDuration = 3000;
+        this.lightTheme = false;
+        this.playlistFolder = false;
     }
 
     //Based on electorn app.getPath

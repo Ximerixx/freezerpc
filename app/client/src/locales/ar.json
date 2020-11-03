@@ -108,5 +108,17 @@
   "Don't minimize to tray": "عدم التصغير إلى شريط المهام",
   "Close on exit": "إغلاق عند الخروج",
   "Settings saved!": "تم حفظ الإعدادات!",
-  "Available only in Electron version!": "متاح فقط في اصدار الإلكترون!"
+  "Available only in Electron version!": "متاح فقط في اصدار الإلكترون!",
+  "Crossfade (ms)": "التلاشي (ملي ثانية)",
+  "Select primary color": "تحديد اللون الأساسي",
+  "Light theme": "المظهر الفاتح",
+  "Create folders for playlists": "إنشاء ملفات لقائمة التشغيل",
+  "About": "حول البرنامج",
+  "Links:": "الروابط:",
+  "Telegram Releases": "إصدارات على تيليجرام",
+  "Telegram Group": "مجموعة التليجرام",
+  "Discord": "دسكورد",
+  "Telegram Android Group": "مجموعة تيليجرام (أندرويد)",
+  "Credits:": "المساهمون:",
+  "Agree": "قبول"
 }

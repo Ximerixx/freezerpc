@@ -45,6 +45,10 @@ export default {
             type: Boolean,
             default: true
         },
+        playlistName: {
+            type: String,
+            default: null
+        }
     },
     data() {
         return {
@@ -71,11 +75,15 @@ export default {
         },
         //Add files to download queue
         async download() {
-            if (this.qualities.indexOf(this.qualityString) == 0 || !this.qualityString) {
-                await this.$axios.post(`/downloads`, this.tracks);
-            } else {
-                await this.$axios.post(`/downloads?q=${this.qualityInt()}`, this.tracks);
+            let data = {
+                tracks: this.tracks,
+                playlistName: this.playlistName,
+                quality: null
             }
+            if (this.qualities.indexOf(this.qualityString) != 0 && this.qualityString) {
+                data['quality'] = this.qualityInt();
+            }
+            await this.$axios.post(`/downloads`, data);
             
             if (this.autostart) this.$axios.put('/download');
             this.$emit("close");

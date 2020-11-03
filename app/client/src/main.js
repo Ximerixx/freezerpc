@@ -228,13 +228,39 @@ new Vue({
         //Configure html audio element
         configureAudio() {
             //Listen position updates
-            this.audio.addEventListener('timeupdate', () => {
+            this.audio.addEventListener('timeupdate', async () => {
                 this.position = this.audio.currentTime * 1000;
 
                 //Gapless playback
-                if (this.position >= (this.duration() - 7000) && this.state == 2) {
-                    if (!this.shuffle && this.repeat != 2)
+                if (this.position >= (this.duration() - (this.settings.crossfadeDuration + 7500)) && this.state == 2) {
+                    if (this.repeat != 2)
                         this.loadGapless();
+                }
+
+                //Crossfade
+                if (this.settings.crossfadeDuration > 0 && this.position >= (this.duration() - this.settings.crossfadeDuration) && this.state == 2 && this.gapless.audio && !this.gapless.crossfade) {
+                    this.gapless.crossfade = true;
+                    let currentVolume = this.audio.volume;
+                    this.gapless.audio.play();
+
+                    let volumeStep = currentVolume / (this.settings.crossfadeDuration / 50);
+                    for (let i=0; i<(this.settings.crossfadeDuration / 50); i++) {
+                        if ((this.audio.volume - volumeStep) > 0)
+                            this.audio.volume -= volumeStep;
+                        this.gapless.audio.volume += volumeStep;
+                        await new Promise((res) => setTimeout(() => res(), 50));
+                    }
+                    this.audio.pause();
+
+                    //Update audio
+                    this.audio = this.gapless.audio;
+                    this.playbackInfo = this.gapless.info;
+                    this.track = this.gapless.track;
+                    this.queue.index = this.gapless.index;
+                    this.resetGapless();
+                    this.configureAudio();
+                    this.updateMediaSession();
+                    await this.savePlaybackInfo();
                 }
 
                 //Scrobble/LogListen
@@ -246,6 +272,7 @@ new Vue({
             this.audio.volume = this.volume;
             
             this.audio.addEventListener('ended', async () => {
+                if (this.gapless.crossfade) return;
 
                 //Repeat track
                 if (this.repeat == 2) {
@@ -346,20 +373,36 @@ new Vue({
 
         //Reset gapless playback meta
         resetGapless() {
-            this.gapless = {promise: null,audio: null,info: null,track: null};
+            this.gapless = {promise: null,audio: null,info: null,track: null,index:null};
         },
         //Load next track for gapless
         async loadGapless() {
             if (this.loaders != 0 || this.gapless.promise || this.gapless.audio) return;
-            //Last song
-            if (this.queue.index+1 >= this.queue.data.length) return;
+
+            //Shuffle
+            if (this.shuffle) {
+                let index = Math.round(Math.random()*this.queue.data.length) - this.queue.index;
+                this.gapless.track = this.queue.data[index];
+                this.gapless.index = index;
+            } else {
+                //Repeat list
+                if (this.repeat == 1 && this.queue.index == this.queue.data.length - 1) {
+                    this.gapless.track = this.queue.data[0];
+                    this.gapless.index = 0;
+                } else {
+                    //Last song
+                    if (this.queue.index+1 >= this.queue.data.length) return;
+                    //Next song
+                    this.gapless.track = this.queue.data[this.queue.index + 1];
+                    this.gapless.index = this.queue.index + 1;
+                }
+            }
 
             //Save promise
             let resolve;
             this.gapless.promise = new Promise((res) => {resolve = res});
             
             //Load meta
-            this.gapless.track = this.queue.data[this.queue.index + 1];
             let info = await this.loadPlaybackInfo(this.gapless.track.streamUrl, this.gapless.track.duration);
             if (!info) {
                 this.resetGapless();
@@ -367,6 +410,9 @@ new Vue({
             }
             this.gapless.info = info
             this.gapless.audio = new Audio(`${window.location.origin}${info.url}`);
+            this.gapless.audio.volume = 0;
+            this.gapless.audio.preload = 'auto';
+            this.gapless.crossfade = false;
 
             //Might get canceled
             if (this.gapless.promise) resolve();
@@ -465,6 +511,11 @@ new Vue({
         let res = await this.$axios.get('/settings');
         this.settings = res.data;
         this.$vuetify.theme.themes.dark.primary = this.settings.primaryColor;
+        this.$vuetify.theme.themes.light.primary = this.settings.primaryColor;
+        if (this.settings.lightTheme) {
+            this.$vuetify.theme.dark = false;
+            this.$vuetify.theme.light = true;
+        }
         i18n.locale = this.settings.language;
         this.volume = this.settings.volume;
 

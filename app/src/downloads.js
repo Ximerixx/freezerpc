@@ -65,12 +65,23 @@ class DownloadManager {
         this.updateQueue();
     }
 
-    async add(track, quality) {
+    //data: {tracks: [], quality, playlistName}
+    async addBatch(data) {
+        for (let track of data.tracks) {
+            let p = this.settings.downloadsPath;
+            if (data.playlistName && this.settings.playlistFolder) {
+                p = path.join(p, sanitize(data.playlistName));
+            }
+            await this.add(track, data.quality, p);
+        }
+    }
+
+    async add(track, quality, p) {
         //Sanitize quality
         let q = this.settings.downloadsQuality;
         if (quality) 
             q = parseInt(quality.toString(), 10);
-        let download = new Download(track, q, 0);
+        let download = new Download(track, q, 0, p);
 
         //Check if in queue
         if (this.queue.some(d => d.track.id == track.id)) {
@@ -430,16 +441,20 @@ class DownloadThread {
     }
 
     generatePath(quality) {
+        //Path
+        let folder = this.settings.downloadsPath;
+        if (this.download.path)
+            folder = this.download.path;
+
         //User uploaded mp3s
         if (this.isUserUploaded) {          
             //Generate path
-            let p = this.settings.downloadsPath;
             if (this.settings.createArtistFolder && this.download.track.artists[0].name.length > 0)
-                p = path.join(p, sanitize(this.download.track.artists[0].name));
+                folder = path.join(folder, sanitize(this.download.track.artists[0].name));
             if (this.settings.createAlbumFolder && this.download.track.album.title.length > 0)
-                p = path.join(p, sanitize(this.download.track.album.title));
+                folder = path.join(folder, sanitize(this.download.track.album.title));
             //Filename
-            let out = path.join(p, sanitize(this.download.track.title));
+            let out = path.join(folder, sanitize(this.download.track.title));
             if (!out.includes('.'))
                 out += '.mp3';
             return out;
@@ -470,9 +485,8 @@ class DownloadThread {
             fn = fn.replace(new RegExp(k, 'g'), sanitize(props[k]));
         }
         //Generate folders
-        let p = this.settings.downloadsPath;
-        if (this.settings.createArtistFolder) p = path.join(p, sanitize(this.track.artists[0].name));
-        if (this.settings.createAlbumFolder) p = path.join(p, sanitize(this.track.album.title));
+        if (this.settings.createArtistFolder) folder = path.join(folder, sanitize(this.track.artists[0].name));
+        if (this.settings.createAlbumFolder) folder = path.join(folder, sanitize(this.track.album.title));
 
         //Extension
         if (quality.toString() == '9') {
@@ -481,14 +495,16 @@ class DownloadThread {
             fn += '.mp3';
         }
 
-        return path.join(p, fn);
+        return path.join(folder, fn);
     }
 }
 
 class Download {
-    constructor (track, quality, state) {
+    constructor (track, quality, state, path) {
         this.track = track;
         this.quality = quality;
+        this.path = path;
+
         // 0 - none
         // 1 - downloading
         // 2 - postprocess
@@ -506,12 +522,13 @@ class Download {
             _id: this.track.id,
             track: this.track,
             quality: this.quality,
-            state: this.state
+            state: this.state,
+            path: this.path
         }
     }
 
     static fromDB(json) {
-        return new Download(json.track, json.quality, json.state);
+        return new Download(json.track, json.quality, json.state, json.path);
     }
 }
 

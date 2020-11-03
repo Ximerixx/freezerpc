@@ -79,7 +79,7 @@
         </v-hover>
     </v-card>
 
-    <DownloadDialog :tracks='tracks' v-if='downloadDialog' @close='downloadDialog = false'></DownloadDialog>
+    <DownloadDialog :playlistName='playlist.title' :tracks='tracks' v-if='downloadDialog' @close='downloadDialog = false'></DownloadDialog>
 
 
 </div>

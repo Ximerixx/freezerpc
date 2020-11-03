@@ -108,5 +108,17 @@
   "Don't minimize to tray": "Don't minimize to tray",
   "Close on exit": "Close on exit",
   "Settings saved!": "Settings saved!",
-  "Available only in Electron version!": "Available only in Electron version!"
+  "Available only in Electron version!": "Available only in Electron version!",
+  "Crossfade (ms)": "Crossfade (ms)",
+  "Select primary color": "Select primary color",
+  "Light theme": "Light theme",
+  "Create folders for playlists": "Create folders for playlists",
+  "About": "About",
+  "Links:": "Links:",
+  "Telegram Releases": "Telegram Releases",
+  "Telegram Group": "Telegram Group",
+  "Discord": "Discord",
+  "Telegram Android Group": "Telegram Android Group",
+  "Credits:": "Credits:",
+  "Agree": "Agree"
 }

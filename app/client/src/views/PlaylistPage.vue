@@ -55,7 +55,7 @@
         <v-progress-circular indeterminate></v-progress-circular>
     </div>
 
-    <DownloadDialog :tracks='playlist.tracks' v-if='downloadDialog' @close='downloadDialog = false'></DownloadDialog>
+    <DownloadDialog :playlistName='playlist.title' :tracks='playlist.tracks' v-if='downloadDialog' @close='downloadDialog = false'></DownloadDialog>
 
 </v-list>
 </template>

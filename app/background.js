@@ -15,7 +15,7 @@ function assetPath(a) {
 }
 
 async function startServer() {
-    settings = await createServer(true, (e) => {
+    settings = await createServer(true, () => {
         //Server error
         shouldExit = true;
         if (win) win.close();
@@ -96,7 +96,11 @@ app.on('ready', async () => {
 
 //Restore or create new window
 function restoreWindow() {
-    if (win) return win.show();
+    if (win) {
+        win.show();
+        setThumbarButtons();
+        return;
+    }
     createWindow();
 }
 
@@ -171,6 +175,10 @@ function setThumbarButtons() {
     ]);
 }
 
+ipcMain.on('openUrl', (event, args) => {
+    shell.openExternal(args);
+});
+
 //Playing state change from UI
 ipcMain.on('playing', (event, args) => {
     playing = args;
@@ -184,13 +192,13 @@ ipcMain.on('updateSettings', (event, args) => {
 });
 
 //onExit callback
-ipcMain.on('onExit', (event) => {
+ipcMain.on('onExit', () => {
     shouldExit = true;
     win.close();
 });
 
 //Open downloads directory
-ipcMain.on('openDownloadsDir', async (event) => {
+ipcMain.on('openDownloadsDir', async () => {
     if ((await shell.openPath(settings.downloadsPath)) == "") return;
     shell.showItemInFolder(settings.downloadsPath);
 });

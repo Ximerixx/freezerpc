@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const https = require('https');
+const packageJson = require('../package.json');
 const fs = require('fs');
 const axios = require('axios').default;
 const logger = require('./winston');
@@ -390,11 +390,7 @@ app.get('/suggestions/:query', async (req, res) => {
 
 //Post list of tracks to download
 app.post('/downloads', async (req, res) => {
-    let tracks = req.body;
-    let quality = req.query.q;
-    for (let track of tracks) {
-        downloadManager.add(track, quality);
-    }
+    downloadManager.addBatch(req.body);
 
     res.status(200).send('OK');
 });
@@ -472,6 +468,13 @@ app.get('/fullurl', async (req, res) => {
     let url = req.query.url;
     let r = await axios.get(url, {validateStatus: null});
     res.json({url: r.request.res.responseUrl});
+});
+
+//About page
+app.get('/about', async (req, res) => {
+    res.json({
+        version: packageJson.version
+    });
 });
 
 //Redirect to index on unknown path

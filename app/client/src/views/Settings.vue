@@ -3,7 +3,7 @@
     <h1 class='pb-2'>{{$t('Settings')}}</h1>
     <v-list>
         <v-select 
-            class='px-4'
+            class='px-4 mx-2'
             :label='$t("Streaming Quality")' 
             persistent-hint
             :items='qualities'
@@ -12,7 +12,7 @@
         ></v-select>
 
         <v-select 
-            class='px-4'
+            class='px-4 mx-2'
             :label='$t("Download Quality")' 
             persistent-hint
             :items='qualities'
@@ -22,7 +22,7 @@
 
         <!-- Download path -->
         <v-text-field 
-            class='px-4' 
+            class='px-4 mx-2' 
             :label='$t("Downloads Directory")'
             v-model='$root.settings.downloadsPath'
             append-icon='mdi-open-in-app'
@@ -37,25 +37,34 @@
             thumb-label
             step='1'
             ticks
-            class='px-4'
+            dense
+            class='px-4 mx-2'
             v-model='$root.settings.downloadThreads'
         ></v-slider>
         
         <!-- Download dialog -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.downloadDialog'></v-checkbox>
+                <v-checkbox v-model='$root.settings.downloadDialog' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Show download dialog")}}</v-list-item-title>
                 <v-list-item-subtitle>{{$t("Always show download confirm dialog before downloading.")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
-
+        <!-- Create playlist folder -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.playlistFolder' class='pl-2'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Create folders for playlists")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
         <!-- Create artist folder -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.createArtistFolder'></v-checkbox>
+                <v-checkbox v-model='$root.settings.createArtistFolder' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Create folders for artists")}}</v-list-item-title>
@@ -64,7 +73,7 @@
         <!-- Create album folder -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.createAlbumFolder'></v-checkbox>
+                <v-checkbox v-model='$root.settings.createAlbumFolder' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Create folders for albums")}}</v-list-item-title>
@@ -73,7 +82,7 @@
         <!-- Download lyrics -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.downloadLyrics'></v-checkbox>
+                <v-checkbox v-model='$root.settings.downloadLyrics' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Download lyrics")}}</v-list-item-title>
@@ -83,12 +92,24 @@
 
         <!-- Download naming -->
         <v-text-field
-            class='px-4 mb-2'
+            class='px-4 my-2'
             label='Download Filename'
             persistent-hint
             v-model='$root.settings.downloadFilename'
             :hint='$t("Variables") + ": %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%, %year%"'
         ></v-text-field>
+
+        <!-- Crossfade -->
+        <v-slider
+            :label='$t("Crossfade (ms)")'
+            min='0'
+            max='10000'
+            thumb-label
+            step='500'
+            ticks
+            class='px-4 mt-4 mx-2'
+            v-model='$root.settings.crossfadeDuration'
+        ></v-slider>
 
         <!-- UI -->
         <v-subheader>{{$t("UI")}}</v-subheader>
@@ -96,22 +117,42 @@
 
         <!-- Language -->
         <v-select 
-            class='mt-2 px-4'
+            class='mt-2 px-4 mx-2'
             label='Language' 
             persistent-hint
             :items='languageNames'
             @change='updateLanguage'
         ></v-select>
+        <!-- Primary color -->
+        <v-list-item @click='colorPicker = true'>
+            <v-list-item-avatar>
+                <v-icon>mdi-palette</v-icon>
+            </v-list-item-avatar>
+            <v-list-item-content>
+                <v-list-item-title class='pl-2'>{{$t("Select primary color")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
 
         <!-- Autocomplete -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.showAutocomplete'></v-checkbox>
+                <v-checkbox v-model='$root.settings.showAutocomplete' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Show autocomplete in search")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
+
+        <!-- Light theme -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox class='pl-2' v-model='$root.settings.lightTheme' @change='changeLightTheme'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Light theme")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
+        
         
         <!-- Accounts -->
         <v-subheader>{{$t("Integrations")}}</v-subheader>
@@ -120,7 +161,7 @@
         <!-- Log listening -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.logListen'></v-checkbox>
+                <v-checkbox v-model='$root.settings.logListen' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Log track listens to Deezer")}}</v-list-item-title>
@@ -133,8 +174,8 @@
                 <v-img src='lastfm.svg'></v-img>
             </v-list-item-avatar>
             <v-list-item-content>
-                <v-list-item-title>{{$t("Login with LastFM")}}</v-list-item-title>
-                <v-list-item-subtitle>{{$t("Connect your LastFM account to allow scrobbling.")}}</v-list-item-subtitle>
+                <v-list-item-title class='pl-2'>{{$t("Login with LastFM")}}</v-list-item-title>
+                <v-list-item-subtitle class='pl-2'>{{$t("Connect your LastFM account to allow scrobbling.")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
         <v-list-item v-if='$root.settings.lastFM' @click='disconnectLastFM'>
@@ -148,7 +189,7 @@
         <!-- Discord -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.enableDiscord' @click='snackbarText = $t("Requires restart to apply!"); snackbar = true'></v-checkbox>
+                <v-checkbox class='pl-2' v-model='$root.settings.enableDiscord' @click='snackbarText = $t("Requires restart to apply!"); snackbar = true'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Discord Rich Presence")}}</v-list-item-title>
@@ -158,7 +199,7 @@
         <!-- Discord Join Button -->
         <v-list-item>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.discordJoin' @click='snackbarText = $t("Requires restart to apply!"); snackbar = true'></v-checkbox>
+                <v-checkbox class='pl-2' v-model='$root.settings.discordJoin' @click='snackbarText = $t("Requires restart to apply!"); snackbar = true'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Discord Join Button")}}</v-list-item-title>
@@ -173,7 +214,7 @@
         <!-- Minimize to tray -->
         <v-list-item v-if='$root.settings.electron'>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.minimizeToTray'></v-checkbox>
+                <v-checkbox v-model='$root.settings.minimizeToTray' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Minimize to tray")}}</v-list-item-title>
@@ -182,7 +223,7 @@
         <!-- Close on exit -->
         <v-list-item v-if='$root.settings.electron'>
             <v-list-item-action>
-                <v-checkbox v-model='$root.settings.closeOnExit'></v-checkbox>
+                <v-checkbox v-model='$root.settings.closeOnExit' class='pl-2'></v-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title>{{$t("Close on exit")}}</v-list-item-title>
@@ -218,6 +259,16 @@
       </template>
     </v-snackbar>
 
+    <!-- Color picker overlay -->
+    <v-overlay :value='colorPicker' elevation='2'>
+        <v-card>
+            <v-color-picker v-model='$root.settings.primaryColor' mode='hexa'></v-color-picker>
+            <v-btn :color='$root.settings.primaryColor' block class='my-1 px-2' @click='saveColor'>
+                Save
+            </v-btn>
+        </v-card>
+    </v-overlay>
+
 </div>
 </template>
 
@@ -242,11 +293,20 @@ export default {
                 {code: 'en', name: 'English'},
                 {code: 'ar', name: 'Arabic'},
                 {code: 'de', name: 'German'},
+                {code: 'el', name: 'Greek'},
+                {code: 'id', name: 'Indonesian'},
+                {code: 'it', name: 'Italian'},
+                {code: 'pl', name: 'Polish'},
+                {code: 'ro', name: 'Romanian'},
+                {code: 'ru', name: 'Russian'},
+                {code: 'tr', name: 'Turkish'},
+                {code: 'uk', name: 'Ukrainian'}
             ],
+            colorPicker: false,
             primaryColorIndex: 0,
             primaries: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', 
                 '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
-                '#795548', '#607D8B', '#9E9E9E', '#333333', '#000000']
+                '#795548', '#607D8B', '#9E9E9E']
         }
     },
     methods: {
@@ -309,18 +369,28 @@ export default {
             await this.$root.saveSettings();
             window.location.reload();
         },
-        changeColor() {
-            this.$vuetify.theme.themes.dark.primary = this.primaries[this.primaryColorIndex];
-            this.$root.settings.primaryColor = this.primaries[this.primaryColorIndex];
-            this.primaryColorIndex++;
-            if (this.primaryColorIndex == this.primaries.length)
-                this.primaryColorIndex = 0;
+        saveColor() {
+            this.colorPicker = false;
+            this.$vuetify.theme.themes.dark.primary = this.$root.settings.primaryColor;
+            this.$vuetify.theme.themes.light.primary = this.$root.settings.primaryColor;
+            this.$root.saveSettings();
         },
         updateLanguage(l) {
             let code = this.languages.filter(lang => lang.name == l)[0].code;
             this.language = code;
             this.$root.updateLanguage(code);
             this.$root.settings.language = code;
+        },
+        //Update light theme
+        changeLightTheme(v) {
+            this.$root.settings.lightTheme = v;
+            if (v) {
+                this.$vuetify.theme.dark = false;
+                this.$vuetify.theme.light = true;
+            } else {
+                this.$vuetify.theme.dark = true;
+                this.$vuetify.theme.light = false;
+            }
         }
     },
     computed: {
@@ -347,16 +417,15 @@ export default {
                 }
             }
 
-            //Shhhhhh
-            if (event.code == 'KeyC' && event.shiftKey) {
-                this.changeColor();
-            }
-
-            //SSHHSHSHHSH
-            console.log(event);
+            //RGB
             if (event.code == 'KeyG' && event.ctrlKey && event.altKey) {
                 setInterval(() => {
-                    this.changeColor();
+                    this.$vuetify.theme.themes.dark.primary = this.primaries[this.primaryColorIndex];
+                    this.$vuetify.theme.themes.light.primary = this.primaries[this.primaryColorIndex];
+                    this.$root.settings.primaryColor = this.primaries[this.primaryColorIndex];
+                    this.primaryColorIndex++;
+                    if (this.primaryColorIndex == this.primaries.length)
+                        this.primaryColorIndex = 0;
                 }, 400);
             }
         });
