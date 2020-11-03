@@ -6,9 +6,10 @@ Free music streaming client for Deezer based on the Deezloader/Deemix "bug".
 
 Binaries are available in Telegram channel: https://t.me/freezereleases
 
-## Telegram
+## Links
 
-Join group: https://t.me/freezerandroid
+Join group: https://t.me/freezerpc  
+Discord: https://discord.gg/7ap654Tp3z  
 
 ## Building
 
