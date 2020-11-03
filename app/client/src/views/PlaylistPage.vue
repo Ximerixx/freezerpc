@@ -141,6 +141,7 @@ export default {
             this.libraryLoading = true;
             await this.$axios.put(`/library/playlist?id=${this.playlist.id}`);
             this.libraryLoading = false;
+            this.$root.globalSnackbar = this.$t('Added to library!');
         },
 
         async initialLoad() {

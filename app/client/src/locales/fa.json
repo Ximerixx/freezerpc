@@ -120,5 +120,11 @@
   "Discord": "Discord",
   "Telegram Android Group": "Telegram Android Group",
   "Credits:": "Credits:",
-  "Agree": "Agree"
+  "Agree": "Agree",
+  "Dismiss": "Dismiss",
+  "Added to playlist!": "Added to playlist!",
+  "Added to library!": "Added to library!",
+  "Removed from library!": "Removed from library!",
+  "Removed from playlist!": "Removed from playlist!",
+  "Playlist deleted!": "Playlist deleted!"
 }

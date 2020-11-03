@@ -120,5 +120,11 @@
   "Discord": "Discord",
   "Telegram Android Group": "Telegram Android-Gruppe",
   "Credits:": "Credits:",
-  "Agree": "Einverstanden"
+  "Agree": "Einverstanden",
+  "Dismiss": "Verwerfen",
+  "Added to playlist!": "Zur Wiedergabeliste hinzugefügt!",
+  "Added to library!": "Zur Mediathek hinzufügen!",
+  "Removed from library!": "Aus der Mediathek entfernen!",
+  "Removed from playlist!": "Aus der Wiedergabeliste entfernt!",
+  "Playlist deleted!": "Wiedergabeliste gelöscht!"
 }

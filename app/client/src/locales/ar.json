@@ -120,5 +120,11 @@
   "Discord": "دسكورد",
   "Telegram Android Group": "مجموعة تيليجرام (أندرويد)",
   "Credits:": "المساهمون:",
-  "Agree": "قبول"
+  "Agree": "قبول",
+  "Dismiss": "تجاهل",
+  "Added to playlist!": "تمت الإضافة إلى قائمة التشغيل!",
+  "Added to library!": "تمت الاضافة الى المكتبة!",
+  "Removed from library!": "الإزالة من المكتبة!",
+  "Removed from playlist!": "تمت الإزالة من قائمة التشغيل!",
+  "Playlist deleted!": "تم حذف قائمة التشغيل!"
 }

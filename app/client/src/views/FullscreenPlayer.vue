@@ -270,11 +270,13 @@ export default {
                 this.inLibrary = false;
                 //Remove from cache
                 this.$root.libraryTracks.splice(this.$root.libraryTracks.indexOf(this.$root.track.id), 1);
+                this.$root.globalSnackbar = this.$t('Removed from library!');
                 return;
             }
             await this.$axios.put('/library/track?id=' + this.$root.track.id);
             this.$root.libraryTracks.push(this.$root.track.id);
             this.inLibrary = true;
+            this.$root.globalSnackbar = this.$t('Added to library!');
         },
         //Download current track
         async download() {

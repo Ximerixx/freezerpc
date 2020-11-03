@@ -151,6 +151,7 @@ export default {
         async library() {
             this.libraryLoading = true;
             await this.$axios.put(`/library/artist?id=${this.artist.id}`);
+            this.$root.globalSnackbar = this.$t('Added to library!');
             this.libraryLoading = false;
         },
         async load() {

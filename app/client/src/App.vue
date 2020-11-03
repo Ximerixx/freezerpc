@@ -252,6 +252,16 @@
       </v-row>
     </v-footer>
 
+    <!-- Global snackbar -->
+    <v-snackbar timeout='2000' v-model='globalSnackbar'>
+      {{this.$root.globalSnackbar}}
+      <template v-slot:action='{attrs}'>
+        <v-btn text v-bind="attrs" @click='globalSnackbar = false' color='primary'>
+          {{$t("Dismiss")}}
+        </v-btn>
+      </template>
+    </v-snackbar>
+
   </v-app>
 </template>
 
@@ -287,7 +297,10 @@ export default {
       searchLoading: false,
       searchInput: null,
       suggestions: [],
-      preventDoubleEnter: false
+      preventDoubleEnter: false,
+      cancelSuggestions: false,
+
+      globalSnackbar: false
     }
   },
   methods: {
@@ -355,6 +368,8 @@ export default {
         this.searchLoading = false;
       } else {
         //Normal search
+        this.cancelSuggestions = true;
+        this.suggestions = [];
         this.$router.push({path: '/search', query: {q: query}});
       }
     },
@@ -417,6 +432,14 @@ export default {
     '$root.position'() {
       this.position = (this.$root.position / this.$root.duration()) * 100;
     },
+    //Global snackbar
+    '$root.globalSnackbar'() {
+      if (!this.$root.globalSnackbar) return;
+      this.globalSnackbar = true;
+      setTimeout(() => {
+        this.$root.globalSnackbar = null;
+      }, 2000);
+    },
     //Autofill
     searchInput(query) {
       //Filters
@@ -437,6 +460,12 @@ export default {
         if (query != this.searchInput) return;
         this.$axios.get('/suggestions/' + encodeURIComponent(query)).then((res) => {
           if (query != this.searchInput) return;
+          //Cancel suggestions to prevent autocompletion when already searched
+          if (this.cancelSuggestions) {
+            this.cancelSuggestions = false;
+            this.searchLoading = false;
+            return;
+          }
           this.suggestions = res.data;
           this.searchLoading = false;
         });

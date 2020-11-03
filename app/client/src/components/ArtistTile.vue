@@ -67,8 +67,9 @@ export default {
         }
     },
     methods: {
-        addLibrary() {
-            this.$axios.put(`/library/artist&id=${this.artist.id}`);
+        async addLibrary() {
+            await this.$axios.put(`/library/artist&id=${this.artist.id}`);
+            this.$root.globalSnackbar = this.$t('Added to library!');
         },
         click() {
             //Navigate to details

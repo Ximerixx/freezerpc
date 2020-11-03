@@ -292,13 +292,16 @@ export default {
             languages: [
                 {code: 'en', name: 'English'},
                 {code: 'ar', name: 'Arabic'},
+                {code: 'fr', name: 'French'},
                 {code: 'de', name: 'German'},
                 {code: 'el', name: 'Greek'},
                 {code: 'id', name: 'Indonesian'},
                 {code: 'it', name: 'Italian'},
                 {code: 'pl', name: 'Polish'},
+                {code: 'pt', name: 'Portuguese'},
                 {code: 'ro', name: 'Romanian'},
                 {code: 'ru', name: 'Russian'},
+                {code: 'es', name: 'Spanish'},
                 {code: 'tr', name: 'Turkish'},
                 {code: 'uk', name: 'Ukrainian'}
             ],

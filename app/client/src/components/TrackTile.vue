@@ -187,6 +187,7 @@ export default {
             this.isLibrary = true;
             this.$root.libraryTracks.push(this.track.id);
             this.$axios.put(`/library/track?id=${this.track.id}`);
+            this.$root.globalSnackbar = this.$t('Added to library!');
         },
         goAlbum() {
             this.$emit('redirect')
@@ -206,6 +207,7 @@ export default {
             this.isLibrary = false;
             this.$root.libraryTracks.splice(this.$root.libraryTracks.indexOf(this.track.id), 1);
             await this.$axios.delete(`/library/track?id=${this.track.id}`);
+            this.$root.globalSnackbar = this.$t('Removed from library!');
             this.$emit('remove');
         },
         //Remove from playlist
@@ -213,6 +215,7 @@ export default {
             await this.$axios.delete(`/playlist/${this.playlistId}/tracks`, {
                 data: {track: this.track.id}
             });
+            this.$root.globalSnackbar = this.$t('Removed from playlist!');
             this.$emit('remove');
         },
         //Download track

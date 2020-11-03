@@ -42,6 +42,7 @@
         </v-card-text>
     </v-card>
 
+
 </div>
 </template>
 
@@ -58,7 +59,7 @@ export default {
             type: 'Private',
             types: ['Private', 'Public'],
             createLoading: false,
-
+            
             loading: false,
             playlists: []
         }
@@ -84,11 +85,13 @@ export default {
             this.createLoading = false;
             this.$emit('created');
             this.$emit('close');
+            this.$root.globalSnackbar = this.$t('Added to playlist!');
         },
         //Add track to playlist
         async addTrack(playlist) {
             await this.$axios.post(`/playlist/${playlist.id}/tracks`, {track: this.track.id});
             this.$emit('close');
+            this.$root.globalSnackbar = this.$t('Added to playlist!');
         }
     },
     async mounted() {

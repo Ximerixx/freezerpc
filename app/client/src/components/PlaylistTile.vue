@@ -140,11 +140,13 @@ export default {
             //Delete own playlist
             if (this.playlist.user.id == this.$root.profile.id) {
                 await this.$axios.delete(`/playlist/${this.playlist.id}`);
+                this.$root.globalSnackbar = this.$t('Playlist deleted!');
             } else {
                 //Remove from library
                 await this.$axios.get('/library/playlist&id=' + this.playlist.id);
+                this.$root.globalSnackbar = this.$t('Removed from library!');
             }
-
+            
             this.$emit('remove');
         },
         async download() {

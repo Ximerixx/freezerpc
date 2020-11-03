@@ -96,12 +96,9 @@ export default {
             if (this.currentLyricIndex == this.currentLyric()) return;
             this.currentLyricIndex = this.currentLyric();
 
-            //Roughly middle
-            let offset = window.innerHeight / 2 - 500;
-
             if (!this.$refs["l"+this.currentLyricIndex]) return;
             this.$refs.content.scrollTo({
-                top: this.$refs["l"+this.currentLyricIndex][0].offsetTop + offset,
+                top: this.$refs["l"+this.currentLyricIndex][0].offsetTop - (window.innerHeight / 2.42),
                 behavior: 'smooth'
             });
         },

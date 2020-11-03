@@ -105,6 +105,7 @@ export default {
             this.libraryLoading = true;
             await this.$axios.put(`/library/album?id=${this.album.id}`);
             this.libraryLoading = false;
+            this.$root.globalSnackbar = this.$t('Added to library!');
         },
         async download() {
             this.downloadDialog = true;

@@ -134,8 +134,9 @@ export default {
             });
             this.$emit('clicked')
         },
-        addLibrary() {
-            this.$axios.put(`/library/album?id=${this.album.id}`);
+        async addLibrary() {
+            await this.$axios.put(`/library/album?id=${this.album.id}`);
+            this.$root.globalSnackbar = this.$t('Added to library!');
         },
         //Add to downloads
         async download() {

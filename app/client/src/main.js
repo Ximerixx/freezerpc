@@ -108,7 +108,9 @@ new Vue({
         },
 
         //Used to prevent double listen logging
-        logListenId: null
+        logListenId: null,
+
+        globalSnackbar: null
     },
 
     methods: {
@@ -241,25 +243,30 @@ new Vue({
                 if (this.settings.crossfadeDuration > 0 && this.position >= (this.duration() - this.settings.crossfadeDuration) && this.state == 2 && this.gapless.audio && !this.gapless.crossfade) {
                     this.gapless.crossfade = true;
                     let currentVolume = this.audio.volume;
-                    this.gapless.audio.play();
-
-                    let volumeStep = currentVolume / (this.settings.crossfadeDuration / 50);
-                    for (let i=0; i<(this.settings.crossfadeDuration / 50); i++) {
-                        if ((this.audio.volume - volumeStep) > 0)
-                            this.audio.volume -= volumeStep;
-                        this.gapless.audio.volume += volumeStep;
-                        await new Promise((res) => setTimeout(() => res(), 50));
-                    }
-                    this.audio.pause();
-
-                    //Update audio
+                    let oldAudio = this.audio;
                     this.audio = this.gapless.audio;
+                    this.audio.play();
+
+                    //Update meta
                     this.playbackInfo = this.gapless.info;
                     this.track = this.gapless.track;
                     this.queue.index = this.gapless.index;
-                    this.resetGapless();
+
                     this.configureAudio();
                     this.updateMediaSession();
+
+                    let volumeStep = currentVolume / (this.settings.crossfadeDuration / 50);
+                    for (let i=0; i<(this.settings.crossfadeDuration / 50); i++) {
+                        if ((oldAudio.volume - volumeStep) > 0)
+                            oldAudio.volume -= volumeStep;
+                        this.audio.volume += volumeStep;
+                        await new Promise((res) => setTimeout(() => res(), 50));
+                    }
+                    oldAudio.pause();
+                    
+                    this.resetGapless();
+
+                    //Save
                     await this.savePlaybackInfo();
                 }
 
