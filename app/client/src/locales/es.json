@@ -121,10 +121,12 @@
   "Telegram Android Group": "Grupo de Android en Telegram",
   "Credits:": "Créditos:",
   "Agree": "Acepto",
-  "Dismiss": "Dismiss",
-  "Added to playlist!": "Added to playlist!",
-  "Added to library!": "Added to library!",
-  "Removed from library!": "Removed from library!",
-  "Removed from playlist!": "Removed from playlist!",
-  "Playlist deleted!": "Playlist deleted!"
+  "Dismiss": "Descartar",
+  "Added to playlist!": "¡Añadido a la lista de reproducción!",
+  "Added to library!": "¡Agregado a la biblioteca!",
+  "Removed from library!": "¡Eliminado de la biblioteca!",
+  "Removed from playlist!": "¡Eliminado de la lista de reproducción!",
+  "Playlist deleted!": "¡Lista de reproducción eliminada!",
+  "Delete": "Eliminar",
+  "Are you sure you want to delete this playlist?": "¿Está seguro de querer eliminar la lista de reproducción?"
 }

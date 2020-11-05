@@ -143,7 +143,6 @@ export default {
     },
     created() {
         this.$axios.get('/about').then((res) => {
-            console.log(res);
             this.data = res.data;
         });
     }

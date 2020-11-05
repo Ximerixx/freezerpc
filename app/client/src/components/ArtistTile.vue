@@ -18,12 +18,21 @@
                 </template>
                 <v-list dense>
                     <!-- Add library -->
-                    <v-list-item dense @click='addLibrary'>
+                    <v-list-item dense @click='library' v-if='!artist.library'>
                         <v-list-item-icon>
                             <v-icon>mdi-heart</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>{{$t("Add to library")}}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <!-- Remvoe from library -->
+                    <v-list-item dense @click='library' v-if='artist.library'>
+                        <v-list-item-icon>
+                            <v-icon>mdi-heart-remove</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{$t("Remove from library")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
@@ -67,9 +76,19 @@ export default {
         }
     },
     methods: {
-        async addLibrary() {
-            await this.$axios.put(`/library/artist&id=${this.artist.id}`);
-            this.$root.globalSnackbar = this.$t('Added to library!');
+        async library() {
+            if (this.artist.library) {
+                //Remove
+                await this.$axios.delete('/library/artist?id=' + this.artist.id);
+                this.$root.globalSnackbar = this.$t('Removed from library!');
+                this.artist.library = false;
+                this.$emit('remove');
+            } else {
+                //Add
+                await this.$axios.put(`/library/artist?id=${this.artist.id}`);
+                this.$root.globalSnackbar = this.$t('Added to library!');
+                this.artist.library = true;
+            }
         },
         click() {
             //Navigate to details

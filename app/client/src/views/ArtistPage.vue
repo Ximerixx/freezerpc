@@ -26,8 +26,15 @@
                     {{$t("Play top")}}
                 </v-btn>
                 <v-btn color='red' class='mx-1' @click='library' :loading='libraryLoading'>
-                    <v-icon left>mdi-heart</v-icon>
-                    {{$t("Library")}}
+                    <div v-if='!artist.library'>
+                        <v-icon left>mdi-heart</v-icon>
+                        {{$t("Library")}}
+                    </div>
+                    <div v-if='artist.library'>
+                        <v-icon left>mdi-heart-remove</v-icon>
+                        {{$t("Remove")}}
+                    </div>
+                    
                 </v-btn>
                 <v-btn color='green' class='mx-1' @click='radio' v-if='artist.radio'>
                     <v-icon left>mdi-radio</v-icon>
@@ -150,8 +157,17 @@ export default {
         //Add to library
         async library() {
             this.libraryLoading = true;
-            await this.$axios.put(`/library/artist?id=${this.artist.id}`);
-            this.$root.globalSnackbar = this.$t('Added to library!');
+            if (this.artist.library) {
+                //Remove
+                await this.$axios.delete('/library/artist?id=' + this.artist.id);
+                this.$root.globalSnackbar = this.$t('Removed from library!');
+                this.artist.library = false;
+            } else {
+                //Add
+                await this.$axios.put(`/library/artist?id=${this.artist.id}`);
+                this.$root.globalSnackbar = this.$t('Added to library!');
+                this.artist.library = true;
+            }
             this.libraryLoading = false;
         },
         async load() {
@@ -160,7 +176,10 @@ export default {
                 this.loading = true;
                 let data = await this.$axios.get(`/artist/${this.artist.id}`);
                 if (data && data.data && data.data.topTracks) {
+                    //Preserve library
+                    let library = this.artist.library;
                     this.artist = data.data;
+                    this.artist.library = library;
                 }
                 this.loading = false;
             }

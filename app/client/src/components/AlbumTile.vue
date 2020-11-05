@@ -37,12 +37,21 @@
                         </v-list-item-content>
                     </v-list-item>
                     <!-- Add to library -->
-                    <v-list-item dense @click='addLibrary'>
+                    <v-list-item dense @click='library' v-if='!album.library'>
                         <v-list-item-icon>
                             <v-icon>mdi-heart</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>{{$t("Add to library")}}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <!-- Remove from library -->
+                    <v-list-item dense @click='library' v-if='album.library'>
+                        <v-list-item-icon>
+                            <v-icon>mdi-heart-remove</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{$t("Remove from library")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                     <!-- Download -->
@@ -134,9 +143,19 @@ export default {
             });
             this.$emit('clicked')
         },
-        async addLibrary() {
-            await this.$axios.put(`/library/album?id=${this.album.id}`);
-            this.$root.globalSnackbar = this.$t('Added to library!');
+        async library() {
+            if (this.album.library) {
+                //Remove
+                await this.$axios.delete('/library/album?id=' + this.album.id);
+                this.$root.globalSnackbar = this.$t('Removed from library!');
+                this.album.library = false;
+                this.$emit('remove');
+            } else {
+                //Add
+                await this.$axios.put(`/library/album?id=${this.album.id}`);
+                this.$root.globalSnackbar = this.$t('Added to library!');
+                this.album.library = true;
+            }
         },
         //Add to downloads
         async download() {

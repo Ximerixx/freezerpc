@@ -121,10 +121,12 @@
   "Telegram Android Group": "Telegram Grub Android",
   "Credits:": "Kredit:",
   "Agree": "Setuju",
-  "Dismiss": "Dismiss",
-  "Added to playlist!": "Added to playlist!",
-  "Added to library!": "Added to library!",
-  "Removed from library!": "Removed from library!",
-  "Removed from playlist!": "Removed from playlist!",
-  "Playlist deleted!": "Playlist deleted!"
+  "Dismiss": "Abaikan",
+  "Added to playlist!": "Ditambahkan ke daftar putar!",
+  "Added to library!": "Ditambahkan ke koleksi!",
+  "Removed from library!": "Dihapus dari koleksi!",
+  "Removed from playlist!": "Dihapus dari daftar putar!",
+  "Playlist deleted!": "Daftar putar dihapus!",
+  "Delete": "Delete",
+  "Are you sure you want to delete this playlist?": "Are you sure you want to delete this playlist?"
 }

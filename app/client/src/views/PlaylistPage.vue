@@ -22,18 +22,28 @@
                 <span class='text-subtitle-2'>{{$numberString(playlist.fans)}} {{$t('fans')}}</span><br>
             </div>
             
-            <div class='my-1'>
+            <div class='my-2'>
                 <v-btn color='primary' class='mr-1' @click='play'>
                     <v-icon left>mdi-play</v-icon>
                     {{$t('Play')}}
                 </v-btn>
-                <v-btn color='red' class='mx-1' @click='library' :loading='libraryLoading'>
-                    <v-icon left>mdi-heart</v-icon>
-                    {{$t('Library')}}
+                <v-btn color='red' class='mx-1' @click='library' :loading='libraryLoading' v-if='!isOwn'>
+                    <div v-if='!playlist.library'>
+                        <v-icon left>mdi-heart</v-icon>
+                        {{$t('Library')}}
+                    </div>
+                    <div v-if='playlist.library'>
+                        <v-icon left>mdi-heart-remove</v-icon>
+                        {{$t('Remove')}}
+                    </div>
                 </v-btn>
                 <v-btn color='green' class='mx-1' @click='download'>
                     <v-icon left>mdi-download</v-icon>
                     {{$t('Download')}}
+                </v-btn>
+                <v-btn color='red' class='mx-1' v-if='isOwn' @click='deleteDialog = true'>
+                    <v-icon left>mdi-delete</v-icon>
+                    {{$t('Delete')}}
                 </v-btn>
             </div>
         </div>
@@ -57,6 +67,23 @@
 
     <DownloadDialog :playlistName='playlist.title' :tracks='playlist.tracks' v-if='downloadDialog' @close='downloadDialog = false'></DownloadDialog>
 
+    <!-- Delete playlist -->
+    <v-dialog v-model='deleteDialog' max-width='256px'>
+        <v-card>
+            <v-card-title>
+                {{$t("Delete")}}
+            </v-card-title>
+            <v-card-text>
+                {{$t("Are you sure you want to delete this playlist?")}}
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text @click='deleteDialog = false' class='mx-2'>{{$t("Cancel")}}</v-btn>
+                <v-btn text color='red' @click='deleteDialog = false; deletePlaylist();'>{{$t("Delete")}}</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
 </v-list>
 </template>
 
@@ -70,7 +97,7 @@ export default {
         TrackTile, DownloadDialog
     },
     props: {
-        playlistData: Object
+        playlistData: Object,
     },
     data() {
         return {
@@ -81,7 +108,8 @@ export default {
             loadingTracks: false,
             //Add to library button
             libraryLoading: false,
-            downloadDialog: false
+            downloadDialog: false,
+            deleteDialog: false
         }
     },
     methods: {
@@ -139,9 +167,18 @@ export default {
         },
         async library() {
             this.libraryLoading = true;
-            await this.$axios.put(`/library/playlist?id=${this.playlist.id}`);
+            if (this.playlist.library) {
+                //Remove
+                await this.$axios.delete('/library/playlist?id=' + this.playlist.id);
+                this.$root.globalSnackbar = this.$t('Removed from library!');
+                this.playlist.library = false;
+            } else {
+                //Add
+                await this.$axios.put(`/library/playlist?id=${this.playlist.id}`);
+                this.$root.globalSnackbar = this.$t('Added to library!');
+                this.playlist.library = true;
+            }
             this.libraryLoading = false;
-            this.$root.globalSnackbar = this.$t('Added to library!');
         },
 
         async initialLoad() {
@@ -150,7 +187,10 @@ export default {
                 this.loading = true;
                 let data = await this.$axios.get(`/playlist/${this.playlist.id}?start=0`);
                 if (data && data.data && data.data.tracks) {
+                    //Preserve library state
+                    let inLib = this.playlist.library;
                     this.playlist = data.data;
+                    this.playlist.library = inLib;
                 }
                 this.loading = false;
             }
@@ -165,10 +205,20 @@ export default {
                 await this.loadAllTracks();
             }
             this.downloadDialog = true;
+        },
+        async deletePlaylist() {
+            await this.$axios.delete(`/playlist/${this.playlist.id}`);
+            this.$router.go(-1);
         }
     },
     mounted() {
-       this.initialLoad(); 
+        this.initialLoad(); 
+    },
+    computed: {
+        isOwn() {
+            if (this.$root.profile.id == this.playlist.user.id) return true;
+            return false;
+        }
     },
     watch: {
         //Reload on playlist change from drawer

@@ -126,5 +126,7 @@
   "Added to library!": "Προστέθηκε στη βιβλιοθήκη!",
   "Removed from library!": "Καταργήθηκε από τη βιβλιοθήκη!",
   "Removed from playlist!": "Καταργήθηκε από τη λίστα αναπαραγωγής!",
-  "Playlist deleted!": "Η λίστα αναπαραγωγής διαγράφηκε!"
+  "Playlist deleted!": "Η λίστα αναπαραγωγής διαγράφηκε!",
+  "Delete": "Delete",
+  "Are you sure you want to delete this playlist?": "Are you sure you want to delete this playlist?"
 }

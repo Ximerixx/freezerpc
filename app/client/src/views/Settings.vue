@@ -96,7 +96,7 @@
             label='Download Filename'
             persistent-hint
             v-model='$root.settings.downloadFilename'
-            :hint='$t("Variables") + ": %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%, %year%"'
+            :hint='$t("Variables") + ": %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%, %year%, %label%"'
         ></v-text-field>
 
         <!-- Crossfade -->
@@ -301,6 +301,7 @@ export default {
                 {code: 'pt', name: 'Portuguese'},
                 {code: 'ro', name: 'Romanian'},
                 {code: 'ru', name: 'Russian'},
+                {code: 'sk', name: 'Slovak'},
                 {code: 'es', name: 'Spanish'},
                 {code: 'tr', name: 'Turkish'},
                 {code: 'uk', name: 'Ukrainian'}

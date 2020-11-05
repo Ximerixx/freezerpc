@@ -321,6 +321,13 @@ new Vue({
                     await this.savePlaybackInfo();
                     return;
                 }
+
+                //End of queue
+                if (this.queue.index+1 == this.queue.data.length) {
+                    this.state = 1;
+                    return;
+                }
+
                 //Skip to next track
                 this.skip(1);
                 this.savePlaybackInfo();

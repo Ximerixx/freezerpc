@@ -126,5 +126,7 @@
   "Added to library!": "تمت الاضافة الى المكتبة!",
   "Removed from library!": "الإزالة من المكتبة!",
   "Removed from playlist!": "تمت الإزالة من قائمة التشغيل!",
-  "Playlist deleted!": "تم حذف قائمة التشغيل!"
+  "Playlist deleted!": "تم حذف قائمة التشغيل!",
+  "Delete": "Delete",
+  "Are you sure you want to delete this playlist?": "Are you sure you want to delete this playlist?"
 }

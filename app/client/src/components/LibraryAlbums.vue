@@ -5,8 +5,8 @@
         <v-progress-circular indeterminate></v-progress-circular>
     </v-overlay>
 
-    <v-lazy max-height="100" v-for='album in albums' :key='album.id'>
-        <AlbumTile :album='album'></AlbumTile>
+    <v-lazy max-height="100" v-for='(album, index) in albums' :key='album.id'>
+        <AlbumTile :album='album' @remove='removed(index)'></AlbumTile>
     </v-lazy>
 
 </v-list>
@@ -32,6 +32,9 @@ export default {
                 this.albums = res.data.data;
             }
             this.loading = false;
+        },
+        removed(index) {
+            this.albums.splice(index, 1);
         }
     },
     components: {

@@ -480,6 +480,7 @@ class DownloadThread {
             '%0trackNumber%': (this.track.trackNumber ? this.track.trackNumber : 1).toString().padStart(2, '0'),
             '%album%': this.track.album.title,
             '%year%': date.getFullYear().toString(),
+            '%label%': (this.publicAlbum.label) ? this.publicAlbum.label : ''
         };
         for (let k of Object.keys(props)) {
             fn = fn.replace(new RegExp(k, 'g'), sanitize(props[k]));

@@ -32,8 +32,14 @@
                     {{$t("Play")}}
                 </v-btn>
                 <v-btn color='red' class='mx-1' @click='library' :loading='libraryLoading'>
-                    <v-icon left>mdi-heart</v-icon>
-                    {{$t("Library")}}
+                    <div v-if='!album.library'>
+                        <v-icon left>mdi-heart</v-icon>
+                        {{$t("Library")}}
+                    </div>
+                    <div v-if='album.library'>
+                        <v-icon left>mdi-heart-remove</v-icon>
+                        {{$t("Remove")}}
+                    </div>
                 </v-btn>
                 <v-btn color='green' class='mx-1' @click='download'>
                     <v-icon left>mdi-download</v-icon>
@@ -103,9 +109,18 @@ export default {
         //Add to library
         async library() {
             this.libraryLoading = true;
-            await this.$axios.put(`/library/album?id=${this.album.id}`);
+            if (this.album.library) {
+                //Remove
+                await this.$axios.delete('/library/album?id=' + this.album.id);
+                this.$root.globalSnackbar = this.$t('Removed from library!');
+                this.album.library = false;
+            } else {
+                //Add
+                await this.$axios.put(`/library/album?id=${this.album.id}`);
+                this.$root.globalSnackbar = this.$t('Added to library!');
+                this.album.library = true;
+            }
             this.libraryLoading = false;
-            this.$root.globalSnackbar = this.$t('Added to library!');
         },
         async download() {
             this.downloadDialog = true;
@@ -123,7 +138,10 @@ export default {
             this.loading = true;
             let data = await this.$axios.get(`/album/${this.album.id}`);
             if (data && data.data && data.data.tracks) {
+                //Preserve library
+                let library = this.album.library;
                 this.album = data.data;
+                this.album.library = library;
             }
             this.loading = false;
         }

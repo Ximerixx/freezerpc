@@ -41,7 +41,7 @@ class Track {
 }
 
 class Album {
-    constructor(json, tracksJson = {data: []}) {
+    constructor(json, tracksJson = {data: []}, library = false) {
         this.id = json.ALB_ID.toString();
         this.title = json.ALB_TITLE;
         this.art = new DeezerImage(json.ALB_PICTURE);
@@ -65,11 +65,13 @@ class Album {
 
         //Helpers
         this.artistString = this.artists.map((a) => a.name).join(', ');
+
+        this.library = library;
     }
 }
 
 class Artist {
-    constructor(json, albumsJson = {data: []}, topJson = {data: []}) {
+    constructor(json, albumsJson = {data: []}, topJson = {data: []}, library = false) {
         this.id = json.ART_ID.toString();
         this.name = json.ART_NAME;
         this.fans = json.NB_FAN;
@@ -78,11 +80,12 @@ class Artist {
         this.albums = albumsJson.data.map((a) => new Album(a));
         this.topTracks = topJson.data.map((t) => new Track(t));
         this.radio = json.SMARTRADIO;
+        this.library = library;
     }
 }
 
 class Playlist {
-    constructor(json, tracksJson = {data: []}) {
+    constructor(json, tracksJson = {data: []}, library = false) {
         this.id = json.PLAYLIST_ID.toString(),
         this.title = json.TITLE,
         this.trackCount = json.NB_SONG ? json.NB_SONG : tracksJson.total;
@@ -96,6 +99,7 @@ class Playlist {
             new DeezerImage(json.PARENT_USER_PICTURE, 'user')
         );
         this.tracks = tracksJson.data.map((t) => new Track(t));
+        this.library = library;
     }
 
     //Extend tracks
@@ -159,15 +163,15 @@ class DeezerLibrary {
                 break;
             case 'albums':
                 this.count = json.albums.total;
-                this.data = json.albums.data.map((a) => new Album(a));
+                this.data = json.albums.data.map((a) => new Album(a, {data: []}, true));
                 break;
             case 'artists':
                 this.count = json.artists.total;
-                this.data = json.artists.data.map((a) => new Artist(a));
+                this.data = json.artists.data.map((a) => new Artist(a, {data: []}, {data: []}, true));
                 break;
             case 'playlists':
                 this.count = json.playlists.total;
-                this.data = json.playlists.data.map((p) => new Playlist(p));
+                this.data = json.playlists.data.map((p) => new Playlist(p, {data: []}, true));
                 break;
         }
     }

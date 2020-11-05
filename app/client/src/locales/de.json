@@ -126,5 +126,7 @@
   "Added to library!": "Zur Mediathek hinzufügen!",
   "Removed from library!": "Aus der Mediathek entfernen!",
   "Removed from playlist!": "Aus der Wiedergabeliste entfernt!",
-  "Playlist deleted!": "Wiedergabeliste gelöscht!"
+  "Playlist deleted!": "Wiedergabeliste gelöscht!",
+  "Delete": "Löschen",
+  "Are you sure you want to delete this playlist?": "Bist du sicher, dass du diese Wiedergabeliste löschen willst?"
 }

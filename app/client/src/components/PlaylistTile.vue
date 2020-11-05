@@ -36,13 +36,23 @@
                         </v-list-item-content>
                     </v-list-item>
 
+                    <!-- Add to library -->
+                    <v-list-item dense v-if='!canRemove && !playlist.library' @click='library'>
+                        <v-list-item-icon>
+                            <v-icon>mdi-heart</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{$t('Add to library')}}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+
                     <!-- Remove -->
                     <v-list-item dense v-if='canRemove' @click='remove'>
                         <v-list-item-icon>
                             <v-icon>mdi-playlist-remove</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>{{$t('Remove')}}</v-list-item-title>
+                            <v-list-item-title>{{$t('Remove from library')}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                     
@@ -157,12 +167,17 @@ export default {
             }
             this.tracks = tracks;
             this.downloadDialog = true;
+        },
+        async library() {
+            await this.$axios.put(`/library/playlist?id=${this.playlist.id}`);
+            this.$root.globalSnackbar = this.$t('Added to library!');
+            this.playlist.library = true;
         }
     },
     computed: {
         canRemove() {
             //Own playlist
-            if (this.$root.profile.id == this.playlist.user.id) return true;
+            if (this.$root.profile.id == this.playlist.user.id || this.playlist.library) return true;
             return false;
         }
     }

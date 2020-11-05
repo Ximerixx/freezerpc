@@ -5,8 +5,8 @@
         <v-progress-circular indeterminate></v-progress-circular>
     </v-overlay>
 
-    <v-lazy max-height="100" v-for='artist in artists' :key='artist.id'>
-        <ArtistTile :artist='artist'></ArtistTile>
+    <v-lazy max-height="100" v-for='(artist, index) in artists' :key='artist.id'>
+        <ArtistTile :artist='artist' @remove='removed(index)'></ArtistTile>
     </v-lazy>
 
 </v-list>
@@ -35,6 +35,9 @@ export default {
                 this.artists = res.data.data;
             }
             this.loading = false;
+        },
+        removed(index) {
+            this.artists.splice(index, 1);
         }
     },
     mounted() {
