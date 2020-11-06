@@ -88,7 +88,7 @@ app.on('ready', async () => {
     createWindow();
 
     //Create Tray
-    if (nativeTheme.shouldUseDarkColors)
+    if (settings.forceWhiteTrayIcon || nativeTheme.shouldUseDarkColors)
         tray = new Tray(assetPath("icon-taskbar-white.png"));
     else
         tray = new Tray(assetPath("icon-taskbar-black.png"));

@@ -16,7 +16,7 @@
                     :src='$root.track.albumArt.full' 
                     :lazy-src="$root.track.albumArt.thumb"
                     aspect-ratio="1"
-                    max-height="calc(90vh - 285px)"
+                    max-height="calc(90vh - 310px)"
                     class='ma-4' 
                     contain>
                 </v-img>
@@ -70,7 +70,7 @@
                 </v-row>
 
                 <!-- Bottom actions -->
-                <div class='d-flex my-1 mx-2 '>
+                <div class='d-flex mx-2 mb-2'>
                     
                     <v-btn icon @click='repeatClick'>
                         <v-icon v-if='$root.repeat == 0'>mdi-repeat</v-icon>
@@ -134,7 +134,7 @@
                 <v-tabs-items v-model='tab'>
                     <!-- Queue tab -->
                     <v-tab-item key='queue'>
-                        <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 140px)'>
+                        <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 160px)'>
                             <v-lazy 
                             min-height="1" 
                             transition="fade-transition"
@@ -151,7 +151,7 @@
                     </v-tab-item>
                     <!-- Info tab -->
                     <v-tab-item key='info'>
-                        <v-list two-line avatar class='overflow-y-auto text-center' style='max-height: calc(100vh - 140px)'>
+                        <v-list two-line avatar class='overflow-y-auto text-center' style='max-height: calc(100vh - 160px)'>
                             <h1>{{$root.track.title}}</h1>
                             <!-- Album -->
                             <h3>Album:</h3>
@@ -182,7 +182,7 @@
                     </v-tab-item>
                     <!-- Lyrics -->
                     <v-tab-item key='lyrics'>
-                        <Lyrics :songId='$root.track.id' height='calc(100vh - 140px)'></Lyrics>
+                        <Lyrics :songId='$root.track.id' height='calc(100vh - 160px)'></Lyrics>
                     </v-tab-item>
 
                 </v-tabs-items>
@@ -204,19 +204,20 @@
 <style scoped>
 .main {
     width: 100vw;
-
 }
 
 .notop {
     height: 100vh;
+    width: 100vw;
 }
 
 .electron {
     height: calc(100vh - 28px);
     margin-top: 28px;
+    width: 100vw;
 }
 
-@media screen and (max-height: 864px) {
+@media screen and (max-height: 900px) {
     .imagescale {
         max-height: 50vh;
     }

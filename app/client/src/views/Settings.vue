@@ -230,6 +230,16 @@
                 <v-list-item-subtitle>{{$t("Don't minimize to tray")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
+        <!-- Force white tray icon -->
+        <v-list-item v-if='$root.settings.electron'>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.forceWhiteTrayIcon' class='pl-2'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Force white tray icon")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("Force default (white) tray icon if theme incorrectly detected. Requires restart.")}}</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
 
         <!-- Logout -->
         <v-btn block color='red' class='mt-4' @click='logout'>

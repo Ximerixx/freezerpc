@@ -38,6 +38,8 @@ class Settings {
         this.crossfadeDuration = 3000;
         this.lightTheme = false;
         this.playlistFolder = false;
+
+        this.forceWhiteTrayIcon = false;
     }
 
     //Based on electorn app.getPath

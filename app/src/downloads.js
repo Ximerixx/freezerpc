@@ -10,6 +10,7 @@ const sanitize = require('sanitize-filename');
 const ID3Writer = require('browser-id3-writer');
 const Metaflac = require('metaflac-js2');
 const { Track, Lyrics } = require('./definitions');
+const { throwDeprecation } = require('process');
 
 let deezer;
 
@@ -220,15 +221,23 @@ class DownloadThread {
         this.qualityInfo = await deezer.fallback(this.download.track.streamUrl, this.download.quality);
         if (!this.qualityInfo) {
             this.download.state = -1;
+            this._cb();
             return;
         }
 
         //Get track info
         if (!this.isUserUploaded) {
-            this.rawTrack = await deezer.callApi('deezer.pageTrack', {'sng_id': this.download.track.id});
-            this.track = new Track(this.rawTrack.results.DATA);
-            this.publicTrack = await deezer.callPublicApi('track', this.track.id);
-            this.publicAlbum = await deezer.callPublicApi('album', this.track.album.id);
+            try {
+                this.rawTrack = await deezer.callApi('deezer.pageTrack', {'sng_id': this.qualityInfo.trackId});
+                this.track = new Track(this.rawTrack.results.DATA);
+                this.publicTrack = await deezer.callPublicApi('track', this.track.id);
+                this.publicAlbum = await deezer.callPublicApi('album', this.track.album.id);
+            } catch (e) {
+                logger.error(`Error fetching metadata for ID: ${this.qualityInfo.trackId}, Error: ${e}`);
+                this.download.state = -1;
+                this._cb();
+                return;
+            }
         }
 
         //Check if exists

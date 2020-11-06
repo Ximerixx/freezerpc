@@ -173,7 +173,7 @@
       <v-container 
         class='overflow-y-auto' 
         fluid
-        style='height: calc(100vh - 118px);'>
+        style='height: calc(100vh - 140px);'>
 
         <keep-alive include='Search,PlaylistPage,HomeScreen,DeezerPage'>
           <router-view></router-view>

@@ -144,7 +144,42 @@ class DeezerAPI {
         return true;
     }
 
+    //Wrapper because electron is piece of shit
     async callPublicApi(path, params) {
+        if (this.electron) return await this._callPublicApiElectron(path, params);
+        return await this._callPublicApiAxios(path, params);
+    }
+
+    async _callPublicApiElectron(path, params) {
+        const net = require('electron').net;
+        let data = await new Promise((resolve, reject) => {
+            //Create request
+            let req = net.request({
+                method: 'GET',
+                url: `https://api.deezer.com/${encodeURIComponent(path)}/${encodeURIComponent(params)}`
+            });
+            
+            req.on('response', (res) => {
+                let data = Buffer.alloc(0);
+                //Response data
+                res.on('data', (buffer) => {
+                    data = Buffer.concat([data, buffer]);
+                });
+                res.on('end', () => {
+                    resolve(data);
+                })
+            });
+            req.on('error', (err) => {
+                reject(err);
+            });
+            req.end();
+        });
+
+        data = JSON.parse(data.toString('utf-8'));
+        return data;
+    }
+
+    async _callPublicApiAxios(path, params) {
         let res = await axios({
             url: `https://api.deezer.com/${encodeURIComponent(path)}/${encodeURIComponent(params)}`,
             responseType: 'json',
@@ -212,7 +247,7 @@ class DeezerAPI {
                 return this.fallback(newTrack.streamUrl);
             }
         } catch (e) {
-            logger.warn('TrackID Fallback failed: ' + e);
+            logger.warn('TrackID Fallback failed: ' + e + ' Original ID: ' + qualityInfo.trackId);
         }
         //ISRC Fallback
         try {
@@ -222,7 +257,7 @@ class DeezerAPI {
             let newTrack = new Track(newTrackData.results.DATA);
             return this.fallback(newTrack.streamUrl);
         } catch (e) {
-            logger.warn('ISRC Fallback failed: ' + e);
+            logger.warn('ISRC Fallback failed: ' + e + ' Original ID: ' + qualityInfo.trackId);
         }
         return null;
     }
