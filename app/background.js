@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain, Tray, Menu, session, dialog, shell} = require('electron');
+const {app, BrowserWindow, ipcMain, Tray, Menu, session, dialog, shell, nativeTheme} = require('electron');
 const {createServer} = require('./src/server');
 const path = require('path');
 
@@ -39,6 +39,7 @@ async function createWindow() {
         minHeight: 600,
         resizable: true,
         autoHideMenuBar: true,
+        frame: false,
         icon: assetPath("icon.png"),
         title: 'Freezer',
         webPreferences: {
@@ -87,7 +88,10 @@ app.on('ready', async () => {
     createWindow();
 
     //Create Tray
-    tray = new Tray(assetPath("icon-taskbar.png"));
+    if (nativeTheme.shouldUseDarkColors)
+        tray = new Tray(assetPath("icon-taskbar-white.png"));
+    else
+        tray = new Tray(assetPath("icon-taskbar-black.png"));
     tray.on('double-click', () => restoreWindow());
     tray.on('click', () => restoreWindow());
 
@@ -174,6 +178,16 @@ function setThumbarButtons() {
         },
     ]);
 }
+
+//_ button in ui
+ipcMain.on('minimize', () => {
+    win.minimize();
+});
+
+//X button in ui
+ipcMain.on('close', () => {
+    win.close();
+});
 
 ipcMain.on('openUrl', (event, args) => {
     shell.openExternal(args);

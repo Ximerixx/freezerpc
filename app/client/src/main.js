@@ -91,7 +91,6 @@ new Vue({
         //Repeat & Shuffle
         //0 - normal, 1 - repeat list, 2 - repeat track
         repeat: 0,
-        shuffle: false,
 
         //Library cache
         libraryTracks: [],
@@ -137,6 +136,7 @@ new Vue({
             if (!this.audio || isNaN(t) || !t) return;
             //ms -> s
             this.audio.currentTime = (t / 1000);
+            this.position = t;
 
             this.updateState();
         },
@@ -174,12 +174,6 @@ new Vue({
         },
         //Skip wrapper with shuffle 
         skipNext() {
-            if (this.shuffle) {
-                let index = Math.round(Math.random()*this.queue.data.length) - this.queue.index;
-                this.skip(index);
-                this.savePlaybackInfo();
-                return;
-            }
             this.skip(1);
             this.savePlaybackInfo();
         },
@@ -265,6 +259,7 @@ new Vue({
                     oldAudio.pause();
                     
                     this.resetGapless();
+                    this.updateState();
 
                     //Save
                     await this.savePlaybackInfo();
@@ -285,40 +280,13 @@ new Vue({
                 if (this.repeat == 2) {
                     this.seek(0);
                     this.audio.play();
-                    return;
-                }
-
-                //Shuffle
-                if (this.shuffle) {
-                    let index = Math.round(Math.random()*this.queue.data.length) - this.queue.index;
-                    this.skip(index);
-                    this.savePlaybackInfo();
+                    this.updateState();
                     return;
                 }
 
                 //Repeat list
                 if (this.repeat == 1 && this.queue.index == this.queue.data.length - 1) {
                     this.skip(-(this.queue.data.length - 1));
-                    return;
-                }
-
-                //Load gapless
-                if (this.gapless.promise || this.gapless.audio) {
-                    this.state = 3;
-                    if (this.gapless.promise) await this.gapless.promise;
-
-                    this.audio = this.gapless.audio;
-                    this.playbackInfo = this.gapless.info;
-                    this.track = this.gapless.track;
-                    this.queue.index++;
-                    this.resetGapless();
-
-                    this.configureAudio();
-                    //Play
-                    this.state = 2;
-                    this.audio.play();
-                    this.updateMediaSession();
-                    await this.savePlaybackInfo();
                     return;
                 }
 
@@ -393,25 +361,18 @@ new Vue({
         async loadGapless() {
             if (this.loaders != 0 || this.gapless.promise || this.gapless.audio) return;
 
-            //Shuffle
-            if (this.shuffle) {
-                let index = Math.round(Math.random()*this.queue.data.length) - this.queue.index;
-                this.gapless.track = this.queue.data[index];
-                this.gapless.index = index;
+            //Repeat list
+            if (this.repeat == 1 && this.queue.index == this.queue.data.length - 1) {
+                this.gapless.track = this.queue.data[0];
+                this.gapless.index = 0;
             } else {
-                //Repeat list
-                if (this.repeat == 1 && this.queue.index == this.queue.data.length - 1) {
-                    this.gapless.track = this.queue.data[0];
-                    this.gapless.index = 0;
-                } else {
-                    //Last song
-                    if (this.queue.index+1 >= this.queue.data.length) return;
-                    //Next song
-                    this.gapless.track = this.queue.data[this.queue.index + 1];
-                    this.gapless.index = this.queue.index + 1;
-                }
+                //Last song
+                if (this.queue.index+1 >= this.queue.data.length) return;
+                //Next song
+                this.gapless.track = this.queue.data[this.queue.index + 1];
+                this.gapless.index = this.queue.index + 1;
             }
-
+            
             //Save promise
             let resolve;
             this.gapless.promise = new Promise((res) => {resolve = res});
@@ -458,7 +419,6 @@ new Vue({
                 queue: this.queue,
                 position: this.position,
                 track: this.track,
-                shuffle: this.shuffle,
                 repeat: this.repeat
             }
             await this.$axios.post('/playback', data);
@@ -538,7 +498,6 @@ new Vue({
         if (pd.data != {}) {
             if (pd.data.queue) this.queue = pd.data.queue;
             if (pd.data.track) this.track = pd.data.track;
-            if (pd.data.shuffle) this.shuffle = pd.data.shuffle;
             if (pd.data.repeat) this.repeat = pd.data.repeat;
             this.playTrack(this.track).then(() => {
                 this.seek(pd.data.position);

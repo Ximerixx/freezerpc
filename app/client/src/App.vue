@@ -1,5 +1,20 @@
 <template>
+<div>
   <v-app v-esc='closePlayer'>
+
+    <v-system-bar 
+      :color='$root.settings.lightTheme ? "#f5f5f5" : "#121212"' 
+      app 
+      class='topbar' 
+      v-if='$root.settings.electron'
+      height='28'>
+
+      <v-spacer></v-spacer>
+      <span>Freezer <span v-if='version'>v{{version}}</span></span>
+      <v-spacer></v-spacer>
+      <v-icon class='topbarbutton mx-2' @click='minimize'>mdi-window-minimize</v-icon>
+      <v-icon @click='exitApp' class='topbarbutton mx-2'>mdi-close</v-icon>
+    </v-system-bar>
 
     <!-- Fullscreen player overlay -->
     <v-overlay :value='showPlayer' opacity='1.00' z-index="100">
@@ -8,7 +23,7 @@
 
     <!-- Drawer/Navigation -->
     <v-navigation-drawer 
-      permanent 
+      permanent
       fixed
       app
       mini-variant
@@ -263,6 +278,7 @@
     </v-snackbar>
 
   </v-app>
+</div>
 </template>
 
 <style lang='scss'>
@@ -277,6 +293,13 @@
 }
 .seekbar .v-progress-linear__determinate {
   transition: none !important;
+}
+.topbar {
+  -webkit-app-region: drag;
+  z-index: 6969;
+}
+.topbarbutton {
+  -webkit-app-region: no-drag;
 }
 </style>
 
@@ -299,8 +322,8 @@ export default {
       suggestions: [],
       preventDoubleEnter: false,
       cancelSuggestions: false,
-
-      globalSnackbar: false
+      globalSnackbar: false,
+      version: null,
     }
   },
   methods: {
@@ -375,6 +398,16 @@ export default {
     },
     seek(val) {
       this.$root.seek(Math.round((val / 100) * this.$root.duration()));
+    },
+    async exitApp() {
+      await this.$root.saveSettings();
+      await this.$root.savePlaybackInfo();
+      const {ipcRenderer} = window.require('electron');
+      ipcRenderer.send('close');
+    },
+    minimize() {
+      const {ipcRenderer} = window.require('electron');
+      ipcRenderer.send('minimize');
     }
   },
   computed: {
@@ -419,6 +452,10 @@ export default {
     if (!this.$root.authorized) {
       this.$router.push('/login');
     }
+
+    this.$axios.get('/about').then((res) => {
+      this.version = res.data.version;
+    });
   },
   watch: {
     volume() {

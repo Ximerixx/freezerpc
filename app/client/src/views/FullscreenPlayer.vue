@@ -1,5 +1,5 @@
 <template>
-    <div class='main pa-0'>
+    <div class='pa-0' :class='{electron: $root.settings.electron, notop: !$root.settings.electron}'>
 
         <v-app-bar dense>
             <v-btn icon @click='close'>
@@ -77,9 +77,8 @@
                         <v-icon color='primary' v-if='$root.repeat == 1'>mdi-repeat</v-icon>
                         <v-icon color='primary' v-if='$root.repeat == 2'>mdi-repeat-once</v-icon>
                     </v-btn>
-                    <v-btn icon @click='$root.shuffle = !$root.shuffle'>
+                    <v-btn icon @click='shuffle'>
                         <v-icon v-if='!$root.shuffle'>mdi-shuffle</v-icon>
-                        <v-icon v-if='$root.shuffle' color='primary'>mdi-shuffle</v-icon>
                     </v-btn>
 
                     <v-btn icon @click='addLibrary'>
@@ -205,7 +204,16 @@
 <style scoped>
 .main {
     width: 100vw;
+
+}
+
+.notop {
     height: 100vh;
+}
+
+.electron {
+    height: calc(100vh - 28px);
+    margin-top: 28px;
 }
 
 @media screen and (max-height: 864px) {
@@ -294,6 +302,15 @@ export default {
                 return;
             }
             this.$root.repeat += 1;
+        },
+        shuffle() {
+            //Shuffle
+            for (let i=this.$root.queue.data.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this.$root.queue.data[i], this.$root.queue.data[j]] = [this.$root.queue.data[j], this.$root.queue.data[i]];
+            }
+            //Update index
+            this.$root.queue.index = this.$root.queue.data.findIndex(t => t.id == this.$root.track.id);
         }
     },
     mounted() {
