@@ -211,6 +211,23 @@
         <v-subheader>{{$t("Other")}}</v-subheader>
         <v-divider></v-divider>
 
+        <div class='d-flex mx-4 pt-2'>
+            <v-select
+                v-model='$root.settings.contentLanguage'
+                :items='languageList'
+                :label='$t("Content language")'
+                class='mr-4'
+            ></v-select>
+
+            <v-select
+                v-model='$root.settings.contentCountry'
+                :items='countryList'
+                :label='$t("Content country")'
+                class='ml-4'
+            ></v-select>
+
+        </div>
+
         <!-- Minimize to tray -->
         <v-list-item v-if='$root.settings.electron'>
             <v-list-item-action>
@@ -283,6 +300,7 @@
 </template>
 
 <script>
+
 export default {
     name: 'Settings',
     data() {
@@ -320,7 +338,11 @@ export default {
             primaryColorIndex: 0,
             primaries: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', 
                 '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
-                '#795548', '#607D8B', '#9E9E9E']
+                '#795548', '#607D8B', '#9E9E9E'],
+            
+            //Lists from Deezer website
+            languageList: ["me", "da", "de", "en", "us", "es", "mx", "fr", "hr", "id", "it", "hu", "ms", "nl", "no", "pl", "br", "pt", "ru", "ro", "sq", "sk", "sl", "sr", "fi", "sv", "tr", "cs", "bg", "uk", "he", "ar", "th", "cn", "ja", "ko"],
+            countryList: ["AF", "AL", "DZ", "AO", "AI", "AG", "AR", "AM", "AU", "AT", "AZ", "BH", "BD", "BB", "BY", "BE", "BJ", "BT", "BO", "BA", "BW", "BR", "IO", "VG", "BN", "BG", "BF", "BI", "KH", "CM", "CA", "CV", "KY", "CF", "TD", "CL", "CX", "CC", "CO", "CK", "CR", "HR", "CY", "CZ", "CD", "DK", "DJ", "DM", "TL", "EC", "EG", "SV", "GQ", "ER", "EE", "ET", "FM", "FJ", "FI", "FR", "GA", "GM", "GE", "DE", "GH", "GR", "GD", "GT", "GN", "GW", "HN", "HU", "IS", "ID", "IQ", "IE", "IL", "IT", "JM", "JP", "JO", "KZ", "KE", "KI", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LT", "LU", "MK", "MG", "MW", "MY", "ML", "MT", "MH", "MR", "MU", "MX", "MD", "MN", "ME", "MS", "MA", "MZ", "NA", "NR", "NP", "NZ", "NI", "NE", "NG", "NU", "NF", "NO", "OM", "PK", "PW", "PA", "PG", "PY", "PE", "PL", "PT", "QA", "CG", "RO", "RU", "RW", "KN", "LC", "VC", "WS", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SK", "SI", "SO", "ZA", "ES", "LK", "SJ", "SZ", "SE", "CH", "TJ", "TZ", "TH", "KM", "FK", "CI", "MV", "NL", "PH", "PN", "SB", "TG", "TK", "TO", "TN", "TR", "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UY", "UZ", "VU", "VE", "VN", "YE", "ZM", "ZW"],
         }
     },
     methods: {

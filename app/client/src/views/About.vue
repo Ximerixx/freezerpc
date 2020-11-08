@@ -50,7 +50,7 @@
                 <v-list-item-subtitle>Developer</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
-        <v-list-item @click='openUrl("https://git.fuwafuwa.moe/RemixDev/deemix")'>
+        <v-list-item>
             <v-list-item-content>
                 <v-list-item-title class='font-weight-bold'>Deemix</v-list-item-title>
                 <v-list-item-subtitle>Much better app &lt;3</v-list-item-subtitle>

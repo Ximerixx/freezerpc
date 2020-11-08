@@ -130,5 +130,9 @@
   "Delete": "Delete",
   "Are you sure you want to delete this playlist?": "Are you sure you want to delete this playlist?",
   "Force white tray icon": "Force white tray icon",
-  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Force default (white) tray icon if theme incorrectly detected. Requires restart."
+  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Force default (white) tray icon if theme incorrectly detected. Requires restart.",
+  "Share": "Share",
+  "Settings quality": "Settings quality",
+  "Content language": "Content language",
+  "Content country": "Content country"
 }

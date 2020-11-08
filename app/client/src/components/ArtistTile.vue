@@ -26,13 +26,22 @@
                             <v-list-item-title>{{$t("Add to library")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
-                    <!-- Remvoe from library -->
+                    <!-- Remove from library -->
                     <v-list-item dense @click='library' v-if='artist.library'>
                         <v-list-item-icon>
                             <v-icon>mdi-heart-remove</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
                             <v-list-item-title>{{$t("Remove from library")}}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <!-- Share -->
+                    <v-list-item dense @click='share'>
+                        <v-list-item-icon>
+                            <v-icon>mdi-share-variant</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{$t("Share")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
@@ -97,6 +106,16 @@ export default {
                 query: {artist: JSON.stringify(this.artist)}
             });
             this.$emit('clicked');
+        },
+        //Copy link
+        share() {
+            let copyElem = document.createElement('input');
+            copyElem.value = `https://deezer.com/artist/${this.artist.id}`;
+            document.body.appendChild(copyElem);
+            copyElem.select();
+            document.execCommand('copy');
+            document.body.removeChild(copyElem);
+            this.$root.globalSnackbar = this.$t('Link copied!');
         }
     }
 }

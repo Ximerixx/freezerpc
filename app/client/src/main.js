@@ -234,7 +234,7 @@ new Vue({
                 }
 
                 //Crossfade
-                if (this.settings.crossfadeDuration > 0 && this.position >= (this.duration() - this.settings.crossfadeDuration) && this.state == 2 && this.gapless.audio && !this.gapless.crossfade) {
+                if (this.settings.crossfadeDuration > 0 && this.position >= (this.duration() - this.settings.crossfadeDuration) && this.state == 2 && this.gapless.audio && !this.gapless.crossfade && this.gapless.track) {
                     this.gapless.crossfade = true;
                     let currentVolume = this.audio.volume;
                     let oldAudio = this.audio;
@@ -249,11 +249,15 @@ new Vue({
                     this.configureAudio();
                     this.updateMediaSession();
 
+                    this.audio.volume = 0.0;
                     let volumeStep = currentVolume / (this.settings.crossfadeDuration / 50);
                     for (let i=0; i<(this.settings.crossfadeDuration / 50); i++) {
                         if ((oldAudio.volume - volumeStep) > 0)
                             oldAudio.volume -= volumeStep;
                         this.audio.volume += volumeStep;
+                        //Prevent going over
+                        if (this.audio.volume >= currentVolume)
+                            break;
                         await new Promise((res) => setTimeout(() => res(), 50));
                     }
                     oldAudio.pause();
@@ -355,11 +359,11 @@ new Vue({
 
         //Reset gapless playback meta
         resetGapless() {
-            this.gapless = {promise: null,audio: null,info: null,track: null,index:null};
+            this.gapless = {crossfade: false,promise: null,audio: null,info: null,track: null,index:null};
         },
         //Load next track for gapless
         async loadGapless() {
-            if (this.loaders != 0 || this.gapless.promise || this.gapless.audio) return;
+            if (this.loaders != 0 || this.gapless.promise || this.gapless.audio || this.gapless.crossfade) return;
 
             //Repeat list
             if (this.repeat == 1 && this.queue.index == this.queue.data.length - 1) {
@@ -385,7 +389,7 @@ new Vue({
             }
             this.gapless.info = info
             this.gapless.audio = new Audio(`${window.location.origin}${info.url}`);
-            this.gapless.audio.volume = 0;
+            this.gapless.audio.volume = 0.00;
             this.gapless.audio.preload = 'auto';
             this.gapless.crossfade = false;
 

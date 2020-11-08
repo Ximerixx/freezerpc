@@ -40,6 +40,8 @@ class Settings {
         this.playlistFolder = false;
 
         this.forceWhiteTrayIcon = false;
+        this.contentLanguage = 'en';
+        this.contentCountry = 'US';
     }
 
     //Based on electorn app.getPath

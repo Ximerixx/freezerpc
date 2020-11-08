@@ -11,7 +11,7 @@
         <!-- Split to half -->
         <v-row class='pa-2' no-gutters justify="center">
             <!-- Left side (track info...) -->
-            <v-col class='col-6 text-center' align-self="center">
+            <v-col class='col-12 col-sm-6 text-center' align-self="center">
                 <v-img 
                     :src='$root.track.albumArt.full' 
                     :lazy-src="$root.track.albumArt.thumb"
@@ -94,6 +94,10 @@
                         <v-icon>mdi-download</v-icon>
                     </v-btn>
 
+                    <v-btn icon @click='share'>
+                        <v-icon>mdi-share-variant</v-icon>
+                    </v-btn>
+
                     <!-- Volume -->
                     <v-slider
                         min='0.00' 
@@ -118,7 +122,7 @@
             </v-col>
 
             <!-- Right side -->
-            <v-col class='col-6 pt-4'>
+            <v-col class='col-12 col-sm-6 pt-4'>
                 <v-tabs v-model='tab'>
                     <v-tab key='queue'>
                         {{$t("Queue")}}
@@ -135,18 +139,18 @@
                     <!-- Queue tab -->
                     <v-tab-item key='queue'>
                         <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 160px)'>
-                            <v-lazy 
-                            min-height="1" 
-                            transition="fade-transition"
-                            v-for="(track, index) in $root.queue.data"
-                            :key='index + "q" + track.id'
-                                ><TrackTile
-                                    :track='track'
-                                    @click='$root.playIndex(index)'
-                                    @redirect='close'
-                                ></TrackTile>
-                            </v-lazy>
-
+                            <draggable v-model='$root.queue.data' @change='queueMove'>
+                                <div v-for="(track, index) in $root.queue.data" :key='index + "q" + track.id'>
+                                    <v-lazy min-height="1" transition="fade-transition">
+                                        <TrackTile
+                                            :track='track'
+                                            @click='$root.playIndex(index)'
+                                            @redirect='close'
+                                            :ripple='false'
+                                        ></TrackTile>
+                                    </v-lazy>
+                                </div>
+                            </draggable>
                         </v-list>
                     </v-tab-item>
                     <!-- Info tab -->
@@ -238,10 +242,12 @@ import PlaylistPopup from '@/components/PlaylistPopup.vue';
 import Lyrics from '@/components/Lyrics.vue';
 import DownloadDialog from '@/components/DownloadDialog.vue';
 
+import draggable from 'vuedraggable';
+
 export default {
     name: 'FullscreenPlayer',
     components: {
-        TrackTile, ArtistTile, AlbumTile, PlaylistPopup, Lyrics, DownloadDialog
+        TrackTile, ArtistTile, AlbumTile, PlaylistPopup, Lyrics, DownloadDialog, draggable
     },
     data() {
         return {
@@ -311,6 +317,19 @@ export default {
                 [this.$root.queue.data[i], this.$root.queue.data[j]] = [this.$root.queue.data[j], this.$root.queue.data[i]];
             }
             //Update index
+            this.$root.queue.index = this.$root.queue.data.findIndex(t => t.id == this.$root.track.id);
+        },
+        //Copy link
+        share() {
+            let copyElem = document.createElement('input');
+            copyElem.value = `https://deezer.com/track/${this.$root.track.id}`;
+            document.body.appendChild(copyElem);
+            copyElem.select();
+            document.execCommand('copy');
+            document.body.removeChild(copyElem);
+            this.$root.globalSnackbar = this.$t('Link copied!');
+        },
+        queueMove() {
             this.$root.queue.index = this.$root.queue.data.findIndex(t => t.id == this.$root.track.id);
         }
     },

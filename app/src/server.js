@@ -91,13 +91,13 @@ app.get('/track/:id', async (req, res) => {
 
 //Get album by id
 app.get('/album/:id', async (req, res) => {
-    let data = await deezer.callApi('deezer.pageAlbum', {alb_id: req.params.id.toString(), lang: 'us'});
+    let data = await deezer.callApi('deezer.pageAlbum', {alb_id: req.params.id.toString(), lang: settings.contentLanguage});
     res.send(new Album(data.results.DATA, data.results.SONGS));
 });
 
 //Get artist by id
 app.get('/artist/:id', async (req, res) => {
-    let data = await deezer.callApi('deezer.pageArtist', {art_id: req.params.id.toString(), lang: 'us'});
+    let data = await deezer.callApi('deezer.pageArtist', {art_id: req.params.id.toString(), lang: settings.contentLanguage});
     res.send(new Artist(data.results.DATA, data.results.ALBUMS, data.results.TOP));
 });
 
@@ -108,7 +108,7 @@ app.get('/playlist/:id', async (req, res) => {
     let nb = req.query.full ? 100000 : 50;
     let data = await deezer.callApi('deezer.pagePlaylist', {
         playlist_id: req.params.id.toString(),
-        lang: 'us',
+        lang: settings.contentLanguage,
         nb: nb,
         start: req.query.start ? parseInt(req.query.start, 10) : 0,
         tags: true
@@ -319,7 +319,7 @@ app.get('/page', async (req, res) => {
             'large-card': ['album', 'playlist', 'show', 'video-link'],
             'ads': [] //None
         },
-        'LANG': 'us',
+        'LANG': settings.contentLanguage,
         'OPTIONS': []
     });
     res.send(new DeezerPage(data.results));
@@ -496,7 +496,7 @@ io.on('connection', (socket) => {
 });
 
 //ecb = Error callback
-async function createServer(electron = false, ecb) {
+async function createServer(electron = false, ecb, override = {}) {
     //Prepare globals
     settings = new Settings(electron);
     settings.load();
@@ -542,12 +542,18 @@ async function createServer(electron = false, ecb) {
         });
     });
 
-    //Start server
+    //Error callback
     server.on('error', (e) => {
-        ecb(e);
+        if (ecb)
+            ecb(e);
+        logger.error(e);
     });
-    server.listen(settings.port, settings.serverIp);
-    console.log(`Running on: http://${settings.serverIp}:${settings.port}`);
+
+    //Start server
+    let serverIp = override.host ? override.host : settings.serverIp;
+    let port = override.port ? override.port: settings.port;
+    server.listen(port, serverIp);
+    console.log(`Running on: http://${serverIp}:${port}`);
 
     return settings;
 }

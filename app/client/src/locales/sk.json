@@ -128,5 +128,11 @@
   "Removed from playlist!": "Odstránené z playlistu!",
   "Playlist deleted!": "Playlist odstránený!",
   "Delete": "Odstrániť",
-  "Are you sure you want to delete this playlist?": "Naozaj chcete odstrániť tento playlist?"
+  "Are you sure you want to delete this playlist?": "Naozaj chcete odstrániť tento playlist?",
+  "Force white tray icon": "Vynútiť bielu ikonu v lište",
+  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Vynútiť predvolenú (bielu) ikonu v lište, ak je motív nesprávne zistený. Vyžaduje sa reštart.",
+  "Share": "Share",
+  "Settings quality": "Settings quality",
+  "Content language": "Content language",
+  "Content country": "Content country"
 }

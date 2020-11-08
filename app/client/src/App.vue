@@ -10,9 +10,10 @@
       height='28'>
 
       <v-spacer></v-spacer>
-      <span>Freezer <span v-if='version'>v{{version}}</span></span>
+      <span style='position: absolute; left: 45%'>Freezer <span v-if='version'>v{{version}}</span></span>
       <v-spacer></v-spacer>
       <v-icon class='topbarbutton mx-2' @click='minimize'>mdi-window-minimize</v-icon>
+      <v-icon class='topbarbutton mx-2' @click='maximize'>mdi-window-maximize</v-icon>
       <v-icon @click='exitApp' class='topbarbutton mx-2'>mdi-close</v-icon>
     </v-system-bar>
 
@@ -408,6 +409,10 @@ export default {
     minimize() {
       const {ipcRenderer} = window.require('electron');
       ipcRenderer.send('minimize');
+    },
+    maximize() {
+      const {ipcRenderer} = window.require('electron');
+      ipcRenderer.send('maximize');
     }
   },
   computed: {

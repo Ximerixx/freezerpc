@@ -128,5 +128,11 @@
   "Removed from playlist!": "Dihapus dari daftar putar!",
   "Playlist deleted!": "Daftar putar dihapus!",
   "Delete": "Hapus",
-  "Are you sure you want to delete this playlist?": "Apakah kamu yakin ingin menghapus daftar putar ini?"
+  "Are you sure you want to delete this playlist?": "Apakah kamu yakin ingin menghapus daftar putar ini?",
+  "Force white tray icon": "Force white tray icon",
+  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Force default (white) tray icon if theme incorrectly detected. Requires restart.",
+  "Share": "Share",
+  "Settings quality": "Settings quality",
+  "Content language": "Content language",
+  "Content country": "Content country"
 }

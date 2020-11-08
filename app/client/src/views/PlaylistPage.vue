@@ -22,7 +22,7 @@
                 <span class='text-subtitle-2'>{{$numberString(playlist.fans)}} {{$t('fans')}}</span><br>
             </div>
             
-            <div class='my-2'>
+            <div class='my-2 d-flex'>
                 <v-btn color='primary' class='mr-1' @click='play'>
                     <v-icon left>mdi-play</v-icon>
                     {{$t('Play')}}
@@ -45,6 +45,16 @@
                     <v-icon left>mdi-delete</v-icon>
                     {{$t('Delete')}}
                 </v-btn>
+                <div class='mx-2' dense stlye='max-width: 120px;'>
+                    <v-select class='px-2' dense solo :items='sortTypes' @change='sort' :label='$t("Sort by")'>
+                    </v-select>
+                </div>
+                <div class='px-2' @click='reverseSort'>
+                    <v-btn icon>
+                        <v-icon v-if='isReversed'>mdi-sort-reverse-variant</v-icon>
+                        <v-icon v-if='!isReversed'>mdi-sort-variant</v-icon>
+                    </v-btn>
+                </div>
             </div>
         </div>
     </v-card>
@@ -109,7 +119,16 @@ export default {
             //Add to library button
             libraryLoading: false,
             downloadDialog: false,
-            deleteDialog: false
+            deleteDialog: false,
+            
+            //Sort
+            sortTypes: [
+                this.$t('Date Added'),
+                this.$t('Name (A-Z)'),
+                this.$t('Artist (A-Z)'),
+                this.$t('Album (A-Z)')
+            ],
+            isReversed: false
         }
     },
     methods: {
@@ -209,7 +228,45 @@ export default {
         async deletePlaylist() {
             await this.$axios.delete(`/playlist/${this.playlist.id}`);
             this.$router.go(-1);
-        }
+        },
+        //Sort changed
+        async sort(type) {
+            let index = this.sortTypes.indexOf(type);
+            //Preload all tracks
+            if (this.playlist.tracks.length < this.playlist.trackCount) 
+                await this.loadAllTracks();
+            //Copy original
+            if (!this.tracksUnsorted)
+                this.tracksUnsorted = JSON.parse(JSON.stringify(this.playlist.tracks));
+            
+            //Using indexes, so it can be translated later
+            this.isReversed = false;
+            switch (index) {
+                //Default
+                case 0:
+                    this.tracks = JSON.parse(JSON.stringify(this.tracksUnsorted));
+                    break;
+                //Name
+                case 1:
+                    this.tracks = this.playlist.tracks.sort((a, b) => {return a.title.localeCompare(b.title);});
+                    break;
+                //Artist
+                case 2:
+                    this.tracks = this.playlist.tracks.sort((a, b) => {return a.artistString.localeCompare(b.artistString);});
+                    break;
+                //Album
+                case 3:
+                    this.tracks = this.playlist.tracks.sort((a, b) => {return a.album.title.localeCompare(b.album.title);});
+                    break;
+            }
+        },
+        async reverseSort() {
+            //Preload tracks if not sorted yet
+            if (this.playlist.tracks.length < this.playlist.trackCount) 
+                await this.sort(0);
+            this.isReversed = !this.isReversed;
+            this.tracks.reverse();
+        },
     },
     mounted() {
         this.initialLoad(); 

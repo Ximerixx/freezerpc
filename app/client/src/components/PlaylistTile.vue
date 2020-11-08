@@ -55,6 +55,16 @@
                             <v-list-item-title>{{$t('Remove from library')}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
+
+                    <!-- Share -->
+                    <v-list-item dense @click='share'>
+                        <v-list-item-icon>
+                            <v-icon>mdi-share-variant</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{$t("Share")}}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
                     
                     <!-- Download -->
                     <v-list-item dense @click='download'>
@@ -172,6 +182,16 @@ export default {
             await this.$axios.put(`/library/playlist?id=${this.playlist.id}`);
             this.$root.globalSnackbar = this.$t('Added to library!');
             this.playlist.library = true;
+        },
+        //Copy link
+        share() {
+            let copyElem = document.createElement('input');
+            copyElem.value = `https://deezer.com/playlist/${this.playlist.id}`;
+            document.body.appendChild(copyElem);
+            copyElem.select();
+            document.execCommand('copy');
+            document.body.removeChild(copyElem);
+            this.$root.globalSnackbar = this.$t('Link copied!');
         }
     },
     computed: {

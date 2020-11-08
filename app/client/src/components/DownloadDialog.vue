@@ -54,12 +54,12 @@ export default {
         return {
             shown: true,
             qualities: [
-                'Settings quality',
+                this.$t('Settings quality'),
                 'MP3 128kbps',
                 'MP3 320kbps',
                 'FLAC ~1441kbps'
             ],
-            qualityString: 'Settings quality',
+            qualityString: this.$t('Settings quality'),
             autostart: true,
             dShow: this.show
         }

@@ -1,5 +1,5 @@
 <template>
-<v-list-item two-line @click='$emit("click")'>
+<v-list-item two-line @click='$emit("click")' :ripple='ripple'>
     <v-list-item-avatar>
         <v-img :src='track.albumArt.thumb'></v-img>
     </v-list-item-avatar>
@@ -93,6 +93,15 @@
                         <v-list-item-title>{{$t("Remove from playlist")}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
+                <!-- Share -->
+                <v-list-item dense @click='share'>
+                    <v-list-item-icon>
+                        <v-icon>mdi-share-variant</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title>{{$t("Share")}}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
                 <!-- Play track mix -->
                 <v-list-item dense @click='trackMix'>
                     <v-list-item-icon>
@@ -174,6 +183,10 @@ export default {
             type: String,
             default: null
         },
+        ripple: {
+            type: Boolean,
+            default: true
+        }
     },
     methods: {
         //Add track next to queue
@@ -231,6 +244,16 @@ export default {
             };
             this.$root.replaceQueue(res.data);
             this.$root.playIndex(0);
+        },
+        //Copy link
+        share() {
+            let copyElem = document.createElement('input');
+            copyElem.value = `https://deezer.com/track/${this.track.id}`;
+            document.body.appendChild(copyElem);
+            copyElem.select();
+            document.execCommand('copy');
+            document.body.removeChild(copyElem);
+            this.$root.globalSnackbar = this.$t('Link copied!');
         }
     }
 }

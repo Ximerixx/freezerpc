@@ -1,6 +1,12 @@
 const {app, BrowserWindow, ipcMain, Tray, Menu, session, dialog, shell, nativeTheme} = require('electron');
 const {createServer} = require('./src/server');
 const path = require('path');
+const arg = require('arg');
+const { exit } = require('process');
+const packageJson = require('./package.json');
+const chalk = require('chalk');
+const {Settings} = require('./src/settings');
+const fs = require('fs');
 
 let win;
 let tray;
@@ -9,12 +15,84 @@ let settings;
 let shouldExit = false;
 let playing = false;
 
+//Arguments
+const args = arg({
+    '--server': Boolean,
+    '--host': String,
+    '--port': Number,
+    '--help': Boolean,
+    '--settings': Boolean,
+    '--reset-settings': Boolean,
+    '--reset-downloads': Boolean,
+    '--log': Boolean,
+
+    '-S': '--server',
+    '-H': '--host',
+    '-h': '--help',
+    '-p': '--port'
+}, {argv: process.argv.slice(1)});
+
+executeCli();
+
 //Get path to asset
 function assetPath(a) {
     return path.join(__dirname, 'assets', a);
 }
 
+//Execute actions by parameters
+function executeCli() {
+    if (args['--help']) {
+        console.log(`
+${chalk.bold.blue('Freezer PC')} ${chalk.bold(`v${packageJson.version}`)} by exttex
+
+${chalk.bold('USAGE:')}
+--help, -h         Prints this and exits
+--server, -S       Starts in server mode
+--host, -H         Override host (default: 127.0.0.1)
+--port, -p         Override port (default: 10069)
+
+${chalk.bold('TOOLS:')}
+--settings         Prints current settings and exits
+--log              Prints server log and exits
+--reset-settings   Reset settings to default
+--reset-downloads  Delete downloads cache and database
+        `);
+        exit(0);
+    }
+    //Print settings and exit
+    if (args["--settings"]) {
+        let settings = new Settings();
+        settings.load();
+        console.log(JSON.stringify(settings, null, 2));
+        exit(0);
+    }
+    if (args["--reset-settings"]) {
+        fs.unlinkSync(Settings.getPath());
+        exit(0);
+    }
+    //Delete downloads db and temp
+    if (args['--reset-downloads']) {
+        fs.unlinkSync(Settings.getDownloadsDB());
+        fs.rmdirSync(Settings.getTempDownloads(), {recursive: true});
+        exit(0);
+    }
+    //Show log
+    if (args['--log']) {
+        let p = path.join(Settings.getDir(), "freezer-server.log");
+        console.log(fs.readFileSync(p, {encoding: 'utf-8'}).toString());
+        exit(0);
+    }
+}
+
 async function startServer() {
+
+    //Override settings
+    let override = {};
+    if (args["--host"])
+        override['host'] = args["--host"];
+    if (args["--port"])
+        override['port'] = args["--port"];
+
     settings = await createServer(true, () => {
         //Server error
         shouldExit = true;
@@ -26,7 +104,7 @@ async function startServer() {
             message: 'Server error occured, Freezer is probably already running!',
             buttons: ['Close']
         });
-    });
+    }, override);
 }
 
 async function createWindow() {
@@ -85,6 +163,8 @@ async function createWindow() {
 //Create window
 app.on('ready', async () => {
     await startServer();
+    //Server mode
+    if (args['--server']) return;
     createWindow();
 
     //Create Tray
@@ -178,6 +258,12 @@ function setThumbarButtons() {
         },
     ]);
 }
+
+
+//[] button
+ipcMain.on('maximize', () => {
+    win.isMaximized() ? win.unmaximize() : win.maximize();
+});
 
 //_ button in ui
 ipcMain.on('minimize', () => {

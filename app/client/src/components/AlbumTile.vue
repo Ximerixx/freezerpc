@@ -54,6 +54,15 @@
                             <v-list-item-title>{{$t("Remove from library")}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
+                    <!-- Share -->
+                    <v-list-item dense @click='share'>
+                        <v-list-item-icon>
+                            <v-icon>mdi-share-variant</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>{{$t("Share")}}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
                     <!-- Download -->
                     <v-list-item dense @click='download'>
                         <v-list-item-icon>
@@ -167,6 +176,16 @@ export default {
             }
             this.album.tracks = tracks;
             this.downloadDialog = true;
+        },
+        //Copy link
+        share() {
+            let copyElem = document.createElement('input');
+            copyElem.value = `https://deezer.com/album/${this.album.id}`;
+            document.body.appendChild(copyElem);
+            copyElem.select();
+            document.execCommand('copy');
+            document.body.removeChild(copyElem);
+            this.$root.globalSnackbar = this.$t('Link copied!');
         }
     }
 };

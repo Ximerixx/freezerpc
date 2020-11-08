@@ -55,7 +55,7 @@
   "Queue": "File d'attente",
   "Total": "Total",
   "Stop": "Arrêter",
-  "Start": "Début",
+  "Start": "Lancer",
   "Show folder": "Afficher le dossier",
   "Clear queue": "Effacer la liste d'attente",
   "Playing from": "Lecture depuis",
@@ -128,5 +128,11 @@
   "Removed from playlist!": "Supprimé de la playlist !",
   "Playlist deleted!": "Playlist supprimée !",
   "Delete": "Supprimer",
-  "Are you sure you want to delete this playlist?": "Voulez-vous vraiment supprimer cette liste de lecture ?"
+  "Are you sure you want to delete this playlist?": "Voulez-vous vraiment supprimer cette liste de lecture ?",
+  "Force white tray icon": "Forcer l'icône blanche dans la zone de notification",
+  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Forcer l'icône blanche par défaut dans la zone de notification si le thème n'est pas correctement détecté. Nécessite un redémarrage.",
+  "Share": "Share",
+  "Settings quality": "Settings quality",
+  "Content language": "Content language",
+  "Content country": "Content country"
 }
