@@ -1,6 +1,6 @@
 <template>
 <div>
-    <v-list-item two-line @click='click' v-if='!card'>
+    <v-list-item two-line @click='click' v-if='!card' @contextmenu.prevent="menu = true">
         <v-hover v-slot:default='{hover}'>
             <v-list-item-avatar>
                 <v-img :src='album.art.thumb'></v-img>

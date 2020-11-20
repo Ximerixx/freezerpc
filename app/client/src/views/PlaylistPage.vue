@@ -265,7 +265,7 @@ export default {
             if (this.playlist.tracks.length < this.playlist.trackCount) 
                 await this.sort(0);
             this.isReversed = !this.isReversed;
-            this.tracks.reverse();
+            this.playlist.tracks.reverse();
         },
     },
     mounted() {

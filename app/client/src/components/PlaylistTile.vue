@@ -1,7 +1,7 @@
 <template>
 <div>
     <!-- List tile -->
-    <v-list-item @click='click' v-if='!card'>
+    <v-list-item @click='click' v-if='!card' @contextmenu.prevent="menu = true">
         <v-hover v-slot:default='{hover}'>
             <v-list-item-avatar>
                 <v-img :src='playlist.image.thumb'></v-img>

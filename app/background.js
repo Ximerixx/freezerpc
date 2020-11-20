@@ -160,6 +160,18 @@ async function createWindow() {
     setThumbarButtons();
 }
 
+//Single instance
+const singleInstanceLock = app.requestSingleInstanceLock();
+if (!singleInstanceLock) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (win) {
+            if (!win.visible) win.show();
+        }
+    });
+}
+
 //Create window
 app.on('ready', async () => {
     await startServer();

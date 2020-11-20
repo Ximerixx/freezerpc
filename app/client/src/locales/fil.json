@@ -131,8 +131,11 @@
   "Are you sure you want to delete this playlist?": "Are you sure you want to delete this playlist?",
   "Force white tray icon": "Force white tray icon",
   "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Force default (white) tray icon if theme incorrectly detected. Requires restart.",
-  "Share": "Share",
+  "Share": "Ibahagi",
   "Settings quality": "Settings quality",
-  "Content language": "Content language",
-  "Content country": "Content country"
+  "Content language": "Wika ng nilalaman",
+  "Content country": "Bansa ng nilalaman",
+  "Website": "Website",
+  "Visit website": "Visit website",
+  "New update available:": "New update available:"
 }

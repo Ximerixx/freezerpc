@@ -130,7 +130,8 @@
         <!-- About -->
         <v-list-item link to='/about'>
           <v-list-item-icon>
-            <v-icon>mdi-information</v-icon>
+            <v-icon v-if='!updateAvailable'>mdi-information</v-icon>
+            <v-icon color='primary' v-if='updateAvailable'>mdi-update</v-icon>
           </v-list-item-icon>
           <v-list-item-title>{{$t('About')}}</v-list-item-title>
         </v-list-item>
@@ -325,6 +326,7 @@ export default {
       cancelSuggestions: false,
       globalSnackbar: false,
       version: null,
+      updateAvailable: false
     }
   },
   methods: {
@@ -413,6 +415,15 @@ export default {
     maximize() {
       const {ipcRenderer} = window.require('electron');
       ipcRenderer.send('maximize');
+    },
+    async checkUpdate() {
+      try {
+        let res = await this.$axios('/updates');
+        if (res.data) 
+          this.updateAvailable = true;
+      } catch (_) {
+        this.updateAvailable = false;
+      } 
     }
   },
   computed: {
@@ -451,6 +462,9 @@ export default {
     //Wait for volume to load
     if (this.$root.loadingPromise) await this.$root.loadingPromise;
     this.volume = this.$root.volume;
+
+    //Check for update
+    this.checkUpdate();
   },
   created() {
     //Go to login if unauthorized

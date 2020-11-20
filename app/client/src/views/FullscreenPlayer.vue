@@ -77,8 +77,9 @@
                         <v-icon color='primary' v-if='$root.repeat == 1'>mdi-repeat</v-icon>
                         <v-icon color='primary' v-if='$root.repeat == 2'>mdi-repeat-once</v-icon>
                     </v-btn>
-                    <v-btn icon @click='shuffle'>
-                        <v-icon v-if='!$root.shuffle'>mdi-shuffle</v-icon>
+                    <v-btn icon @click='$root.shuffle()'>
+                        <v-icon color='primary' v-if='$root.shuffled'>mdi-shuffle</v-icon>
+                        <v-icon v-if='!$root.shuffled'>mdi-shuffle</v-icon>
                     </v-btn>
 
                     <v-btn icon @click='addLibrary'>
@@ -112,7 +113,7 @@
                     >
                         <template v-slot:append>
                             <div style='position: absolute; padding-top: 4px;'>
-                                {{Math.round($root.audio.volume * 100)}}%
+                                {{Math.round($root.volume * 100)}}%
                             </div>
                         </template>
                     </v-slider>
@@ -137,7 +138,7 @@
 
                 <v-tabs-items v-model='tab'>
                     <!-- Queue tab -->
-                    <v-tab-item key='queue'>
+                    <v-tab-item key='queue' v-if='showQueue'>
                         <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 160px)'>
                             <draggable v-model='$root.queue.data' @change='queueMove'>
                                 <div v-for="(track, index) in $root.queue.data" :key='index + "q" + track.id'>
@@ -257,7 +258,9 @@ export default {
             tab: null,
             inLibrary: this.$root.track.library ? true:false,
             playlistPopup: false,
-            downloadDialog: false
+            downloadDialog: false,
+            //For reloading queue
+            showQueue: true,
         }
     },
     methods: {
@@ -310,15 +313,6 @@ export default {
             }
             this.$root.repeat += 1;
         },
-        shuffle() {
-            //Shuffle
-            for (let i=this.$root.queue.data.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [this.$root.queue.data[i], this.$root.queue.data[j]] = [this.$root.queue.data[j], this.$root.queue.data[i]];
-            }
-            //Update index
-            this.$root.queue.index = this.$root.queue.data.findIndex(t => t.id == this.$root.track.id);
-        },
         //Copy link
         share() {
             let copyElem = document.createElement('input');
@@ -347,6 +341,11 @@ export default {
                 this.position = this.$root.position / 1000;
             }
         },
+        //Force update queue
+        '$root.shuffled'() {
+            this.showQueue = false;
+            this.showQueue = true;
+        }
     }
 };
 

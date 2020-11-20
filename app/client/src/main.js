@@ -88,9 +88,9 @@ new Vue({
             track: null
         },
 
-        //Repeat & Shuffle
         //0 - normal, 1 - repeat list, 2 - repeat track
         repeat: 0,
+        shuffled: false,
 
         //Library cache
         libraryTracks: [],
@@ -172,7 +172,32 @@ new Vue({
             if (newIndex < 0 || newIndex >= this.queue.data.length) return;
             await this.playIndex(newIndex);
         },
-        //Skip wrapper with shuffle 
+        shuffle() {
+            if (!this.shuffled) {
+                //Save positions
+                for (let i=0; i<this.queue.data.length; i++) 
+                    this.queue.data[i]._position = i+1;
+
+                //Shuffle
+                for (let i=this.queue.data.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.queue.data[i], this.queue.data[j]] = [this.queue.data[j], this.queue.data[i]];
+                }
+                //Update index
+                this.queue.index = this.queue.data.findIndex(t => t.id == this.track.id);
+                this.shuffled = true;
+                return;
+            }
+            //Restore unshuffled queue
+            if (this.shuffled) {
+                this.queue.data.sort((a, b) => (a._position || 10000) - (b._position || 10000));
+                this.queue.index = this.queue.data.findIndex(t => t.id == this.track.id);
+                this.shuffled = false;
+                return;
+            }
+        },
+
+        //Skip wrapper
         skipNext() {
             this.skip(1);
             this.savePlaybackInfo();
@@ -254,12 +279,15 @@ new Vue({
                     for (let i=0; i<(this.settings.crossfadeDuration / 50); i++) {
                         if ((oldAudio.volume - volumeStep) > 0)
                             oldAudio.volume -= volumeStep;
-                        this.audio.volume += volumeStep;
-                        //Prevent going over
-                        if (this.audio.volume >= currentVolume)
+                        if ((this.audio.volume + volumeStep) >= 1.0 || (this.audio.volume + volumeStep) >= currentVolume)
                             break;
+                        this.audio.volume += volumeStep;
                         await new Promise((res) => setTimeout(() => res(), 50));
                     }
+                    //Restore original volume
+                    this.audio.voume = currentVolume;
+                    this.volume = currentVolume;
+
                     oldAudio.pause();
                     
                     this.resetGapless();
@@ -423,7 +451,8 @@ new Vue({
                 queue: this.queue,
                 position: this.position,
                 track: this.track,
-                repeat: this.repeat
+                repeat: this.repeat,
+                shuffled: this.shuffled
             }
             await this.$axios.post('/playback', data);
         },
@@ -503,6 +532,7 @@ new Vue({
             if (pd.data.queue) this.queue = pd.data.queue;
             if (pd.data.track) this.track = pd.data.track;
             if (pd.data.repeat) this.repeat = pd.data.repeat;
+            if (pd.data.shuffled) this.shuffled = pd.data.shuffled;
             this.playTrack(this.track).then(() => {
                 this.seek(pd.data.position);
             });

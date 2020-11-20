@@ -127,12 +127,15 @@
   "Removed from library!": "Usunięto z biblioteki!",
   "Removed from playlist!": "Usunięto z playlisty!",
   "Playlist deleted!": "Playlista została usunięta!",
-  "Delete": "Delete",
-  "Are you sure you want to delete this playlist?": "Are you sure you want to delete this playlist?",
-  "Force white tray icon": "Force white tray icon",
-  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Force default (white) tray icon if theme incorrectly detected. Requires restart.",
-  "Share": "Share",
-  "Settings quality": "Settings quality",
-  "Content language": "Content language",
-  "Content country": "Content country"
+  "Delete": "Usuń",
+  "Are you sure you want to delete this playlist?": "Na pewno chcesz usunąć tę playlistę?",
+  "Force white tray icon": "Wymuś białą ikonę w zasobniku",
+  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Wymuś domyślną (białą) ikonę w zasobniku paska zadań jeśli motyw został nieprawidłowo odczytany. Wymaga ponownego uruchomienia.",
+  "Share": "Udostępnij",
+  "Settings quality": "Jakość z ustawień",
+  "Content language": "Język treści",
+  "Content country": "Kraj treści",
+  "Website": "Strona internetowa",
+  "Visit website": "Odwiedź stronę internetową",
+  "New update available:": "Dostępna jest nowa aktualizacja:"
 }

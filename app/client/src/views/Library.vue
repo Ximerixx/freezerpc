@@ -23,7 +23,7 @@
     <v-tabs-items v-model='tab'>
         <!-- Tracks -->
         <v-tab-item key='tracks'>
-            <LibraryTracks height='calc(100vh - 290px)'></LibraryTracks>
+            <LibraryTracks height='calc(100vh - 310px)'></LibraryTracks>
         </v-tab-item>
 
         <!-- Albums -->

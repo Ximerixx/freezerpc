@@ -129,10 +129,13 @@
   "Playlist deleted!": "Daftar putar dihapus!",
   "Delete": "Hapus",
   "Are you sure you want to delete this playlist?": "Apakah kamu yakin ingin menghapus daftar putar ini?",
-  "Force white tray icon": "Force white tray icon",
-  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Force default (white) tray icon if theme incorrectly detected. Requires restart.",
-  "Share": "Share",
-  "Settings quality": "Settings quality",
-  "Content language": "Content language",
-  "Content country": "Content country"
+  "Force white tray icon": "Paksa ikon baki putih",
+  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Paksa default (putih) ikon baki jika tema tidak terdeteksi dengan benar. Membutuhkan restart.",
+  "Share": "Bagikan",
+  "Settings quality": "Pengaturan kualitas",
+  "Content language": "Bahasa konten",
+  "Content country": "Wilayah konten",
+  "Website": "Website",
+  "Visit website": "Visit website",
+  "New update available:": "New update available:"
 }

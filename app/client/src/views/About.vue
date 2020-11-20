@@ -2,12 +2,25 @@
 <div>
 
     <v-img src='@/../public/banner.png' max-width='400px' class='mx-auto'></v-img>
-    <div v-if='data' class='text-center text-h5 font-weight-bold mb-4'>
+    <div v-if='data' class='text-center text-h5 font-weight-bold'>
         v{{data.version}}
+    </div>
+    <br>
+    <div v-if='update' class='text-center text-h6 font-weight-bold mb-4' @click='openUrl("https://freezer.life")'>
+        {{$t("New update available:")}} {{update.version}}
+        <v-btn text color='primary' outlined class='mx-2'>{{$t("Visit website")}}</v-btn>
     </div>
 
     <h1 class='my-2 px-2'>{{$t("Links:")}}</h1>
     <v-list>
+        <v-list-item @click='openUrl("https://freezer.life")'>
+            <v-list-item-icon>
+                <v-icon>mdi-earth</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+                <v-list-item-title class='font-weight-bold'>{{$t("Website")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
         <v-list-item @click='openUrl("https://t.me/freezereleases")'>
             <v-list-item-icon>
                 <v-icon>mdi-telegram</v-icon>
@@ -124,7 +137,8 @@ export default {
         return {
             data: null,
             xandarDialog: false,
-            tobsDialog: false
+            tobsDialog: false,
+            update: null
         }
     },
     methods: {
@@ -132,7 +146,9 @@ export default {
             if (this.$root.settings.electron) {
                 const {ipcRenderer} = window.require('electron');
                 ipcRenderer.send('openUrl', url);
+                return;
             }
+            window.open(url, '_blank');
         },
         fTheme() {
             this.$root.settings.primaryColor = '#333333';
@@ -145,6 +161,17 @@ export default {
         this.$axios.get('/about').then((res) => {
             this.data = res.data;
         });
+    },
+    async mounted() {
+        //Check for updates
+        try {
+            let res = await this.$axios.get('/updates');
+            if (res.data) {
+                this.update = res.data;
+            }
+        } catch (_) {
+            //No update / failed to check, ignore
+        }
     }
 }
 </script>

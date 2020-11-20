@@ -1,5 +1,5 @@
 <template>
-<v-list-item two-line @click='$emit("click")' :ripple='ripple'>
+<v-list-item two-line @click='$emit("click")' :ripple='ripple' @contextmenu.prevent="menu = true">
     <v-list-item-avatar>
         <v-img :src='track.albumArt.thumb'></v-img>
     </v-list-item-avatar>
@@ -191,10 +191,10 @@ export default {
     methods: {
         //Add track next to queue
         playNext() {
-            this.$root.addTrackIndex(this.track, this.$root.queueIndex+1);
+            this.$root.addTrackIndex(this.track, this.$root.queue.index+1);
         },
         addQueue() {
-            this.$root.queue.push(this.track);
+            this.$root.queue.data.push(this.track);
         },
         addLibrary() {
             this.isLibrary = true;

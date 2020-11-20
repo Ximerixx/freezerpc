@@ -131,8 +131,11 @@
   "Are you sure you want to delete this playlist?": "Είστε βέβαιοι ότι θέλετε να διαγράψετε την λίστα αναπαραγωγής;",
   "Force white tray icon": "Εξαναγκασμός λευκού εικονιδίου",
   "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Επαναφορά προεπιλογής (λευκού) εικονιδίου σε περίπτωση σφάλματος θέματος. Απαιτείται επανεκκίνηση.",
-  "Share": "Share",
-  "Settings quality": "Settings quality",
-  "Content language": "Content language",
-  "Content country": "Content country"
+  "Share": "Κοινοποίηση",
+  "Settings quality": "Επιλογή ρυθμίσεων ποιότητας",
+  "Content language": "Γλώσσα περιεχομένου",
+  "Content country": "Χώρα περιεχομένου",
+  "Website": "Website",
+  "Visit website": "Visit website",
+  "New update available:": "New update available:"
 }

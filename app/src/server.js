@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const packageJson = require('../package.json');
 const fs = require('fs');
+const compareVersions = require('compare-versions');
 const axios = require('axios').default;
 const logger = require('./winston');
 const {DeezerAPI, DeezerStream} = require('./deezer');
@@ -475,6 +476,21 @@ app.get('/about', async (req, res) => {
     res.json({
         version: packageJson.version
     });
+});
+
+app.get('/updates', async (req, res) => {
+    try {
+        let response = await axios.get('https://freezer.life/api/versions');
+        //New version
+        if (compareVersions(response.data.pc.latest, packageJson.version) >= 1) {
+            res.send(response.data.pc.versions[0]);
+            return;
+        }
+        res.status(404).end();
+        return;
+    } catch (e) {
+        res.status(500).end();
+    }
 });
 
 //Redirect to index on unknown path

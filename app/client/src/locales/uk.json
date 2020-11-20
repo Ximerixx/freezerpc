@@ -63,7 +63,7 @@
   "Lyrics": "Текст",
   "Track number": "Номер треку",
   "Disk number": "Номер диску",
-  "Explicit": "Докладно",
+  "Explicit": "18+",
   "Source": "Джерело",
   "ID": "ID",
   "Error logging in!": "Помилка входу!",
@@ -129,10 +129,13 @@
   "Playlist deleted!": "Плейлист видалено!",
   "Delete": "Видалити",
   "Are you sure you want to delete this playlist?": "Ви впевнені, що хочете видалити цей плейлист?",
-  "Force white tray icon": "Force white tray icon",
-  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Force default (white) tray icon if theme incorrectly detected. Requires restart.",
-  "Share": "Share",
-  "Settings quality": "Settings quality",
-  "Content language": "Content language",
-  "Content country": "Content country"
+  "Force white tray icon": "Примусово використовувати білий значок трею",
+  "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Примусово використовувати (білий) значок, якщо тема визначена неправильно. Необхідне перезавантаження.",
+  "Share": "Поширити",
+  "Settings quality": "Налаштування якості",
+  "Content language": "Мова контенту",
+  "Content country": "Країна контенту",
+  "Website": "Веб-сторінка",
+  "Visit website": "Відвідати веб-сторінку",
+  "New update available:": "Доступне оновлення:"
 }

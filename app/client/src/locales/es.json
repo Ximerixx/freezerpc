@@ -131,8 +131,11 @@
   "Are you sure you want to delete this playlist?": "¿Está seguro de querer eliminar la lista de reproducción?",
   "Force white tray icon": "Forzar icono blanco en la bandeja",
   "Force default (white) tray icon if theme incorrectly detected. Requires restart.": "Forzar icono predeterminado en bandeja (blanco) si el tema no es detectado correctamente. Requiere reinicio.",
-  "Share": "Share",
-  "Settings quality": "Settings quality",
-  "Content language": "Content language",
-  "Content country": "Content country"
+  "Share": "Compartir",
+  "Settings quality": "Ajustes de calidad",
+  "Content language": "Idioma del contenido",
+  "Content country": "País del contenido",
+  "Website": "Sitio Web",
+  "Visit website": "Visita la página web",
+  "New update available:": "Nueva actualización disponible:"
 }
