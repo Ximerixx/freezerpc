@@ -29,7 +29,7 @@ cd app
 npm i 
 ```
 
-**1.0.5** - Prebuilt frontend is now included in the repo. The following steps are optional (but recommended):
+Frontend:
 
 ```
 cd client
