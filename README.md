@@ -4,7 +4,10 @@ Free music streaming client for Deezer based on the Deezloader/Deemix "bug".
 
 ## Downloads
 
-Binaries are available in Telegram channel: https://t.me/freezereleases
+Binaries are available in:
+
+[Telegram channel](https://t.me/freezereleases)   
+[Website](https://www.freezer.life/) 
 
 ## Links
 
@@ -54,9 +57,11 @@ npm run dist
 ## Credits
 
 **Francesco** - design help, tester  
-**Homam** - tester  
+**Xandar** - Community manager, helper, tester  
 **Bas Curtiz** - logo  
 **RemixDev** - how2deez
+
+**Huge thanks to all the Crowdin translators and all the contributors to this project <3**
 
 ## Support me
 BTC: `14hcr4PGbgqeXd3SoXY9QyJFNpyurgrL9y`
