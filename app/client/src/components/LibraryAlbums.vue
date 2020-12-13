@@ -20,11 +20,21 @@
                 <v-icon v-if='!isReversed'>mdi-sort-variant</v-icon>
             </v-btn>
         </div>
+        <!-- Search -->
+        <v-text-field
+            dense
+            :label='$t("Search")'
+            solo
+            class='mx-2 mt-1'
+            v-model='searchQuery'
+        ></v-text-field>
     </div>
 
-    <v-lazy max-height="100" v-for='(album, index) in albums' :key='album.id'>
-        <AlbumTile :album='album' @remove='removed(index)'></AlbumTile>
-    </v-lazy>
+    <div class='d-flex justify-center flex-wrap'>
+        <v-lazy max-height="230" v-for='album in filtered' :key='album.id' class='ma-2'>
+            <AlbumTile :album='album' @remove='removed(album.id)' card></AlbumTile>
+        </v-lazy>
+    </div>
 
 </v-list>
 </template>
@@ -34,6 +44,9 @@ import AlbumTile from '@/components/AlbumTile.vue';
 
 export default {
     name: 'LibraryAlbums',
+    components: {
+        AlbumTile
+    },
     data() {
         return {
             albums: [],
@@ -46,7 +59,8 @@ export default {
                 this.$t('Name (A-Z)'),
                 this.$t('Artist (A-Z)')
             ],
-            unsorted: null
+            unsorted: null,
+            searchQuery: null
         }
     },
     methods: {
@@ -59,8 +73,8 @@ export default {
             }
             this.loading = false;
         },
-        removed(index) {
-            this.albums.splice(index, 1);
+        removed(id) {
+            this.albums.splice(this.albums.findIndex(a => a.id == id), 1);
         },
         //Sort changed
         async sort(type) {
@@ -91,12 +105,18 @@ export default {
             this.albums.reverse();
         },
     },
-    components: {
-        AlbumTile
-    },
     mounted() {
         //Initial load
         this.load();
+    },
+    computed: {
+        //Search
+        filtered() {
+            if (!this.searchQuery)
+                return this.albums;
+            
+            return this.albums.filter(a => a.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
+        }
     }
 }
 </script>

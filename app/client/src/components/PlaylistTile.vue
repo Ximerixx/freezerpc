@@ -82,11 +82,11 @@
     </v-list-item>
 
     <!-- Card -->
-    <v-card v-if='card' max-width='175px' max-height='175px' @click='click' rounded>
+    <v-card v-if='card' max-width='175px' max-height='220px' @click='click' color='transparent' elevation='0'>
         <v-hover v-slot:default='{hover}'>
             <div>
 
-                <v-img :src='playlist.image.thumb'>
+                <v-img :src='playlist.image.thumb' class='rounded-lg'>
                 </v-img>
 
                 <v-overlay absolute :value='hover' opacity='0.5'>
@@ -94,6 +94,8 @@
                         <v-icon color='black'>mdi-play</v-icon>
                     </v-btn>
                 </v-overlay>
+
+                <div v-if='cardTitle' class='px-2 pt-2 pb-1 text-subtitle-2 text-center text-truncate'>{{playlist.title}}</div>
 
             </div>
         </v-hover>
@@ -122,6 +124,10 @@ export default {
     props: {
         playlist: Object,
         card: {
+            type: Boolean,
+            default: false
+        },
+        cardTitle: {
             type: Boolean,
             default: false
         }

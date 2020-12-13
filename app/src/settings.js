@@ -36,7 +36,6 @@ class Settings {
         this.language = 'en';
 
         this.crossfadeDuration = 3000;
-        this.lightTheme = false;
         this.playlistFolder = false;
 
         this.forceWhiteTrayIcon = false;

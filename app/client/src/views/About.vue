@@ -102,9 +102,8 @@
     <v-dialog v-model='xandarDialog' max-width='512'>
         <v-card elevation='2'>
             <v-card-title class="headline">
-                You have been judged by Xandar
+                f
             </v-card-title>
-            <v-card-text>Linux good, Windows bad</v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="red darken-1" text @click="xandarDialog = false">

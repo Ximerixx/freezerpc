@@ -51,7 +51,7 @@
     </v-list-item>
 
     <!-- Card version -->
-    <v-card max-height='200px' max-width='200px' v-if='card' @click='click'>
+    <v-card max-height='200px' width='180px' v-if='card' @click='click' color='transparent' elevation='0'>
         <div class='d-flex justify-center'>
             <v-avatar size='150' class='ma-1'>
                 <v-img :src='artist.picture.thumb'>
@@ -82,7 +82,7 @@ export default {
         tiny: {
             type: Boolean,
             default: false
-        }
+        },
     },
     methods: {
         async library() {

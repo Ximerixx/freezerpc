@@ -294,6 +294,7 @@ export default {
             await this.$axios.put('/library/track?id=' + this.$root.track.id);
             this.$root.libraryTracks.push(this.$root.track.id);
             this.inLibrary = true;
+
             this.$root.globalSnackbar = this.$t('Added to library!');
         },
         //Download current track
@@ -302,7 +303,6 @@ export default {
         },
         //Save volume
         updateVolume(v) {
-            if (this.$root.audio) this.$root.audio.volume = v;
             this.$root.volume = v;
         },
         //Repeat button click

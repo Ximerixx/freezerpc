@@ -20,11 +20,21 @@
                 <v-icon v-if='!isReversed'>mdi-sort-variant</v-icon>
             </v-btn>
         </div>
+        <!-- Search -->
+        <v-text-field
+            dense
+            :label='$t("Search")'
+            solo
+            class='mx-2 mt-1'
+            v-model='searchQuery'
+        ></v-text-field>
     </div>
 
-    <v-lazy max-height="100" v-for='(artist, index) in artists' :key='artist.id'>
-        <ArtistTile :artist='artist' @remove='removed(index)'></ArtistTile>
-    </v-lazy>
+    <div class='d-flex flex-wrap justify-center'>
+        <v-lazy max-height="200" v-for='artist in filtered' :key='artist.id' class='my-2 ml-3'>
+            <ArtistTile :artist='artist' @remove='removed(artist.id)' card></ArtistTile>
+        </v-lazy>
+    </div>
 
 </v-list>
 </template>
@@ -48,7 +58,8 @@ export default {
                 this.$t('Date Added'),
                 this.$t('Name (A-Z)')
             ],
-            unsorted: null
+            unsorted: null,
+            searchQuery: null
         }
     },
     methods: {
@@ -61,8 +72,8 @@ export default {
             }
             this.loading = false;
         },
-        removed(index) {
-            this.artists.splice(index, 1);
+        removed(id) {
+            this.artists.splice(this.artists.findIndex(a => a.id == id), 1);
         },
         //Sort changed
         async sort(type) {
@@ -92,6 +103,15 @@ export default {
     mounted() {
         //Initial load
         this.load();
+    },
+    computed: {
+        //Search
+        filtered() {
+            if (!this.searchQuery)
+                return this.artists;
+            
+            return this.artists.filter(a => a.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
+        }
     }
 }
 </script>

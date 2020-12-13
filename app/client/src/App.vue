@@ -139,7 +139,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app dense>
+    <v-app-bar app dense color='#1e1e1e'>
 
       <v-btn icon @click='previous'>
         <v-icon>mdi-arrow-left</v-icon>
@@ -478,7 +478,6 @@ export default {
   },
   watch: {
     volume() {
-      if (this.$root.audio) this.$root.audio.volume = this.volume;
       this.$root.volume = this.volume;
     },
     '$root.volume'() {

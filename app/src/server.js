@@ -69,8 +69,9 @@ app.post('/settings', async (req, res) => {
 app.post('/authorize', async (req, res) => {
     if (!req.body.arl || req.body.arl.length < 100) return res.status(500).send('Invalid ARL');
     
-    //Check if arl valid
-    deezer.arl = req.body.arl;
+    //Check if ARL valid
+    let electron = deezer.electron;
+    deezer = new DeezerAPI(req.body.arl, electron);
     settings.arl = req.body.arl;
 
     if (await (deezer.authorize())) {

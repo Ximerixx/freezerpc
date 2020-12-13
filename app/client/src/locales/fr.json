@@ -88,7 +88,7 @@
   "Show download dialog": "Afficher une boîte de dialogue pour chaque téléchargement",
   "Create folders for artists": "Générer des dossiers par artiste",
   "Create folders for albums": "Générer des dossiers par album",
-  "Download lyrics": "Télécharger les paroles",
+  "Download lyrics": "Télécharger les paroles (.LRC)",
   "Variables": "Variables",
   "UI": "Interface",
   "Show autocomplete in search": "Afficher la saisie automatique dans la recherche",

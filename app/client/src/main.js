@@ -286,7 +286,6 @@ new Vue({
                     }
                     //Restore original volume
                     this.audio.voume = currentVolume;
-                    this.volume = currentVolume;
 
                     oldAudio.pause();
                     
@@ -303,7 +302,8 @@ new Vue({
                 }
             });
             this.audio.muted = this.muted;
-            this.audio.volume = this.volume;
+            //Set volume
+            this.audio.volume = this.volume * this.volume;
             
             this.audio.addEventListener('ended', async () => {
                 if (this.gapless.crossfade) return;
@@ -518,11 +518,6 @@ new Vue({
         let res = await this.$axios.get('/settings');
         this.settings = res.data;
         this.$vuetify.theme.themes.dark.primary = this.settings.primaryColor;
-        this.$vuetify.theme.themes.light.primary = this.settings.primaryColor;
-        if (this.settings.lightTheme) {
-            this.$vuetify.theme.dark = false;
-            this.$vuetify.theme.light = true;
-        }
         i18n.locale = this.settings.language;
         this.volume = this.settings.volume;
 
@@ -621,23 +616,19 @@ new Vue({
             //<- -5s (from YT)
             if (e.code == "ArrowLeft") this.$root.seek((this.position - 5000));
             // ^ v - Volume 
-            if (e.code == 'ArrowUp' && this.audio) {
-                if ((this.audio.volume + 0.05) > 1) {
-                    this.audio.volume = 1.00;
+            if (e.code == 'ArrowUp') {
+                if ((this.volume + 0.05) > 1) {
                     this.volume = 1.00;
                     return;
                 }
-                this.audio.volume += 0.05;
-                this.volume = this.audio.volume;
+                this.volume += 0.05;
             }
-            if (e.code == 'ArrowDown' && this.audio) {
-                if ((this.audio.volume - 0.05) < 0) {
-                    this.audio.volume = 0.00;
+            if (e.code == 'ArrowDown') {
+                if ((this.volume - 0.05) < 0) {
                     this.volume = 0.00;
                     return;
                 }
-                this.audio.volume -= 0.05;
-                this.volume = this.audio.volume;
+                this.volume -= 0.05;
             }
         });
     },
@@ -647,6 +638,11 @@ new Vue({
         state() {
             this.updateMediaSession();
             this.updateState();
+        },
+        //Update volume with curve
+        volume() {
+            if (this.audio)
+                this.audio.volume = this.volume * this.volume;
         }
     },
 

@@ -142,17 +142,6 @@
                 <v-list-item-title>{{$t("Show autocomplete in search")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
-
-        <!-- Light theme -->
-        <v-list-item>
-            <v-list-item-action>
-                <v-checkbox class='pl-2' v-model='$root.settings.lightTheme' @change='changeLightTheme'></v-checkbox>
-            </v-list-item-action>
-            <v-list-item-content>
-                <v-list-item-title>{{$t("Light theme")}}</v-list-item-title>
-            </v-list-item-content>
-        </v-list-item>
-        
         
         <!-- Accounts -->
         <v-subheader>{{$t("Integrations")}}</v-subheader>
@@ -320,6 +309,8 @@ export default {
             languages: [
                 {code: 'en', name: 'English'},
                 {code: 'ar', name: 'Arabic'},
+                {code: 'hr', name: 'Croatian'},
+                {code: 'fil', name: 'Filipino'},
                 {code: 'fr', name: 'French'},
                 {code: 'de', name: 'German'},
                 {code: 'el', name: 'Greek'},
@@ -332,7 +323,8 @@ export default {
                 {code: 'sk', name: 'Slovak'},
                 {code: 'es', name: 'Spanish'},
                 {code: 'tr', name: 'Turkish'},
-                {code: 'uk', name: 'Ukrainian'}
+                {code: 'uk', name: 'Ukrainian'},
+                {code: 'vi', name: 'Vietnamese'}
             ],
             colorPicker: false,
             primaryColorIndex: 0,

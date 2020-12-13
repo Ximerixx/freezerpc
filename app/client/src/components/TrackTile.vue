@@ -255,6 +255,11 @@ export default {
             document.body.removeChild(copyElem);
             this.$root.globalSnackbar = this.$t('Link copied!');
         }
+    },
+    watch: {
+        '$root.libraryTracks'() {
+            this.isLibrary = this.$root.libraryTracks.includes(this.track.id);
+        }
     }
 }
 </script>

@@ -106,7 +106,7 @@
   "Other": "Diğer",
   "Minimize to tray": "Sistem tray'e küçülsün",
   "Don't minimize to tray": "Sistem tray'e küçülmesin tamamen kapansın",
-  "Close on exit": "Programı kapattığınızda",
+  "Close on exit": "Programı kapattığınızda tamamen kapansın",
   "Settings saved!": "Ayarlar kaydedildi!",
   "Available only in Electron version!": "Sadece Electron versiyonunda mevcuttur!",
   "Crossfade (ms)": "Crossfade (ms)",
@@ -135,7 +135,7 @@
   "Settings quality": "Kalite ayarları",
   "Content language": "İçerik dili",
   "Content country": "İçerik ülkesi",
-  "Website": "Website",
-  "Visit website": "Visit website",
-  "New update available:": "New update available:"
+  "Website": "İnternet sitesi",
+  "Visit website": "İnternet sitesini ziyaret et",
+  "New update available:": "Yeni güncelleme mevcut:"
 }

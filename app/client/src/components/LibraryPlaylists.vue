@@ -6,12 +6,6 @@
     </v-overlay>
 
     <div class='d-flex'>
-        <!-- Create playlist -->
-        <v-btn class='ma-2 ml-3' color='primary' @click='popup = true'>
-            <v-icon left>mdi-playlist-plus</v-icon>
-            {{$t("Create new playlist")}}
-        </v-btn>
-
         <!-- Sort -->
         <div class='mt-1 px-2 d-flex'>
             <div class='text-overline pt-1 mx-2'>
@@ -28,16 +22,34 @@
                 </v-btn>
             </div>
         </div>
-
+        <!-- Search -->
+        <v-text-field
+            dense
+            :label='$t("Search")'
+            solo
+            class='mx-2 mt-1'
+            v-model='searchQuery'
+        ></v-text-field>
     </div>
 
     <v-dialog max-width="400px" v-model='popup'>
         <PlaylistPopup @created='playlistCreated'></PlaylistPopup>
     </v-dialog>
 
-    <v-lazy max-height="100" v-for='(playlist, index) in playlists' :key='playlist.id'>
-        <PlaylistTile :playlist='playlist' @remove='removed(index)'></PlaylistTile>
-    </v-lazy>
+    <div class='d-flex justify-center flex-wrap'>
+        <!-- Add playlist card -->
+        <v-card width='175px' height='175px' class='ma-2 d-flex justify-center align-center flex-column text-center rounded-lg' outlined @click='popup = true'>
+            <v-icon large>
+                mdi-playlist-plus
+            </v-icon>
+            <br>
+            <p class='text-h6 font-weight-bold'>{{$t("Create new playlist")}}</p>
+        </v-card>
+
+        <v-lazy max-height="220" v-for='playlist in filtered' :key='playlist.id' class='ma-2'>
+            <PlaylistTile :playlist='playlist' @remove='removed(playlist.id)' card cardTitle></PlaylistTile>
+        </v-lazy>
+    </div>
 
 </v-list>
 </template>
@@ -63,7 +75,8 @@ export default {
                 this.$t('Date Added'),
                 this.$t('Name (A-Z)'),
             ],
-            unsorted: null
+            unsorted: null,
+            searchQuery: null
         }
     },
     methods: {
@@ -84,8 +97,8 @@ export default {
             this.load();
         },
         //On playlist remove
-        removed(i) {
-            this.playlists.splice(i, 1);
+        removed(id) {
+            this.playlists.splice(this.playlists.findIndex(p => p.id == id), 1);
         },
         //Sort changed
         async sort(type) {
@@ -115,6 +128,15 @@ export default {
     mounted() {
         //Initial load
         this.load();
+    },
+    computed: {
+        //Search playlists
+        filtered() {
+            if (!this.searchQuery)
+                return this.playlists;
+            
+            return this.playlists.filter(p => p.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
+        }
     }
 }
 </script>

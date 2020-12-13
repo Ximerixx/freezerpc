@@ -89,7 +89,7 @@ class Playlist {
         this.id = json.PLAYLIST_ID.toString(),
         this.title = json.TITLE,
         this.trackCount = json.NB_SONG ? json.NB_SONG : tracksJson.total;
-        this.image = new DeezerImage(json.PLAYLIST_PICTURE, 'playlist');
+        this.image = new DeezerImage(json.PLAYLIST_PICTURE, json.PICTURE_TYPE);
         this.fans = json.NB_FAN;
         this.duration = parseInt((json.DURATION ? json.DURATION : 0).toString(), 10) * 1000;
         this.description = json.DESCRIPTION;

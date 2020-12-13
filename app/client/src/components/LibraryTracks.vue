@@ -14,14 +14,22 @@
                 <v-icon v-if='!isReversed'>mdi-sort-variant</v-icon>
             </v-btn>
         </div>
+        <!-- Search -->
+        <v-text-field
+            dense
+            :label='$t("Search")'
+            solo
+            class='mx-2 mt-1'
+            v-model='searchQuery'
+        ></v-text-field>
     </div>
 
     <v-list :height='height' class='overflow-y-auto'>
         <v-lazy
-            v-for='(track, index) in tracks'
+            v-for='(track, index) in filtered'
             :key='index + "t" + track.id'
             max-height="100"
-        ><TrackTile :track='track' @click='play(index)' @remove='removedTrack(index)'>
+        ><TrackTile :track='track' @click='play(track.id)' @remove='removedTrack(track.id)'>
             </TrackTile>
         </v-lazy>
 
@@ -52,7 +60,8 @@ export default {
                 this.$t('Album (A-Z)')
             ],
             tracksUnsorted: null,
-            isReversed: false
+            isReversed: false,
+            searchQuery: null
         }
     },
     props: {
@@ -97,14 +106,14 @@ export default {
             this.loading = false;
         },
         //Play track
-        async play(index) {
+        async play(id) {
             this.$root.queue.source = {
                 text: 'Loved tracks',
                 source: 'playlist',
                 data: this.$root.profile.favoritesPlaylist
             };
             this.$root.replaceQueue(this.tracks);
-            this.$root.playIndex(index);
+            this.$root.playIndex(this.tracks.findIndex(t => t.id == id));
 
             //Load all tracks
             if (this.tracks.length < this.count) {
@@ -151,12 +160,22 @@ export default {
             this.isReversed = !this.isReversed;
             this.tracks.reverse();
         },
-        removedTrack(index) {
-            this.tracks.splice(index, 1);
+        removedTrack(id) {
+            this.tracks.splice(this.tracks.findIndex(t => t.id == id), 1);
+            this.$root.libraryTracks.splice(this.$root.libraryTracks.indexOf(id), 1);
         }
     },
     mounted() {
         this.initialLoad();
+    },
+    computed: {
+        //Search
+        filtered() {
+            if (!this.searchQuery)
+                return this.tracks;
+            
+            return this.tracks.filter(t => t.title.toLowerCase().includes(this.searchQuery.toLowerCase()));
+        }
     }
 
 }

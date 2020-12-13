@@ -1,7 +1,7 @@
 <template>
 <div>
 
-    <v-card max-width='175px' max-height='210px' @click='play' :loading='loading'>
+    <v-card max-width='175px' max-height='210px' @click='play' :loading='loading' elevation='0' color='transparent'>
         <v-img :src='stl.cover.thumb'>
         </v-img>
 

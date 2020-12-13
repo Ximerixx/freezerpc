@@ -79,11 +79,12 @@
         </v-list-item-action>
     </v-list-item>
 
-    <v-card v-if='card' max-width='175px' max-height='210px' @click='click'>
+    <!-- Card version -->
+    <v-card v-if='card' max-width='175px' max-height='230px' @click='click' color='transparent' elevation='0'>
          <v-hover v-slot:default='{hover}'>
             <div>
 
-                <v-img :src='album.art.thumb'>
+                <v-img :src='album.art.thumb' class='rounded-lg'>
                 </v-img>
 
                 <v-overlay absolute :value='hover' opacity='0.5'>
@@ -95,8 +96,8 @@
             </div>
         </v-hover>
 
-
-        <div class='pa-2 text-subtitle-2 text-center text-truncate'>{{album.title}}</div>
+        <div class='px-2 pt-2 pb-1 text-subtitle-2 text-center text-truncate'>{{album.title}}</div>
+        <div class='pb-1 px-2 text-caption text-center text-truncate'>{{album.artistString}}</div>
 
     </v-card>
 

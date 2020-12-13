@@ -15,9 +15,9 @@
             <h1 class='py-2'>{{section.title}}</h1>
             <div class='d-flex' style='overflow-x: auto; overflow-y: hidden;'>
                 <div v-for='(item, index) in section.items' :key='"item"+index' class='mr-4 my-2'>
-                    <PlaylistTile v-if='item.type == "playlist"' :playlist='item.data' card></PlaylistTile>
+                    <PlaylistTile v-if='item.type == "playlist"' :playlist='item.data' card class='mb-4'></PlaylistTile>
                     <ArtistTile v-if='item.type == "artist"' :artist='item.data' card></ArtistTile>
-                    <DeezerChannel v-if='item.type == "channel"' :channel='item.data'></DeezerChannel>
+                    <DeezerChannel v-if='item.type == "channel"' :channel='item.data' class='mb-2'></DeezerChannel>
                     <AlbumTile v-if='item.type == "album"' :album='item.data' card></AlbumTile>
                     <SmartTrackList v-if='item.type == "smarttracklist" || item.type == "flow"' :stl='item.data'></SmartTrackList>
                 </div>
