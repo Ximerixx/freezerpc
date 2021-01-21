@@ -1,6 +1,10 @@
 <template>
 <div>
-    <h1>{{$t("Library")}}</h1>
+    <h1>{{$t("Library")}} 
+        <v-btn class='ml-2 mb-1' icon @click='shuffle'>
+            <v-icon>mdi-shuffle</v-icon>
+        </v-btn>
+    </h1>
 
     <v-tabs v-model='tab'>
         <v-tab key='tracks'>
@@ -76,7 +80,18 @@ export default {
         }
     },
     methods: {
-
+        async shuffle() {
+            let res = await this.$axios.get('/shuffle');
+            if (res && res.data) {
+                this.$root.queue.source = {
+                    text: this.$t('Shuffle'),
+                    source: 'playlist',
+                    data: 0
+                };
+                this.$root.replaceQueue(res.data);
+                this.$root.playIndex(0);
+            }
+        }
     },
     mounted() {
         //Make mutable

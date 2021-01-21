@@ -204,6 +204,15 @@ app.get('/profile', async (req, res) => {
     res.send(profile);
 });
 
+//Get shuffled library
+app.get('/shuffle', async (req, res) => {
+    let data = await deezer.callApi('tracklist.getShuffledCollection', {
+        nb: 50,
+        start: 0
+    });
+    res.send(data.results.data.map((t) => new Track(t)));
+});
+
 //Get list of `type` from library
 app.get('/library/:type', async (req, res) => {
     let type = req.params.type;

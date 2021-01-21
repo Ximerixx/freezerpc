@@ -9,7 +9,7 @@ const decryptor = require('nodeezcryptor');
 const sanitize = require('sanitize-filename');
 const ID3Writer = require('browser-id3-writer');
 const Metaflac = require('metaflac-js2');
-const { Track, Lyrics } = require('./definitions');
+const { Track, Lyrics, DeezerImage } = require('./definitions');
 const { throwDeprecation } = require('process');
 
 let deezer;
@@ -206,6 +206,7 @@ class DownloadThread {
         this.settings = settings;
         this.stopped = true;
         this.isUserUploaded = download.track.id.toString().startsWith('-');
+        this.coverPath = null;
     }
 
     //Callback wrapper
@@ -328,9 +329,11 @@ class DownloadThread {
         await fs.promises.unlink(`${tmp}.DEC`);
         await fs.promises.unlink(tmp);
 
+        let cover = null;
+
         if (!this.isUserUploaded) {
-            //Tag
-            await this.tagTrack(outPath);
+            //Tag, returns cover to prevent double downlaoding
+            cover = await this.tagTrack(outPath);
 
             //Lyrics
             if (this.settings.downloadLyrics) {
@@ -346,6 +349,25 @@ class DownloadThread {
                 }
             }
         }
+
+        //Cover
+        if (this.coverPath) {
+            if (!fs.existsSync(this.coverPath)) {
+                //Create empty file to "lock"
+                fs.closeSync(fs.openSync(this.coverPath, 'w'));
+
+                if (!cover) {
+                    try {
+                        cover = await this.downloadCover(DeezerImage.url(this.track.albumArt.hash, 'cover', this.settings.coverResolution));
+                    } catch (e) {}
+                }
+                if (!cover) {
+                    logger.warn("Error downloading album art!");
+                } else {
+                    await fs.promises.writeFile(this.coverPath, cover);
+                }
+            }
+        }
         
 
         this.download.state = 3;
@@ -355,7 +377,7 @@ class DownloadThread {
     async tagTrack(path) {
         let cover;
         try {
-            cover = await this.downloadCover(this.track.albumArt.full);
+            cover = await this.downloadCover(this.track.albumArt.hash, 'cover', this.settings.coverResolution);
         } catch (e) {}
         
         //Genre tag
@@ -392,7 +414,8 @@ class DownloadThread {
 
             //Write
             await fs.promises.writeFile(path, Buffer.from(writer.arrayBuffer));
-            return;
+
+            return cover;
         }
 
         //Tag FLAC
@@ -496,7 +519,12 @@ class DownloadThread {
         }
         //Generate folders
         if (this.settings.createArtistFolder) folder = path.join(folder, sanitize(this.track.artists[0].name));
-        if (this.settings.createAlbumFolder) folder = path.join(folder, sanitize(this.track.album.title));
+        if (this.settings.createAlbumFolder) {
+            folder = path.join(folder, sanitize(this.track.album.title));
+            if (this.settings.downloadCover) {
+                this.coverPath = path.join(folder, "cover.jpg");
+            }
+        }
 
         //Extension
         if (quality.toString() == '9') {

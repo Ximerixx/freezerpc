@@ -122,14 +122,13 @@ class DeezerImage {
         this.hash = hash;
         this.type = type;
         //Create full and thumb, to standardize size and because functions aren't preserved
-        this.full = this.url(1400);
-        this.thumb = this.url(256);
+        this.full = DeezerImage.url(this.hash, this.type, 1400);
+        this.thumb = DeezerImage.url(this.hash, this.type, 256);
     }
-
-    url(size = 256) {
-        if (!this.hash)
-            return `https://e-cdns-images.dzcdn.net/images/${this.type}/${size}x${size}-000000-80-0-0.jpg`;
-        return `https://e-cdns-images.dzcdn.net/images/${this.type}/${this.hash}/${size}x${size}-000000-80-0-0.jpg`;
+    static url(hash, type, size = 256) {
+        if (!hash)
+            return `https://e-cdns-images.dzcdn.net/images/${type}/${size}x${size}-000000-80-0-0.jpg`;
+        return `https://e-cdns-images.dzcdn.net/images/${type}/${hash}/${size}x${size}-000000-80-0-0.jpg`;
     }
 }
 

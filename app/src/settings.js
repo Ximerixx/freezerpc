@@ -23,6 +23,8 @@ class Settings {
         this.createArtistFolder = true;
         this.downloadFilename = '%0trackNumber%. %artists% - %title%';
         this.downloadDialog = true;
+        this.downloadCover = true;
+        this.coverResolution = 1400;
 
         this.logListen = false;
         this.lastFM = null;

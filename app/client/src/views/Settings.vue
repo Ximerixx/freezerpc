@@ -79,6 +79,18 @@
                 <v-list-item-title>{{$t("Create folders for albums")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
+        <!-- Download Cover -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.downloadCover' class='pl-2'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Download album cover")}}</v-list-item-title>
+            </v-list-item-content>
+            <!-- Resolution -->
+            <v-select :items='artResolutions' :label='$t("Art Resolution")' v-model='$root.settings.coverResolution' style='max-width: 150px;'></v-select>
+            
+        </v-list-item>
         <!-- Download lyrics -->
         <v-list-item>
             <v-list-item-action>
@@ -324,8 +336,10 @@ export default {
                 {code: 'es', name: 'Spanish'},
                 {code: 'tr', name: 'Turkish'},
                 {code: 'uk', name: 'Ukrainian'},
-                {code: 'vi', name: 'Vietnamese'}
+                {code: 'vi', name: 'Vietnamese'},
+                {code: 'uwu', name: 'Furry'}
             ],
+            artResolutions: [256, 512, 600, 800, 1000, 1200, 1400, 1600, 1800],
             colorPicker: false,
             primaryColorIndex: 0,
             primaries: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', 

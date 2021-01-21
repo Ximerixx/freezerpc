@@ -1,5 +1,5 @@
 <template>
-<div v-scroll.self='scroll'>
+<div>
     <div class='px-4 pt-2 d-flex' style='max-height: 50px;'>
         <div class='text-overline px-2 pt-1'>
             {{count}} {{$t("TRACKS")}}
@@ -24,7 +24,7 @@
         ></v-text-field>
     </div>
 
-    <v-list :height='height' class='overflow-y-auto'>
+    <v-list :height='height' class='overflow-y-auto' v-scroll.self='scroll' >
         <v-lazy
             v-for='(track, index) in filtered'
             :key='index + "t" + track.id'
@@ -69,7 +69,8 @@ export default {
     },
     methods: {
         scroll(event) {
-            let loadOffset = event.target.scrollHeight - event.target.offsetHeight - 100;
+            console.log(event);
+            let loadOffset = event.target.scrollHeight - event.target.offsetHeight - 150;
             if (event.target.scrollTop > loadOffset) {
                 if (!this.loading) this.load();
             }

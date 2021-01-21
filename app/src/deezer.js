@@ -66,7 +66,7 @@ class DeezerAPI {
 
         //Invalid CSRF
         if (data.data.error && data.data.error.VALID_TOKEN_REQUIRED) {
-            await this.callApi('deezer.getUserData');
+            await this.authorize();
             return await this.callApi(method, args, gatewayInput);
         }
 
@@ -127,7 +127,7 @@ class DeezerAPI {
 
         //Invalid CSRF
         if (data.error && data.error.VALID_TOKEN_REQUIRED) {
-            await this.callApi('deezer.getUserData');
+            await this.authorize();
             return await this.callApi(method, args, gatewayInput);
         }
 

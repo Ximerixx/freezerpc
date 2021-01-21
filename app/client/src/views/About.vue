@@ -45,7 +45,7 @@
                 <v-list-item-title class='font-weight-bold'>{{$t("Telegram Android Group")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
-        <v-list-item @click='openUrl("https://discord.gg/7ap654Tp3z")'>
+        <v-list-item @click='openUrl("https://discord.gg/qwJpa3r4dQ")'>
             <v-list-item-icon>
                 <v-icon>mdi-discord</v-icon>
             </v-list-item-icon>
@@ -102,8 +102,11 @@
     <v-dialog v-model='xandarDialog' max-width='512'>
         <v-card elevation='2'>
             <v-card-title class="headline">
-                f
+                ass
             </v-card-title>
+            <v-card-text>
+                windows user
+            </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="red darken-1" text @click="xandarDialog = false">
