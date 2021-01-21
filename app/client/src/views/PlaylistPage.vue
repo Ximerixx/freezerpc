@@ -13,7 +13,12 @@
             <v-overlay absolute :value="loading" z-index="3" opacity='0.9'>
                 <v-progress-circular indeterminate></v-progress-circular>
             </v-overlay>
-            <h1>{{playlist.title}}</h1>
+            <h1>
+                {{playlist.title}}
+                <v-icon v-if='playlist.type == "private"' class='ml-2 mb-2'>mdi-lock</v-icon>
+                <v-icon v-if='playlist.type == "public"' class='ml-2 mb-2'>mdi-earth</v-icon>
+                <v-icon v-if='playlist.type == "collaborative"' class='ml-2 mb-2'>mdi-account-edit</v-icon>
+            </h1>
             <h3>{{playlist.user.name}}</h3>
             <h5>{{playlist.description}}</h5>
             <div class='mt-2' v-if='!loading'>
@@ -44,6 +49,10 @@
                 <v-btn color='red' class='mx-1' v-if='isOwn' @click='deleteDialog = true'>
                     <v-icon left>mdi-delete</v-icon>
                     {{$t('Delete')}}
+                </v-btn>
+                <v-btn color='red' class='mx-1' v-if='isOwn' @click='editDialog = true'>
+                    <v-icon left>mdi-pencil</v-icon>
+                    {{$t('Edit')}}
                 </v-btn>
                 <div class='mx-2' dense stlye='max-width: 120px;'>
                     <v-select class='px-2' dense solo :items='sortTypes' @change='sort' :label='$t("Sort by")'>
@@ -94,17 +103,24 @@
         </v-card>
     </v-dialog>
 
+    <!-- Edit playlist -->
+    <v-dialog v-model='editDialog' max-width='400px'>
+        <PlaylistPopup edit :playlist='this.playlist' @edit='refresh()' v-if='editDialog'></PlaylistPopup>
+    </v-dialog>
+
+
 </v-list>
 </template>
 
 <script>
 import TrackTile from '@/components/TrackTile.vue';
 import DownloadDialog from '@/components/DownloadDialog.vue';
+import PlaylistPopup from '@/components/PlaylistPopup.vue';
 
 export default {
     name: 'PlaylistTile',
     components: {
-        TrackTile, DownloadDialog
+        TrackTile, DownloadDialog, PlaylistPopup
     },
     props: {
         playlistData: Object,
@@ -120,6 +136,7 @@ export default {
             libraryLoading: false,
             downloadDialog: false,
             deleteDialog: false,
+            editDialog: false,
             
             //Sort
             sortTypes: [
@@ -199,7 +216,20 @@ export default {
             }
             this.libraryLoading = false;
         },
-
+        //Refresh metadata
+        async refresh() {
+            this.editDialog = false;
+            this.loading = true;
+            let data = await this.$axios.get(`/playlist/${this.playlist.id}?start=0`);
+            if (data && data.data) {
+                let tracks = this.playlist.tracks;
+                let library = this.playlist.library;
+                this.playlist = data.data;
+                this.playlist.tracks = tracks;
+                this.playlist.library = library;
+            }
+            this.loading = false;
+        },
         async initialLoad() {
             //Load meta and intial tracks
             if (this.playlist.tracks.length < this.playlist.trackCount) {

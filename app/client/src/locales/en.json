@@ -140,5 +140,11 @@
   "New update available:": "New update available:",
   "Shuffle": "Shuffle",
   "Download album cover": "Download album cover",
-  "Art Resolution": "Art Resolution"
+  "Art Resolution": "Art Resolution",
+  "Public": "Public",
+  "Private": "Private",
+  "Collaborative": "Collaborative",
+  "Edit playlist": "Edit playlist",
+  "Save": "Save",
+  "Edit": "Edit"
 }

@@ -128,17 +128,28 @@ app.delete('/playlist/:id', async (req, res) => {
 // {
 //     desciption,
 //     title,
-//     type: 'public' || 'private',
+//     type: 0, 1, 2 = public, private, collab
 //     track: trackID
 // }
 app.post('/playlist', async (req, res) => {
     await deezer.callApi('playlist.create', {
         description: req.body.description,
         title: req.body.title,
-        status: req.body.type == 'public' ? 2 : 1,
+        status: req.body.type,
         songs: req.body.track ? [[req.body.track, 0]] : []
     });
 
+    res.sendStatus(200);
+});
+
+//PUT edit playlist, see above create
+app.put('/playlist/:id', async (req, res) => {
+    await deezer.callApi('playlist.update', {
+        description: req.body.description,
+        title: req.body.title,
+        status: req.body.type,
+        playlist_id: parseInt(req.params.id.toString(), 10)
+    });
     res.sendStatus(200);
 });
 

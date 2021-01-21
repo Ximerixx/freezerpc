@@ -100,6 +100,17 @@ class Playlist {
         );
         this.tracks = tracksJson.data.map((t) => new Track(t));
         this.library = library;
+        switch (json.STATUS) {
+            case 0:
+                this.type = 'public';
+                break;
+            case 1:
+                this.type = 'private';
+                break;
+            case 2:
+                this.type = 'collaborative'
+                break;
+        }
     }
 
     //Extend tracks
