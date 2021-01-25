@@ -6,7 +6,6 @@ const logger = require('./winston');
 class Integrations extends EventEmitter {
 
     //LastFM, Discord etc
-
     constructor(settings) {
         super();
 
@@ -67,7 +66,7 @@ class Integrations extends EventEmitter {
     //Connect to discord client
     connectDiscord() {
         //Don't steal, k ty
-        const CLIENTID = '759835951450292324';
+        const CLIENTID = '803292927227854878';
 
         this.discordReady = false;
         DiscordRPC.register(CLIENTID);

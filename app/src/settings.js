@@ -43,6 +43,7 @@ class Settings {
         this.forceWhiteTrayIcon = false;
         this.contentLanguage = 'en';
         this.contentCountry = 'US';
+        this.sidebarOpen = false;
     }
 
     //Based on electorn app.getPath

@@ -10,6 +10,7 @@ const {Settings} = require('./settings');
 const {Track, Album, Artist, Playlist, DeezerProfile, SearchResults, DeezerLibrary, DeezerPage, Lyrics} = require('./definitions');
 const {DownloadManager} = require('./downloads');
 const {Integrations} = require('./integrations');
+const {Importer} = require('./importer');
 
 let settings;
 let deezer;
@@ -461,6 +462,69 @@ app.post('/log', async (req, res) => {
                 media: {id: req.body.id, type: 'song', format: 'MP3_128'}
             }
         });
+    res.status(200).end();
+});
+
+//Importer
+app.post('/import', async (req, res) => {
+    //Importer status
+    sockets.forEach(s => s.emit('importerInit', {
+        done: false,
+        active: true,
+        error: false,
+        tracks: []
+    }));
+    let type = req.body.type;
+
+    //Create importer
+    let importer = new Importer(deezer);
+    //Error
+    importer.on('error', t => {
+        sockets.forEach(s => s.emit('importerError'));
+    })
+    //New track imported
+    importer.on('imported', t => {
+        sockets.forEach(s => s.emit('importerTrack', t));
+    });
+    //Finished
+    importer.on('done', async (i) => {
+        //Create playlist
+        let playlistRaw = await deezer.callApi('playlist.create', {
+            description: i.description,
+            title: i.title,
+            status: 1,
+            songs: i.tracks.map(t => [parseInt(t.id, 10)])
+        });
+        //Download
+        if (type == 'download') {
+            //Fetch playlist
+            let data = await deezer.callApi('deezer.pagePlaylist', {
+                playlist_id: playlistRaw.results.toString(),
+                lang: settings.contentLanguage,
+                nb: 10000,
+                start: 0,
+                tags: true
+            });
+            let playlist = new Playlist(data.results.DATA, data.results.SONGS);
+            //Enqueue
+            await downloadManager.addBatch({
+                tracks: playlist.tracks,
+                quality: settings.downloadsQuality,
+                playlistName: i.title
+            });
+            //Delete
+            await deezer.callApi('playlist.delete', {playlist_id: parseInt(playlist.id.toString(),10)});
+            downloadManager.start();
+        }
+
+        //Send to UI
+        sockets.forEach(s => {
+            s.emit('importerDone');
+        });
+    })
+
+    importer.importSpotifyPlaylist(req.body.url);
+
     res.status(200).end();
 });
 

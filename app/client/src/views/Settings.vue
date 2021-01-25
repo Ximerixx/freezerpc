@@ -144,7 +144,6 @@
                 <v-list-item-title class='pl-2'>{{$t("Select primary color")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
-
         <!-- Autocomplete -->
         <v-list-item>
             <v-list-item-action>
@@ -154,6 +153,17 @@
                 <v-list-item-title>{{$t("Show autocomplete in search")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
+        <!-- Keep sidebar open -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.sidebarOpen' class='pl-2'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Keep sidebar open")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("WARNING: Might require reload to work properly!")}}</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
+
         
         <!-- Accounts -->
         <v-subheader>{{$t("Integrations")}}</v-subheader>

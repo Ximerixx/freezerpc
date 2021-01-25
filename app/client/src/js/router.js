@@ -12,6 +12,7 @@ import Settings from '@/views/Settings.vue';
 import DeezerPage from '@/views/DeezerPage.vue';
 import DownloadsPage from '@/views/DownloadsPage.vue';
 import About from '@/views/About.vue';
+import Importer from '@/views/Importer.vue';
 
 Vue.use(VueRouter);
 
@@ -79,6 +80,10 @@ const routes = [
     {
         path: '/about',
         component: About
+    },
+    {
+        path: '/importer',
+        component: Importer
     }
 ];
 

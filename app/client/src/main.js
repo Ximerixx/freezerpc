@@ -106,6 +106,14 @@ new Vue({
             }
         },
 
+        //Importer
+        importer: {
+            active: false,
+            done: false,
+            error: false,
+            tracks: []
+        },
+
         //Used to prevent double listen logging
         logListenId: null,
 
@@ -586,6 +594,27 @@ new Vue({
             this.seek(data.position);
         });
 
+        //Importer
+
+        //Start
+        this.sockets.subscribe('importerInit', (data) => {
+            this.importer = data;
+        });
+        //New track imported
+        this.sockets.subscribe('importerTrack', (data) => {
+            this.importer.tracks.push(data);
+        });
+        //Mark as done
+        this.sockets.subscribe('importerDone', () => {
+            this.importer.active = false;
+            this.importer.done = true;
+        });
+        this.sockets.subscribe('importerError', () => {
+            this.importer.error = true;
+            this.importer.active = false;
+            this.importer.done = false;
+        });
+
         r();
     },
 
@@ -605,6 +634,9 @@ new Vue({
         document.addEventListener('keyup', (e) => {
             //Don't handle keystrokes in text fields
             if (e.target.tagName == "INPUT") return;
+            //Don't handle if specials
+            if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+
             //K toggle playback
             if (e.code == "KeyK" || e.code == "Space") this.$root.toggle();
             //L +10s (from YT)

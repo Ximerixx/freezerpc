@@ -10,7 +10,6 @@ const sanitize = require('sanitize-filename');
 const ID3Writer = require('browser-id3-writer');
 const Metaflac = require('metaflac-js2');
 const { Track, Lyrics, DeezerImage } = require('./definitions');
-const { throwDeprecation } = require('process');
 
 let deezer;
 
@@ -377,7 +376,7 @@ class DownloadThread {
     async tagTrack(path) {
         let cover;
         try {
-            cover = await this.downloadCover(this.track.albumArt.hash, 'cover', this.settings.coverResolution);
+            cover = await this.downloadCover(DeezerImage.url(this.track.albumArt.hash, 'cover', this.settings.coverResolution), 'cover', this.settings.coverResolution);
         } catch (e) {}
         
         //Genre tag

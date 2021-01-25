@@ -27,8 +27,8 @@
       permanent
       fixed
       app
-      mini-variant
-      expand-on-hover
+      :mini-variant='!this.$root.settings.sidebarOpen'
+      :expand-on-hover='!this.$root.settings.sidebarOpen'
     ><v-list nav dense>
 
         <!-- Profile -->
@@ -125,6 +125,16 @@
           </v-list-item-icon>
 
           <v-list-item-title>{{$t('Downloads')}}</v-list-item-title>
+        </v-list-item>
+
+        <!-- Importer -->
+        <v-list-item link to='/importer'>
+          <v-list-item-icon>
+            <v-icon v-if='!$root.importer.done && !$root.importer.active'>mdi-import</v-icon>
+            <v-icon v-if='$root.importer.done' color='primary'>mdi-check</v-icon>
+            <v-progress-circular indeterminate style='top: -8px' size='42' v-if='$root.importer.active'></v-progress-circular>
+          </v-list-item-icon>
+          <v-list-item-title>{{$t('Importer')}}</v-list-item-title>
         </v-list-item>
 
         <!-- About -->
@@ -243,8 +253,7 @@
         <v-spacer></v-spacer>
         
         <!-- Volume -->
-        <v-col cols='auto' class='d-none d-sm-flex px-2' @click.stop>
-
+        <v-col cols='auto' class='d-none d-sm-flex px-2' @click.stop ref='volumeBar'>
           <div style='width: 180px;' class='d-flex'>
             <v-slider 
               dense 
@@ -445,6 +454,23 @@ export default {
     }
   },
   async mounted() {
+    //Scroll on volume
+    this.$refs.volumeBar.addEventListener('wheel', e => {
+      //Volup
+      if (e.deltaY < 0) {
+        if (this.volume + 0.05 > 1)
+          this.volume = 1;
+        else 
+          this.volume += 0.05;
+      } else {
+        //Voldown
+        if (this.volume - 0.05 < 0)
+          this.volume = 0;
+        else 
+          this.volume -= 0.05;
+      }
+    });
+
     //onClick for footer
     this.$refs.footer.addEventListener('click', () => {
       if (this.$root.track) this.showPlayer = true;

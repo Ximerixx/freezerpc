@@ -100,23 +100,25 @@
                     </v-btn>
 
                     <!-- Volume -->
-                    <v-slider
-                        min='0.00' 
-                        :prepend-icon='$root.muted ? "mdi-volume-off" : "mdi-volume-high"'
-                        max='1.00'
-                        step='0.01'
-                        v-model='$root.volume'
-                        class='px-8'
-                        style='padding-top: 2px;'
-                        @change='updateVolume'
-                        @click:prepend='$root.toggleMute()'
-                    >
-                        <template v-slot:append>
-                            <div style='position: absolute; padding-top: 4px;'>
-                                {{Math.round($root.volume * 100)}}%
-                            </div>
-                        </template>
-                    </v-slider>
+                    <div ref='volumeBar' style='width: 100%;'>
+                        <v-slider
+                            min='0.00' 
+                            :prepend-icon='$root.muted ? "mdi-volume-off" : "mdi-volume-high"'
+                            max='1.00'
+                            step='0.01'
+                            v-model='$root.volume'
+                            class='px-8'
+                            style='padding-top: 2px;'
+                            @change='updateVolume'
+                            @click:prepend='$root.toggleMute()'
+                        >
+                            <template v-slot:append>
+                                <div style='position: absolute; padding-top: 4px;'>
+                                    {{Math.round($root.volume * 100)}}%
+                                </div>
+                            </template>
+                        </v-slider>
+                    </div>
                 </div>
 
 
@@ -328,6 +330,22 @@ export default {
         }
     },
     mounted() {
+        //Scroll on volume
+        this.$refs.volumeBar.addEventListener('wheel', e => {
+            //Volup
+            if (e.deltaY < 0) {
+                if (this.$root.volume + 0.05 > 1)
+                    this.$root.volume = 1;
+                else 
+                    this.$root.volume += 0.05;
+            } else {
+                //Voldown
+                if (this.$root.volume - 0.05 < 0)
+                    this.$root.volume = 0;
+                else 
+                    this.$root.volume -= 0.05;
+            }
+        });
     },
     computed: {
     },

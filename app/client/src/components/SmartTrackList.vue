@@ -1,11 +1,11 @@
 <template>
 <div>
 
-    <v-card max-width='175px' max-height='210px' @click='play' :loading='loading' elevation='0' color='transparent'>
+    <v-card max-width='175px' max-height='220px' height='220px' @click='play' :loading='loading' elevation='0' color='transparent'>
         <v-img :src='stl.cover.thumb'>
         </v-img>
 
-        <div class='pa-2 text-subtitle-2 text-center text-truncate'>{{stl.title}}</div>
+        <div class='pa-2 text-subtitle-2'>{{stl.subtitle}}</div>
     </v-card>
 
 </div>
