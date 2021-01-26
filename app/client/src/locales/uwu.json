@@ -137,5 +137,21 @@
   "Content country": "Content countwy",
   "Website": "Website",
   "Visit website": "Visit website",
-  "New update available:": "Nyew update available:"
+  "New update available:": "Nyew update available:",
+  "Shuffle": "Shuffwe",
+  "Download album cover": "Downwaod awbum cover",
+  "Art Resolution": "Awt Wesowution",
+  "Public": "Pubwic",
+  "Private": "Pwivate",
+  "Collaborative": "Cowabowative",
+  "Edit playlist": "Edit pwaywist",
+  "Save": "Save",
+  "Edit": "Edit",
+  "Importer": "Importer",
+  "Enter URL": "Enter URL",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Currently only Spotify is supported and limited to 100 tracks.",
+  "Import into playlist": "Import into playlist",
+  "Keep sidebar open": "Keep sidebar open",
+  "WARNING: Might require reload to work properly!": "WARNING: Might require reload to work properly!",
+  "An error occured, URL might be invalid or unsupported.": "An error occured, URL might be invalid or unsupported."
 }

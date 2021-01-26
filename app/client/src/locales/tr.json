@@ -137,5 +137,21 @@
   "Content country": "İçerik ülkesi",
   "Website": "İnternet sitesi",
   "Visit website": "Web sitesine git",
-  "New update available:": "Yeni güncelleme mevcut:"
+  "New update available:": "Yeni güncelleme mevcut:",
+  "Shuffle": "Karışık çal",
+  "Download album cover": "Albüm kapağını indir",
+  "Art Resolution": "Art Çözüm",
+  "Public": "Herkese Açık",
+  "Private": "Gizli",
+  "Collaborative": "Paylaşılan",
+  "Edit playlist": "Çalma listesini düzenle",
+  "Save": "Kaydet",
+  "Edit": "Düzenle",
+  "Importer": "Aktaracı",
+  "Enter URL": "URL girin",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Şimdilik sadece Spotify destekleniyor ve 100 parça sınırı mevcut.",
+  "Import into playlist": "Çalma listesine aktar",
+  "Keep sidebar open": "Kenar çubuğu açık kalsın",
+  "WARNING: Might require reload to work properly!": "DİKKAT: Düzgün çalışması için yeniden yükleme gerekebilir!",
+  "An error occured, URL might be invalid or unsupported.": "Bir hata oluştu, URL geçersiz veya desteklenmiyor olabilir."
 }

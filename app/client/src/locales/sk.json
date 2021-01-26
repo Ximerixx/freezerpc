@@ -137,5 +137,21 @@
   "Content country": "Krajina obsahu",
   "Website": "Webová stránka",
   "Visit website": "Navštíviť webovú stránku",
-  "New update available:": "Nová aktualizácia k dispozícii:"
+  "New update available:": "Nová aktualizácia k dispozícii:",
+  "Shuffle": "Náhodne prehrať",
+  "Download album cover": "Prevziať obal albumu",
+  "Art Resolution": "Rozlíšenie",
+  "Public": "Verejné",
+  "Private": "Sukromné",
+  "Collaborative": "Spolupráca",
+  "Edit playlist": "Upraviť playlist",
+  "Save": "Uložiť",
+  "Edit": "Upraviť",
+  "Importer": "Importovať",
+  "Enter URL": "Zadajte URL adresu",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Momentálne je podporované iba Spotify s limitom 100 skladieb.",
+  "Import into playlist": "Importovať do playlistu",
+  "Keep sidebar open": "Nechať bočný panel otvorený",
+  "WARNING: Might require reload to work properly!": "UPOZORNENIE: Môže vyžadovať obnovenie pre správnu funkčnosť!",
+  "An error occured, URL might be invalid or unsupported.": "Chybná alebo nepodporovaná URL adresa."
 }

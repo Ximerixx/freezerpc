@@ -614,6 +614,20 @@ new Vue({
             this.importer.active = false;
             this.importer.done = false;
         });
+        //Album
+        this.sockets.subscribe('importerAlbum', a => {
+            //Not downloading, got albumn
+            if (a) {
+                this.$router.push({
+                    path: '/album',
+                    query: {album: JSON.stringify(a)}
+                });
+            }
+            //Mark done
+            this.importer.error = false;
+            this.importer.active = false;
+            this.importer.done = false;
+        });
 
         r();
     },

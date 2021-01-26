@@ -11,6 +11,7 @@ const {Track, Album, Artist, Playlist, DeezerProfile, SearchResults, DeezerLibra
 const {DownloadManager} = require('./downloads');
 const {Integrations} = require('./integrations');
 const {Importer} = require('./importer');
+const { url } = require('inspector');
 
 let settings;
 let deezer;
@@ -478,53 +479,94 @@ app.post('/import', async (req, res) => {
 
     //Create importer
     let importer = new Importer(deezer);
-    //Error
-    importer.on('error', t => {
+    //Resolve URI
+    let uri = await importer.resolveSpotifyURL(req.body.url);
+    if (!uri) {
         sockets.forEach(s => s.emit('importerError'));
-    })
-    //New track imported
-    importer.on('imported', t => {
-        sockets.forEach(s => s.emit('importerTrack', t));
-    });
-    //Finished
-    importer.on('done', async (i) => {
-        //Create playlist
-        let playlistRaw = await deezer.callApi('playlist.create', {
-            description: i.description,
-            title: i.title,
-            status: 1,
-            songs: i.tracks.map(t => [parseInt(t.id, 10)])
-        });
-        //Download
-        if (type == 'download') {
-            //Fetch playlist
-            let data = await deezer.callApi('deezer.pagePlaylist', {
-                playlist_id: playlistRaw.results.toString(),
-                lang: settings.contentLanguage,
-                nb: 10000,
-                start: 0,
-                tags: true
-            });
-            let playlist = new Playlist(data.results.DATA, data.results.SONGS);
-            //Enqueue
-            await downloadManager.addBatch({
-                tracks: playlist.tracks,
-                quality: settings.downloadsQuality,
-                playlistName: i.title
-            });
-            //Delete
-            await deezer.callApi('playlist.delete', {playlist_id: parseInt(playlist.id.toString(),10)});
-            downloadManager.start();
+        return res.status(200).end();
+    }
+        
+    //Import album
+    if (uri.split(':')[1] == 'album') {
+        try {
+            let albumRaw = await importer.importSpotifyAlbum(uri);
+            //Get album from Deezer
+            let data = await deezer.callApi('deezer.pageAlbum', {alb_id: albumRaw.id.toString(), lang: settings.contentLanguage});
+            let album = new Album(data.results.DATA, data.results.SONGS);
+            //Download
+            if (type == 'download') {
+                //Enqueue
+                await downloadManager.addBatch({
+                    tracks: album.tracks,
+                    quality: settings.downloadsQuality,
+                });
+                downloadManager.start();
+                //Send empty response
+                sockets.forEach(s => s.emit('importerAlbum', null));
+            } else {
+                //Send to UI
+                sockets.forEach(s => s.emit('importerAlbum', album));
+            }
+        } catch (e) {
+            logger.error(`Import album error: ${e}`);
+            sockets.forEach(s => s.emit('importerError'));
         }
+        return res.status(200).end();
+    }
 
-        //Send to UI
-        sockets.forEach(s => {
-            s.emit('importerDone');
+    //Import playlist
+    if (uri.split(':')[1] == 'playlist') {
+        //Error
+        importer.on('error', () => {
+            sockets.forEach(s => s.emit('importerError'));
+        })
+        //New track imported
+        importer.on('imported', t => {
+            sockets.forEach(s => s.emit('importerTrack', t));
         });
-    })
+        //Finished
+        importer.on('done', async (i) => {
+            //Create playlist
+            let playlistRaw = await deezer.callApi('playlist.create', {
+                description: i.description,
+                title: i.title,
+                status: 1,
+                songs: i.tracks.map(t => [parseInt(t.id, 10)])
+            });
+            //Download
+            if (type == 'download') {
+                //Fetch playlist
+                let data = await deezer.callApi('deezer.pagePlaylist', {
+                    playlist_id: playlistRaw.results.toString(),
+                    lang: settings.contentLanguage,
+                    nb: 10000,
+                    start: 0,
+                    tags: true
+                });
+                let playlist = new Playlist(data.results.DATA, data.results.SONGS);
+                //Enqueue
+                await downloadManager.addBatch({
+                    tracks: playlist.tracks,
+                    quality: settings.downloadsQuality,
+                    playlistName: i.title
+                });
+                //Delete
+                await deezer.callApi('playlist.delete', {playlist_id: parseInt(playlist.id.toString(),10)});
+                downloadManager.start();
+            }
 
-    importer.importSpotifyPlaylist(req.body.url);
+            //Send to UI
+            sockets.forEach(s => {
+                s.emit('importerDone');
+            });
+        })
 
+        importer.importSpotifyPlaylist(uri);
+        return res.status(200).end();
+    }
+
+    //Not imported
+    sockets.forEach(s => s.emit('importerError'));
     res.status(200).end();
 });
 

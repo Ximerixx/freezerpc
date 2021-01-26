@@ -10,19 +10,37 @@ class Importer extends EventEmitter {
         this.tracks = [];
     }
 
-    //Conver spotify URL to URI
-    async getSpotifyURI(inputUrl) {
-        let url = new URL(inputUrl);
-        return 'spotify' + url.pathname.replace(new RegExp('/', 'g'), ':');
+    //Resolve spotify URLs to URI
+    async resolveSpotifyURL(url) {
+        let parsed = new URL(url);
+        //link.tospotify
+        if (parsed.host == 'link.tospotify.com') {
+            let res = await axios.get(url);
+            let re = new RegExp(/window\.top\.location = validate\("(.+)"\)/);
+            url = res.data.match(re)[1];
+        }
+        parsed = new URL(url);
+        //open.spotify
+        if (parsed.host == 'open.spotify.com' && parsed.pathname.split('/').length >= 2) {
+            return 'spotify' + parsed.pathname.replace(new RegExp('/', 'g'), ':');
+        }
+    }
+
+    //Find album on deezer
+    async importSpotifyAlbum(uri) {
+        let spotifyData = await Spotify.getEmbedData(uri);
+        let upc = spotifyData.external_ids.upc;
+        let deezerData = await this.deezer.callPublicApi('album', 'upc:' + upc);
+        if (deezerData && deezerData.id)
+            return deezerData;
     }
 
     //Import spotify playlist
-    async importSpotifyPlaylist(url) {
+    async importSpotifyPlaylist(uri) {
         //Clean
         this.tracks = [];
         try {
             //Fetch
-            let uri = await this.getSpotifyURI(url);
             let spotifyData = await Spotify.getEmbedData(uri);
             if (!spotifyData.tracks.items) throw Error("No items!");
 

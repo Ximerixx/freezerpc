@@ -137,5 +137,21 @@
   "Content country": "Kraj treści",
   "Website": "Strona internetowa",
   "Visit website": "Odwiedź stronę internetową",
-  "New update available:": "Dostępna jest nowa aktualizacja:"
+  "New update available:": "Dostępna jest nowa aktualizacja:",
+  "Shuffle": "Losowo",
+  "Download album cover": "Pobierz okładkę albumu",
+  "Art Resolution": "Rozdzielczość Obrazu",
+  "Public": "Publiczne",
+  "Private": "Prywatne",
+  "Collaborative": "Współpraca",
+  "Edit playlist": "Edytuj playlistę",
+  "Save": "Zapisz",
+  "Edit": "Edytuj",
+  "Importer": "Importer",
+  "Enter URL": "Enter URL",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Currently only Spotify is supported and limited to 100 tracks.",
+  "Import into playlist": "Import into playlist",
+  "Keep sidebar open": "Keep sidebar open",
+  "WARNING: Might require reload to work properly!": "WARNING: Might require reload to work properly!",
+  "An error occured, URL might be invalid or unsupported.": "An error occured, URL might be invalid or unsupported."
 }

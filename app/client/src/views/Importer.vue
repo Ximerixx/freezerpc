@@ -23,6 +23,10 @@
             {{$t("Download")}}
         </v-btn>
     </div>
+    <!-- Loading -->
+    <div class='text-center my-2' v-if='$root.importer.active'>
+        <v-progress-circular indeterminate color='primary'></v-progress-circular>
+    </div>
     <!-- Tracks -->
     <div class='mt-4' v-if='$root.importer.done || $root.importer.active'>
         <h2 class='mb-2'>Tracks:</h2>
@@ -67,7 +71,7 @@ export default {
     computed: {
         valid() {
             let i = this.input || '';
-            return i.startsWith('https://open.spotify.com/playlist/') && !i.includes(' ');
+            return (i.includes('open.spotify.com/') || i.includes('link.tospotify.com/')) && !i.includes(' ');
         }
     },
     mounted() {

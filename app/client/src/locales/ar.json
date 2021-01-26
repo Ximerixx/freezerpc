@@ -137,5 +137,21 @@
   "Content country": "بلد المحتوى",
   "Website": "الموقع الالكتروني",
   "Visit website": "زيارة الموقع الإلكتروني",
-  "New update available:": "تحديث جديد متوفر:"
+  "New update available:": "تحديث جديد متوفر:",
+  "Shuffle": "خلط عشوائي",
+  "Download album cover": "تنزيل صورة الألبوم",
+  "Art Resolution": "دقة صورة الالبوم",
+  "Public": "عامة",
+  "Private": "خاص",
+  "Collaborative": "التعاونيه",
+  "Edit playlist": "تعديل قائمة التشغيل",
+  "Save": "حفظ",
+  "Edit": "حرّر",
+  "Importer": "المستورد",
+  "Enter URL": "أدخل الرابط",
+  "Currently only Spotify is supported and limited to 100 tracks.": "حاليا فقط يدعم سبوتيقاي ومحدود إلى 100 اغنية.",
+  "Import into playlist": "استيراد إلى قائمة التشغيل",
+  "Keep sidebar open": "إبقاء الشريط الجانبي مفتوح",
+  "WARNING: Might require reload to work properly!": "تحذير: قد تتطلب إعادة تحميل للعمل بشكل صحيح!",
+  "An error occured, URL might be invalid or unsupported.": "حدث خطأ، قد يكون الرابط غير صالح أو غير مدعوم."
 }

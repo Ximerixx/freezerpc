@@ -137,5 +137,21 @@
   "Content country": "Koda države",
   "Website": "Spletna stran",
   "Visit website": "Obišči spletno stran",
-  "New update available:": "Na voljo je nova posodobitev:"
+  "New update available:": "Na voljo je nova posodobitev:",
+  "Shuffle": "Naključno",
+  "Download album cover": "Shrani sličico albuma",
+  "Art Resolution": "Ločljivost sličice",
+  "Public": "Javno",
+  "Private": "Zasebno",
+  "Collaborative": "Sodelovalno",
+  "Edit playlist": "Uredi seznam predvajanja",
+  "Save": "Shrani",
+  "Edit": "Uredi",
+  "Importer": "Uvoznik",
+  "Enter URL": "Vnesite URL",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Trenutno je podprt samo Spotify in ima omejitev 100 pesmi.",
+  "Import into playlist": "Uvozi na seznam predvajanja",
+  "Keep sidebar open": "Obdrži odprto stransko vrstico",
+  "WARNING: Might require reload to work properly!": "OPOZORILO: Potrebuje ponovni zagon aplikacije za učinkovanje!",
+  "An error occured, URL might be invalid or unsupported.": "Pojavila se je napaka, URL je lahko napačen ali nepodprt."
 }

@@ -137,5 +137,21 @@
   "Content country": "Quốc gia của nội dung",
   "Website": "Trang web",
   "Visit website": "Truy cập trang web",
-  "New update available:": "Có bản cập nhật mới:"
+  "New update available:": "Có bản cập nhật mới:",
+  "Shuffle": "Trộn",
+  "Download album cover": "Tải xuống ảnh bìa album",
+  "Art Resolution": "Độ Phân Giải",
+  "Public": "Công khai",
+  "Private": "Riêng tư",
+  "Collaborative": "Hợp tác",
+  "Edit playlist": "Chỉnh sửa danh sách phát",
+  "Save": "Lưu",
+  "Edit": "Chỉnh sửa",
+  "Importer": "Công cụ nhập",
+  "Enter URL": "Nhập URL",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Hiện chỉ hỗ trợ Spotify và giới hạn 100 bài hát.",
+  "Import into playlist": "Nhập vào danh sách phát",
+  "Keep sidebar open": "Giữ thanh bên luôn mở",
+  "WARNING: Might require reload to work properly!": "CẢNH BÁO: Có thể phải tải lại để hoạt động bình thường!",
+  "An error occured, URL might be invalid or unsupported.": "Lỗi, URL sai hoặc không được hỗ trợ."
 }

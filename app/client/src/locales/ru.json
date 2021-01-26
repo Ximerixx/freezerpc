@@ -137,5 +137,21 @@
   "Content country": "Страна контента",
   "Website": "Веб-сайт",
   "Visit website": "Посетить веб-сайт",
-  "New update available:": "Доступна новая версия:"
+  "New update available:": "Доступна новая версия:",
+  "Shuffle": "Перемешать",
+  "Download album cover": "Загрузить обложку альбома",
+  "Art Resolution": "Разрешение",
+  "Public": "Публичный",
+  "Private": "Приватный",
+  "Collaborative": "Совместное",
+  "Edit playlist": "Изменить плейлист",
+  "Save": "Сохранить",
+  "Edit": "Редактировать",
+  "Importer": "Импорт плейлистов",
+  "Enter URL": "Введите ссылку",
+  "Currently only Spotify is supported and limited to 100 tracks.": "В настоящее время поддерживается только Spotify. Не более 100 треков в плейлисте.",
+  "Import into playlist": "Импортировать в плейлист",
+  "Keep sidebar open": "Не закрывать боковое меню",
+  "WARNING: Might require reload to work properly!": "Внимание! Может потребоваться перезапуск для правильной работы.",
+  "An error occured, URL might be invalid or unsupported.": "Ошибка, URL недействителен или не поддерживается."
 }

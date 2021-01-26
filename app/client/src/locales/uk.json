@@ -137,5 +137,21 @@
   "Content country": "Країна контенту",
   "Website": "Веб-сторінка",
   "Visit website": "Відвідати веб-сторінку",
-  "New update available:": "Доступне оновлення:"
+  "New update available:": "Доступне оновлення:",
+  "Shuffle": "Перемішати",
+  "Download album cover": "Завантажити обкладинку альбому",
+  "Art Resolution": "Art Resolution",
+  "Public": "Публічний",
+  "Private": "Приватний",
+  "Collaborative": "Collaborative",
+  "Edit playlist": "Редагувати плейлист",
+  "Save": "Зберегти",
+  "Edit": "Редагувати",
+  "Importer": "Importer",
+  "Enter URL": "Enter URL",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Currently only Spotify is supported and limited to 100 tracks.",
+  "Import into playlist": "Import into playlist",
+  "Keep sidebar open": "Keep sidebar open",
+  "WARNING: Might require reload to work properly!": "WARNING: Might require reload to work properly!",
+  "An error occured, URL might be invalid or unsupported.": "An error occured, URL might be invalid or unsupported."
 }

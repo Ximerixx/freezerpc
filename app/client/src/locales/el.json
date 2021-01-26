@@ -137,5 +137,21 @@
   "Content country": "Χώρα περιεχομένου",
   "Website": "Ιστοσελίδα",
   "Visit website": "Μετάβαση στην Ιστοσελίδα",
-  "New update available:": "Διαθέσιμη νέα ενημέρωση:"
+  "New update available:": "Διαθέσιμη νέα ενημέρωση:",
+  "Shuffle": "Ανάμιξη",
+  "Download album cover": "Λήψη εξώφυλλου άλμπουμ",
+  "Art Resolution": "Ανάλυση εξώφυλλου",
+  "Public": "Δημόσιο",
+  "Private": "Ιδιωτικό",
+  "Collaborative": "Συνεργατικό",
+  "Edit playlist": "Επεξεργασία λίστας αναπαραγωγής",
+  "Save": "Αποθήκευση",
+  "Edit": "Επεξεργασία",
+  "Importer": "Importer",
+  "Enter URL": "Enter URL",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Currently only Spotify is supported and limited to 100 tracks.",
+  "Import into playlist": "Import into playlist",
+  "Keep sidebar open": "Keep sidebar open",
+  "WARNING: Might require reload to work properly!": "WARNING: Might require reload to work properly!",
+  "An error occured, URL might be invalid or unsupported.": "An error occured, URL might be invalid or unsupported."
 }

@@ -143,16 +143,18 @@
                     <v-tab-item key='queue' v-if='showQueue'>
                         <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 160px)'>
                             <draggable v-model='$root.queue.data' @change='queueMove'>
-                                <div v-for="(track, index) in $root.queue.data" :key='index + "q" + track.id'>
-                                    <v-lazy min-height="1" transition="fade-transition">
-                                        <TrackTile
-                                            :track='track'
-                                            @click='$root.playIndex(index)'
-                                            @redirect='close'
-                                            :ripple='false'
-                                        ></TrackTile>
-                                    </v-lazy>
-                                </div>
+                                <v-virtual-scroll :items='$root.queue.data' item-height='72' benched='5'>
+                                    <template v-slot:default="{ index, item }">
+                                        <v-lazy min-height="1" transition="fade-transition" :key='"qq" + index'>
+                                            <TrackTile
+                                                :track='item'
+                                                @click='$root.playIndex(index)'
+                                                @redirect='close'
+                                                :ripple='false'
+                                            ></TrackTile>
+                                        </v-lazy>
+                                    </template>
+                                </v-virtual-scroll>
                             </draggable>
                         </v-list>
                     </v-tab-item>

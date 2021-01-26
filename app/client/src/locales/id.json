@@ -137,5 +137,21 @@
   "Content country": "Wilayah konten",
   "Website": "Situs",
   "Visit website": "Kunjungi situs web",
-  "New update available:": "Pembaruan tersedia:"
+  "New update available:": "Pembaruan tersedia:",
+  "Shuffle": "Shuffle",
+  "Download album cover": "Download album cover",
+  "Art Resolution": "Art Resolution",
+  "Public": "Public",
+  "Private": "Private",
+  "Collaborative": "Collaborative",
+  "Edit playlist": "Edit playlist",
+  "Save": "Save",
+  "Edit": "Edit",
+  "Importer": "Importer",
+  "Enter URL": "Enter URL",
+  "Currently only Spotify is supported and limited to 100 tracks.": "Currently only Spotify is supported and limited to 100 tracks.",
+  "Import into playlist": "Import into playlist",
+  "Keep sidebar open": "Keep sidebar open",
+  "WARNING: Might require reload to work properly!": "WARNING: Might require reload to work properly!",
+  "An error occured, URL might be invalid or unsupported.": "An error occured, URL might be invalid or unsupported."
 }

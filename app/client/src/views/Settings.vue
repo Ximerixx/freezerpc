@@ -331,6 +331,7 @@ export default {
             languages: [
                 {code: 'en', name: 'English'},
                 {code: 'ar', name: 'Arabic'},
+                {code: 'ast', name: 'Asturian'},
                 {code: 'hr', name: 'Croatian'},
                 {code: 'fil', name: 'Filipino'},
                 {code: 'fr', name: 'French'},
