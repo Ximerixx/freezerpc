@@ -44,7 +44,7 @@
         </div>
     </v-card>
 
-    <h1 class='my-2'>Top tracks</h1>
+    <h1 class='my-2'>{{$t("Top tracks")}}</h1>
     <v-list class='overflow-y-auto' height="300px">
         <div
             v-for='(track, index) in artist.topTracks'
@@ -57,7 +57,7 @@
             ></TrackTile>
             
             <v-list-item v-if='!allTopTracks && index == 3' @click='allTopTracks = true'>
-                <v-list-item-title>Show all top tracks</v-list-item-title>
+                <v-list-item-title>{{$t("Show all top tracks")}}</v-list-item-title>
             </v-list-item>
 
         </div>
@@ -65,7 +65,7 @@
     </v-list>
 
     <!-- Normal albums -->
-    <h1 class='my-2'>Albums</h1>
+    <h1 class='my-2'>{{$t("Albums")}}</h1>
     <v-list class='overflow-y-auto' style='max-height: 400px' @scroll.native="scroll">
         <div
         v-for='(album, index) in artist.albums'
@@ -89,7 +89,7 @@
     </v-list>
 
     <!-- Singles -->
-    <h1 class='my-2'>Singles</h1>
+    <h1 class='my-2'>{{$t("Singles")}}</h1>
     <v-list class='overflow-y-auto' style='max-height: 400px' @scroll.native="scroll">
         <div
         v-for='(album, index) in artist.albums'

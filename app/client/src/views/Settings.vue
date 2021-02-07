@@ -105,7 +105,7 @@
         <!-- Download naming -->
         <v-text-field
             class='px-4 my-2'
-            label='Download Filename'
+            :label='$t("Download Filename")'
             persistent-hint
             v-model='$root.settings.downloadFilename'
             :hint='$t("Variables") + ": %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%, %year%, %label%"'
@@ -130,7 +130,7 @@
         <!-- Language -->
         <v-select 
             class='mt-2 px-4 mx-2'
-            label='Language' 
+            :label='$t("Language")' 
             persistent-hint
             :items='languageNames'
             @change='updateLanguage'
@@ -292,7 +292,7 @@
           v-bind="attrs"
           @click="snackbar = false"
         >
-          Dismiss
+          {{$t("Dismiss")}}
         </v-btn>
       </template>
     </v-snackbar>
@@ -302,7 +302,7 @@
         <v-card>
             <v-color-picker v-model='$root.settings.primaryColor' mode='hexa'></v-color-picker>
             <v-btn :color='$root.settings.primaryColor' block class='my-1 px-2' @click='saveColor'>
-                Save
+                {{$t("Save")}}
             </v-btn>
         </v-card>
     </v-overlay>

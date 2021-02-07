@@ -153,5 +153,14 @@
   "Import into playlist": "Uvezi u popis za reprodukciju",
   "Keep sidebar open": "Drži bočnu traku otvorenom",
   "WARNING: Might require reload to work properly!": "UPOZORENJE: Možda će zahtijevati ponovno pokretanje da bi radilo ispravno!",
-  "An error occured, URL might be invalid or unsupported.": "Dogodila se pogreška, URL je neispravan ili nepodržan."
+  "An error occured, URL might be invalid or unsupported.": "Dogodila se pogreška, URL je neispravan ili nepodržan.",
+  "Top tracks": "Top tracks",
+  "Show all top tracks": "Show all top tracks",
+  "Singles": "Singles",
+  "Album:": "Album:",
+  "Artists:": "Artists:",
+  "Yes": "Yes",
+  "No": "No",
+  "Download Filename": "Download Filename",
+  "Language": "Language"
 }

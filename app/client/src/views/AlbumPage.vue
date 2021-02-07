@@ -49,7 +49,7 @@
         </div>
     </v-card>
 
-    <h1 class='mt-2'>Tracks</h1>
+    <h1 class='mt-2'>{{$t("Tracks")}}</h1>
     <v-list avatar v-if='album.tracks.length > 0'>
         <div v-for='(track, index) in album.tracks' :key='track.id'>
 

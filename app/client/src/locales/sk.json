@@ -153,5 +153,14 @@
   "Import into playlist": "Importovať do playlistu",
   "Keep sidebar open": "Nechať bočný panel otvorený",
   "WARNING: Might require reload to work properly!": "UPOZORNENIE: Môže vyžadovať obnovenie pre správnu funkčnosť!",
-  "An error occured, URL might be invalid or unsupported.": "Chybná alebo nepodporovaná URL adresa."
+  "An error occured, URL might be invalid or unsupported.": "Chybná alebo nepodporovaná URL adresa.",
+  "Top tracks": "Top tracks",
+  "Show all top tracks": "Show all top tracks",
+  "Singles": "Singles",
+  "Album:": "Album:",
+  "Artists:": "Artists:",
+  "Yes": "Yes",
+  "No": "No",
+  "Download Filename": "Download Filename",
+  "Language": "Language"
 }

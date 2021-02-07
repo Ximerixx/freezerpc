@@ -73,7 +73,7 @@
                 <div class='d-flex mx-2 mb-2'>
                     
                     <v-btn icon @click='repeatClick'>
-                        <v-icon v-if='$root.repeat == 0'>mdi-repeat</v-icon>
+                        <v-icon v-if='$root.repeat == 0 || !$root.repeat'>mdi-repeat</v-icon>
                         <v-icon color='primary' v-if='$root.repeat == 1'>mdi-repeat</v-icon>
                         <v-icon color='primary' v-if='$root.repeat == 2'>mdi-repeat-once</v-icon>
                     </v-btn>
@@ -163,13 +163,13 @@
                         <v-list two-line avatar class='overflow-y-auto text-center' style='max-height: calc(100vh - 160px)'>
                             <h1>{{$root.track.title}}</h1>
                             <!-- Album -->
-                            <h3>Album:</h3>
+                            <h3>{{$t("Album:")}}</h3>
                             <AlbumTile
                                 :album='$root.track.album'
                                 @clicked='$emit("close")'
                             ></AlbumTile>
                             <!-- Artists -->
-                            <h3>Artists:</h3>
+                            <h3>{{$t("Artists:")}}</h3>
                             <v-list>
                                 <ArtistTile
                                     v-for='(artist, index) in $root.track.artists'
@@ -183,7 +183,7 @@
                             <h3>{{$t("Duration")}}: <span>{{$duration($root.track.duration)}}</span></h3>
                             <h3>{{$t("Track number")}}: {{$root.track.trackNumber}}</h3>
                             <h3>{{$t("Disk number")}}: {{$root.track.diskNumber}}</h3>
-                            <h3>{{$t("Explicit")}}: {{$root.track.explicit?"Yes":"No"}}</h3>
+                            <h3>{{$t("Explicit")}}: {{$root.track.explicit?$t("Yes"):$t("No")}}</h3>
                             <h3>{{$t("Source")}}: {{$root.playbackInfo.source}}</h3>
                             <h3>{{$t("Quality")}}: {{$root.playbackInfo.qualityString}}</h3>
                             <h3>{{$t("ID")}}: {{$root.track.id}}</h3>

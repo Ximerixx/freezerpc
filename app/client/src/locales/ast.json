@@ -93,7 +93,7 @@
   "UI": "IU",
   "Show autocomplete in search": "Amosar el completáu automáticu na busca",
   "Integrations": "Integraciones",
-  "This allows listening history, flow and recommendations to work properly.": "Esto permite que l'historial, fluxu y recomendaciones d'escuches funciones afayadizamente.",
+  "This allows listening history, flow and recommendations to work properly.": "Esto permite que l'historial, fluxu y recomendaciones d'escuches funcionen afayadizamente.",
   "Log track listens to Deezer": "Rexistrar les pistes sentíes en Deezer",
   "Connect your LastFM account to allow scrobbling.": "Conecta la to cuenta de LastFM pa permitir la sincronización de pistes.",
   "Login with LastFM": "Aniciar sesión en LastFM",
@@ -151,7 +151,16 @@
   "Enter URL": "Introduz una URL",
   "Currently only Spotify is supported and limited to 100 tracks.": "Anguaño namás se sofita Spotify y con una llende de 100 pistes.",
   "Import into playlist": "Importar a una llista",
-  "Keep sidebar open": "Caltner la barra llateral abierta",
+  "Keep sidebar open": "Caltener la barra llateral abierta",
   "WARNING: Might require reload to work properly!": "ALVERTENCIA: ¡Reanicia l'aplicación pa que funcione afayadizamente!",
-  "An error occured, URL might be invalid or unsupported.": "Asocedió un fallo, quiciabes la URL nun seya válida o nun se sofite."
+  "An error occured, URL might be invalid or unsupported.": "Asocedió un fallu, quiciabes la URL nun seya válida o nun se sofite.",
+  "Top tracks": "Top tracks",
+  "Show all top tracks": "Show all top tracks",
+  "Singles": "Singles",
+  "Album:": "Album:",
+  "Artists:": "Artists:",
+  "Yes": "Yes",
+  "No": "No",
+  "Download Filename": "Download Filename",
+  "Language": "Language"
 }

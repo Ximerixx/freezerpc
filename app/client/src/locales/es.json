@@ -153,5 +153,14 @@
   "Import into playlist": "Importar lista de reproducción",
   "Keep sidebar open": "Mantener barra lateral abierta",
   "WARNING: Might require reload to work properly!": "ADVERTENCIA: ¡Puede requerir recarga para trabajar correctamente!",
-  "An error occured, URL might be invalid or unsupported.": "Ocurrió un error, la URL es invalida o no es soportada."
+  "An error occured, URL might be invalid or unsupported.": "Ocurrió un error, la URL es invalida o no es soportada.",
+  "Top tracks": "Top tracks",
+  "Show all top tracks": "Show all top tracks",
+  "Singles": "Singles",
+  "Album:": "Album:",
+  "Artists:": "Artists:",
+  "Yes": "Yes",
+  "No": "No",
+  "Download Filename": "Download Filename",
+  "Language": "Language"
 }
