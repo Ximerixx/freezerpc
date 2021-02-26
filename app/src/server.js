@@ -229,12 +229,24 @@ app.get('/shuffle', async (req, res) => {
 //Get list of `type` from library
 app.get('/library/:type', async (req, res) => {
     let type = req.params.type;
-    let data = await deezer.callApi('deezer.pageProfile', {
+    //Normal
+    if (type != 'tracks') {
+        let data = await deezer.callApi('deezer.pageProfile', {
+            nb: 50,
+            tab: (type == 'tracks') ? 'loved' : type,
+            user_id: deezer.userId
+        });
+        return res.send(new DeezerLibrary(data.results.TAB, type)).end();
+    }
+    //Tracks
+    let data = await deezer.callApi('deezer.pagePlaylist', {
+        playlist_id: deezer.favoritesPlaylist,
+        lang: settings.contentLanguage,
         nb: 50,
-        tab: (type == 'tracks') ? 'loved' : type,
-        user_id: deezer.userId
+        start: 0,
+        tags: true
     });
-    res.send(new DeezerLibrary(data.results.TAB, type));
+    res.send(new DeezerLibrary(data.results.SONGS, type));
 });
 
 //DELETE from library

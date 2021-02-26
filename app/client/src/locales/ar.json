@@ -154,13 +154,13 @@
   "Keep sidebar open": "إبقاء الشريط الجانبي مفتوح",
   "WARNING: Might require reload to work properly!": "تحذير: قد تتطلب إعادة تحميل للعمل بشكل صحيح!",
   "An error occured, URL might be invalid or unsupported.": "حدث خطأ، قد يكون الرابط غير صالح أو غير مدعوم.",
-  "Top tracks": "Top tracks",
-  "Show all top tracks": "Show all top tracks",
-  "Singles": "Singles",
-  "Album:": "Album:",
-  "Artists:": "Artists:",
-  "Yes": "Yes",
-  "No": "No",
-  "Download Filename": "Download Filename",
-  "Language": "Language"
+  "Top tracks": "افضل الاغاني",
+  "Show all top tracks": "عرض كل الاغاني المفضلة",
+  "Singles": "الأغاني",
+  "Album:": "ألبوم:",
+  "Artists:": "الفنانين:",
+  "Yes": "نعم",
+  "No": "لا",
+  "Download Filename": "تنزيل اسم الملف",
+  "Language": "اللغة"
 }

@@ -154,13 +154,13 @@
   "Keep sidebar open": "Mantieni la barra laterale aperta",
   "WARNING: Might require reload to work properly!": "ATTENZIONE: Potrebbe essere necessario ricaricare per funzionare correttamente!",
   "An error occured, URL might be invalid or unsupported.": "Si è verificato un errore, l'URL potrebbe non essere valido o non supportato.",
-  "Top tracks": "Top tracks",
-  "Show all top tracks": "Show all top tracks",
-  "Singles": "Singles",
+  "Top tracks": "Tracce più ascoltate",
+  "Show all top tracks": "Mostra tutte le tracce più ascoltate",
+  "Singles": "Singoli",
   "Album:": "Album:",
-  "Artists:": "Artists:",
-  "Yes": "Yes",
+  "Artists:": "Artisti:",
+  "Yes": "Sì",
   "No": "No",
-  "Download Filename": "Download Filename",
-  "Language": "Language"
+  "Download Filename": "Nome del file scaricato",
+  "Language": "Lingua"
 }

@@ -510,6 +510,8 @@ class DownloadThread {
             '%trackNumber%': (this.track.trackNumber ? this.track.trackNumber : 1).toString(),
             '%0trackNumber%': (this.track.trackNumber ? this.track.trackNumber : 1).toString().padStart(2, '0'),
             '%album%': this.track.album.title,
+            '%albumArtist%': this.track.album.artists[0].name,
+            '%albumArtists%': this.track.album.artistString,
             '%year%': date.getFullYear().toString(),
             '%label%': (this.publicAlbum.label) ? this.publicAlbum.label : ''
         };

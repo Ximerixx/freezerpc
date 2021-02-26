@@ -108,7 +108,7 @@
             :label='$t("Download Filename")'
             persistent-hint
             v-model='$root.settings.downloadFilename'
-            :hint='$t("Variables") + ": %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%, %year%, %label%"'
+            :hint='$t("Variables") + ": %title%, %artists%, %artist%, %feats%, %trackNumber%, %0trackNumber%, %album%, %year%, %label%, %albumArtist%, %albumArtists%"'
         ></v-text-field>
 
         <!-- Crossfade -->

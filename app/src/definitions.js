@@ -168,8 +168,10 @@ class DeezerLibrary {
     constructor(json, type='tracks') {
         switch (type) {
             case 'tracks':
-                this.count = json.loved.total;
-                this.data = json.loved.data.map((t) => new Track(t));
+                // this.count = json.loved.total;
+                // this.data = json.loved.data.map((t) => new Track(t));
+                this.count = json.total;
+                this.data = json.data.map((t) => new Track(t));
                 break;
             case 'albums':
                 this.count = json.albums.total;

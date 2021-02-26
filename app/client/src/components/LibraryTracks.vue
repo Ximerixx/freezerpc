@@ -69,7 +69,6 @@ export default {
     },
     methods: {
         scroll(event) {
-            console.log(event);
             let loadOffset = event.target.scrollHeight - event.target.offsetHeight - 150;
             if (event.target.scrollTop > loadOffset) {
                 if (!this.loading) this.load();

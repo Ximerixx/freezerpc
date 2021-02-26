@@ -142,9 +142,9 @@
                     <!-- Queue tab -->
                     <v-tab-item key='queue' v-if='showQueue'>
                         <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 160px)'>
-                            <draggable v-model='$root.queue.data' @change='queueMove'>
-                                <v-virtual-scroll :items='$root.queue.data' item-height='72' benched='5'>
-                                    <template v-slot:default="{ index, item }">
+                            <v-virtual-scroll :items='$root.queue.data' item-height='72' benched='5'>
+                                <template v-slot:default="{ index, item }">
+                                    <draggable v-model='$root.queue.data' @move='queueMove'>
                                         <v-lazy min-height="1" transition="fade-transition" :key='"qq" + index'>
                                             <TrackTile
                                                 :track='item'
@@ -153,9 +153,9 @@
                                                 :ripple='false'
                                             ></TrackTile>
                                         </v-lazy>
-                                    </template>
-                                </v-virtual-scroll>
-                            </draggable>
+                                    </draggable>
+                                </template>
+                            </v-virtual-scroll>
                         </v-list>
                     </v-tab-item>
                     <!-- Info tab -->
@@ -328,6 +328,7 @@ export default {
             this.$root.globalSnackbar = this.$t('Link copied!');
         },
         queueMove() {
+            console.log('move');
             this.$root.queue.index = this.$root.queue.data.findIndex(t => t.id == this.$root.track.id);
         }
     },

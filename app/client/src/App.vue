@@ -478,7 +478,7 @@ export default {
 
     // /search
     document.addEventListener('keypress', (e) => {
-      if (e.keyCode != 47) return;
+      if (e.key != '/' || e.target.nodeName == "INPUT") return;
       this.$refs.searchBar.focus();
       setTimeout(() => {
         if (this.searchQuery.startsWith('/')) this.searchQuery = this.searchQuery.substring(1);

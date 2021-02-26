@@ -154,13 +154,13 @@
   "Keep sidebar open": "Garder le panneau latéral ouvert",
   "WARNING: Might require reload to work properly!": "AVERTISSEMENT : Il peut être nécessaire de recharger pour fonctionner correctement !",
   "An error occured, URL might be invalid or unsupported.": "Une erreur est survenue, l'URL est peut-être invalide ou non prise en charge.",
-  "Top tracks": "Top tracks",
-  "Show all top tracks": "Show all top tracks",
+  "Top tracks": "Titres populaires",
+  "Show all top tracks": "Afficher tous les titres populaires",
   "Singles": "Singles",
-  "Album:": "Album:",
-  "Artists:": "Artists:",
-  "Yes": "Yes",
-  "No": "No",
-  "Download Filename": "Download Filename",
-  "Language": "Language"
+  "Album:": "Album :",
+  "Artists:": "Artistes :",
+  "Yes": "Oui",
+  "No": "Non",
+  "Download Filename": "Nom du fichier à télécharger",
+  "Language": "Langue"
 }

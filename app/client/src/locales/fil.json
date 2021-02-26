@@ -154,13 +154,13 @@
   "Keep sidebar open": "Keep sidebar open",
   "WARNING: Might require reload to work properly!": "WARNING: Might require reload to work properly!",
   "An error occured, URL might be invalid or unsupported.": "An error occured, URL might be invalid or unsupported.",
-  "Top tracks": "Top tracks",
-  "Show all top tracks": "Show all top tracks",
+  "Top tracks": "Patok na mga kanta",
+  "Show all top tracks": "Ipakita lahat ng mga kanta",
   "Singles": "Singles",
   "Album:": "Album:",
   "Artists:": "Artists:",
-  "Yes": "Yes",
-  "No": "No",
+  "Yes": "Oo",
+  "No": "Hindi",
   "Download Filename": "Download Filename",
-  "Language": "Language"
+  "Language": "Wika"
 }

@@ -1,15 +1,16 @@
 {
   "name": "freezer",
   "private": true,
-  "version": "1.1.16",
-  "description": "",
+  "version": "1.1.17",
+  "description": "Freezer PC",
   "scripts": {
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "build": "cd app && npm i && cd client && npm i && npm run build && cd .. && cd .. && npm run dist"
   },
-  "license": "ISC",
+  "license": "GNU",
+  "homepage": "https://freezer.life",
   "devDependencies": {
     "electron": "^9.2.1",
     "electron-builder": "^22.8.0"
@@ -46,10 +47,11 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage", "deb", "tar.gz"
       ],
       "category": "audio",
-      "icon": "build/iconset"
+      "icon": "build/iconset",
+      "maintainer": "exttex"
     },
     "appImage": {
       "desktop": {
@@ -58,6 +60,9 @@
         "Type": "Application",
         "Categories": "AudioVideo"
       }
+    },
+    "deb": {
+      "depends": ["libssl-dev", "gconf2", "gconf-service", "libnotify4", "libappindicator1", "libxtst6", "libnss3"]
     }
   }
 }

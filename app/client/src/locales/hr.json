@@ -154,13 +154,13 @@
   "Keep sidebar open": "Drži bočnu traku otvorenom",
   "WARNING: Might require reload to work properly!": "UPOZORENJE: Možda će zahtijevati ponovno pokretanje da bi radilo ispravno!",
   "An error occured, URL might be invalid or unsupported.": "Dogodila se pogreška, URL je neispravan ili nepodržan.",
-  "Top tracks": "Top tracks",
-  "Show all top tracks": "Show all top tracks",
-  "Singles": "Singles",
+  "Top tracks": "Najslušanije pjesme",
+  "Show all top tracks": "Prikaži sve najslušanije pjesme",
+  "Singles": "Singlovi",
   "Album:": "Album:",
-  "Artists:": "Artists:",
-  "Yes": "Yes",
-  "No": "No",
-  "Download Filename": "Download Filename",
-  "Language": "Language"
+  "Artists:": "Izvođači:",
+  "Yes": "Da",
+  "No": "Ne",
+  "Download Filename": "Naziv datoteke preuzimanja",
+  "Language": "Jezik"
 }

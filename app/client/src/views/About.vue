@@ -21,7 +21,7 @@
                 <v-list-item-title class='font-weight-bold'>{{$t("Website")}}</v-list-item-title>
             </v-list-item-content>
         </v-list-item>
-        <v-list-item @click='openUrl("https://t.me/freezereleases")'>
+        <v-list-item @click='openUrl("https://t.me/joinchat/Se4zLEBvjS1NCiY9")'>
             <v-list-item-icon>
                 <v-icon>mdi-telegram</v-icon>
             </v-list-item-icon>

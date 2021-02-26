@@ -154,13 +154,13 @@
   "Keep sidebar open": "Giữ thanh bên luôn mở",
   "WARNING: Might require reload to work properly!": "CẢNH BÁO: Có thể phải tải lại để hoạt động bình thường!",
   "An error occured, URL might be invalid or unsupported.": "Lỗi, URL sai hoặc không được hỗ trợ.",
-  "Top tracks": "Top tracks",
-  "Show all top tracks": "Show all top tracks",
-  "Singles": "Singles",
+  "Top tracks": "Bài hát hàng đầu",
+  "Show all top tracks": "Hiện tất cả bài hát hàng đầu",
+  "Singles": "Đĩa đơn",
   "Album:": "Album:",
-  "Artists:": "Artists:",
-  "Yes": "Yes",
-  "No": "No",
-  "Download Filename": "Download Filename",
-  "Language": "Language"
+  "Artists:": "Nghệ sĩ:",
+  "Yes": "Có",
+  "No": "Không",
+  "Download Filename": "Tải xuống tên tệp",
+  "Language": "Ngôn ngữ"
 }

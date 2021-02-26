@@ -139,6 +139,7 @@ class DeezerAPI {
         let data = await this.callApi('deezer.getUserData');
         this.token = data.results.checkForm;
         this.userId = data.results.USER.USER_ID;
+        this.favoritesPlaylist = data.results.USER.LOVEDTRACKS_ID.toString();
 
         if (!this.userId || this.userId == 0 || !this.token) return false;
         return true;

@@ -154,13 +154,13 @@
   "Keep sidebar open": "Nechať bočný panel otvorený",
   "WARNING: Might require reload to work properly!": "UPOZORNENIE: Môže vyžadovať obnovenie pre správnu funkčnosť!",
   "An error occured, URL might be invalid or unsupported.": "Chybná alebo nepodporovaná URL adresa.",
-  "Top tracks": "Top tracks",
-  "Show all top tracks": "Show all top tracks",
-  "Singles": "Singles",
+  "Top tracks": "Najlepšie skladby",
+  "Show all top tracks": "Zobraziť všetky najlepšie skladby",
+  "Singles": "Single",
   "Album:": "Album:",
-  "Artists:": "Artists:",
-  "Yes": "Yes",
-  "No": "No",
-  "Download Filename": "Download Filename",
-  "Language": "Language"
+  "Artists:": "Interpreti:",
+  "Yes": "Áno",
+  "No": "Nie",
+  "Download Filename": "Stiahnuť názov súboru",
+  "Language": "Jazyk"
 }
