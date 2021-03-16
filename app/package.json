@@ -21,7 +21,7 @@
     "lastfmapi": "^0.1.1",
     "metaflac-js2": "^1.0.7",
     "nedb": "^1.8.0",
-    "nodeezcryptor": "git+https://codeberg.org/exttex/nodeezcryptor",
+    "nodeezcryptor": "git+https://git.freezer.life/exttex/nodeezcryptor.git",
     "sanitize-filename": "^1.6.3",
     "socket.io": "^2.3.0",
     "winston": "^3.3.3"
