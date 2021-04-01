@@ -2,7 +2,7 @@ const {app, BrowserWindow, ipcMain, Tray, Menu, session, dialog, shell, nativeTh
 const {createServer} = require('./src/server');
 const path = require('path');
 const arg = require('arg');
-const { exit } = require('process');
+const { exit, platform } = require('process');
 const packageJson = require('./package.json');
 const chalk = require('chalk');
 const {Settings} = require('./src/settings');
@@ -174,6 +174,10 @@ if (!singleInstanceLock) {
 
 //Create window
 app.on('ready', async () => {
+    //No mac
+    if (platform == 'darwin')
+        process.exit(-1);
+
     await startServer();
     //Server mode
     if (args['--server']) return;

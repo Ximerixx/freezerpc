@@ -10,7 +10,7 @@
         ></v-img>
         
         <div class='pl-4'>
-            <v-overlay absolute :value="loading" z-index="3" opacity='0.9'>
+            <v-overlay absolute :value="loading" z-index="3" opacity='0'>
                 <v-progress-circular indeterminate></v-progress-circular>
             </v-overlay>
             <h1>{{album.title}}</h1>

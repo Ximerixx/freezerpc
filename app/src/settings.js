@@ -44,6 +44,10 @@ class Settings {
         this.contentLanguage = 'en';
         this.contentCountry = 'US';
         this.sidebarOpen = false;
+
+        //Has to be local path
+        this.backgroundImage = null;
+        this.lightTheme = false;
     }
 
     //Based on electorn app.getPath
@@ -121,7 +125,7 @@ class Settings {
             await fs.promises.mkdir(Settings.getDir(), {recursive: true});
         } catch (_) {}
 
-        await fs.promises.writeFile(Settings.getPath(), JSON.stringify(this), 'utf-8');
+        await fs.promises.writeFile(Settings.getPath(), JSON.stringify(this, null, 2), 'utf-8');
     }
 
 }

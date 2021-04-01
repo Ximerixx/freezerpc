@@ -1,7 +1,7 @@
 {
   "name": "freezer",
   "private": true,
-  "version": "1.1.17",
+  "version": "1.1.18",
   "description": "Freezer PC",
   "scripts": {
     "pack": "electron-builder --dir",
@@ -47,7 +47,9 @@
     },
     "linux": {
       "target": [
-        "AppImage", "deb", "tar.gz"
+        "AppImage",
+        "deb",
+        "tar.gz"
       ],
       "category": "audio",
       "icon": "build/iconset",
@@ -62,7 +64,15 @@
       }
     },
     "deb": {
-      "depends": ["libssl-dev", "gconf2", "gconf-service", "libnotify4", "libappindicator1", "libxtst6", "libnss3"]
+      "depends": [
+        "libssl-dev",
+        "gconf2",
+        "gconf-service",
+        "libnotify4",
+        "libappindicator1",
+        "libxtst6",
+        "libnss3"
+      ]
     }
   }
 }

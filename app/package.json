@@ -1,7 +1,7 @@
 {
   "name": "freezer",
   "private": true,
-  "version": "1.1.17",
+  "version": "1.1.18",
   "description": "",
   "main": "background.js",
   "scripts": {
@@ -16,6 +16,7 @@
     "chalk": "^4.1.0",
     "cheerio": "^1.0.0-rc.5",
     "compare-versions": "^3.6.0",
+    "cors": "^2.8.5",
     "discord-rpc": "^3.1.4",
     "express": "^4.17.1",
     "lastfmapi": "^0.1.1",

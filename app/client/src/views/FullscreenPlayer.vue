@@ -39,6 +39,7 @@
                             :value='position'
                             ref='seeker'
                             class='seekbar'
+                            color='primary'
                             hide-details>
                         </v-slider>
                     </v-col>
@@ -108,6 +109,7 @@
                             step='0.01'
                             v-model='$root.volume'
                             class='px-8'
+                            color='primary'
                             style='padding-top: 2px;'
                             @change='updateVolume'
                             @click:prepend='$root.toggleMute()'

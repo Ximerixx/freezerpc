@@ -135,6 +135,19 @@
             :items='languageNames'
             @change='updateLanguage'
         ></v-select>
+        <!-- Light theme -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox 
+                    v-model='$root.settings.lightTheme' 
+                    class='pl-2'
+                    @change='$vuetify.theme.dark = !$root.settings.lightTheme'
+                ></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Light theme")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
         <!-- Primary color -->
         <v-list-item @click='colorPicker = true'>
             <v-list-item-avatar>

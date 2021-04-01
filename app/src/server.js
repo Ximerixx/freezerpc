@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const packageJson = require('../package.json');
 const fs = require('fs');
@@ -11,7 +12,6 @@ const {Track, Album, Artist, Playlist, DeezerProfile, SearchResults, DeezerLibra
 const {DownloadManager} = require('./downloads');
 const {Integrations} = require('./integrations');
 const {Importer} = require('./importer');
-const { url } = require('inspector');
 
 let settings;
 let deezer;
@@ -24,6 +24,7 @@ let sockets = [];
 const app = express();
 app.use(express.json({limit: '50mb'}));
 app.use(express.static(path.join(__dirname, '../client', 'dist')));
+app.use(cors({origin: 'http://localhost:8080'}));
 //Server
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server, {
@@ -630,6 +631,15 @@ app.get('/updates', async (req, res) => {
     } catch (e) {
         res.status(500).end();
     }
+});
+
+//Background image
+app.get('/background', async (req, res) => {
+    //Missing
+    if (!settings.backgroundImage && !fs.existsSync(settings.backgroundImage)) {
+        return res.status(404).end();
+    }
+    res.sendFile(path.resolve(settings.backgroundImage));
 });
 
 //Redirect to index on unknown path

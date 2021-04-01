@@ -27,7 +27,7 @@
             dense
             :label='$t("Search")'
             solo
-            class='mx-2 mt-1'
+            class='mx-2'
             v-model='searchQuery'
         ></v-text-field>
     </div>

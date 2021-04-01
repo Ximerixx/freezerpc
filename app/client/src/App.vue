@@ -1,5 +1,5 @@
 <template>
-<div>
+<div :class='{"enable-bgi": $root.settings.backgroundImage}'>
   <v-app v-esc='closePlayer'>
 
     <v-system-bar 
@@ -18,8 +18,15 @@
     </v-system-bar>
 
     <!-- Fullscreen player overlay -->
-    <v-overlay :value='showPlayer' opacity='1.00' z-index="100">
-        <FullscreenPlayer @close='closePlayer' @volumeChange='volume = $root.volume'></FullscreenPlayer>
+    <v-overlay 
+      :dark='!$root.settings.lightTheme' 
+      :light='$root.settings.lightTheme' :value='showPlayer' 
+      :opacity='$root.settings.backgroundImage ? 0.0 : 1.0' 
+      z-index="100"
+      :color='$root.settings.lightTheme ? "#ffffff" : "#212121"'>
+      
+      <img :src='backgroundSrc' class='wallpaper-overlay' v-if='$root.settings.backgroundImage'>
+      <FullscreenPlayer @close='closePlayer' @volumeChange='volume = $root.volume'></FullscreenPlayer>
     </v-overlay>
 
     <!-- Drawer/Navigation -->
@@ -149,7 +156,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app dense color='#1e1e1e'>
+    <v-app-bar app dense :color='$root.settings.lightTheme ? null : "#1e1e1e"'>
 
       <v-btn icon @click='previous'>
         <v-icon>mdi-arrow-left</v-icon>
@@ -172,6 +179,7 @@
         :loading='searchLoading'
         @keyup='search'
         ref='searchBar'
+        :background-color='$root.settings.lightTheme ? "#ffffff00" : "#00000000"'
         v-model='searchQuery'
         :search-input.sync='searchInput'
         :items='suggestions'
@@ -182,13 +190,13 @@
     
     <!-- Main -->
     <v-main>
+      <img :src='backgroundSrc' class='wallpaper' v-if='$root.settings.backgroundImage'>
       <v-container 
         class='overflow-y-auto' 
         fluid
         style='height: calc(100vh - 140px);'>
-
         <keep-alive include='Search,PlaylistPage,HomeScreen,DeezerPage'>
-          <router-view></router-view>
+          <router-view class='router-wiev'></router-view>
         </keep-alive>
       </v-container>
     </v-main>
@@ -295,8 +303,12 @@
 <style lang='scss'>
 @import 'styles/scrollbar.scss';
 .v-navigation-drawer__content {
-    overflow-y: hidden !important;
+  overflow-y: hidden !important;
 }
+.enable-bgi {
+  @import 'styles/bg-image.scss';
+}
+
 </style>
 <style lang='scss' scoped>
 .seekbar {
@@ -311,6 +323,22 @@
 }
 .topbarbutton {
   -webkit-app-region: no-drag;
+}
+.wallpaper {
+  width: 100vw;
+  height: 100vh;
+  top: -48px;
+  left: -56px;
+  z-index: -100;
+  position: absolute;
+  object-fit: fill;
+}
+.wallpaper-overlay {
+  width: 100vw;
+  height: 100vh;
+  z-index: -100;
+  position: absolute;
+  object-fit: fill;
 }
 </style>
 
@@ -451,6 +479,12 @@ export default {
       if (p > 100)
         p = 100;
       return Math.round(p);
+    },
+    //Get background src
+    backgroundSrc() {
+      if (this.$root.settings.backgroundImage && this.$root.settings.backgroundImage.startsWith("http"))
+        return this.$root.settings.backgroundImage;
+      return process.env.NODE_ENV === 'development' ? "http://localhost:10069/background" : "/background";
     }
   },
   async mounted() {

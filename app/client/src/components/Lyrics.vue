@@ -9,7 +9,7 @@
         v-for='(lyric, index) in lyrics.lyrics' 
         :key='lyric.offset' 
         class='my-6 mx-4 pa-2 rounded' 
-        :class='{"grey darken-3": playingNow(index)}'
+        :class='{"grey darken-3": (playingNow(index) && !$root.settings.lightTheme), "grey lighten-1": (playingNow(index) && $root.settings.lightTheme)}'
         @click='seekTo(index)'>
             <span 
             class='my-8'

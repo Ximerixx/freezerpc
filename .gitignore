@@ -7,3 +7,6 @@ app/client/node_modules/
 electron_dist/
 freezer-*.tgz
 translations.zip
+package-lock.json
+app/package-lock.json
+app/client/package-lock.json

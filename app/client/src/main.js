@@ -11,7 +11,7 @@ import i18n from './js/i18n';
 let ipcRenderer;
 //Axios
 let axiosInstance = axios.create({
-    baseURL: `${window.location.origin}`,
+    baseURL: process.env.NODE_ENV === 'development' ? "http://localhost:10069" : `${window.location.origin}`,
     timeout: 16000,
     responseType: 'json'
 });
@@ -53,7 +53,7 @@ Vue.prototype.$filesize = (bytes) => {
 
 //Sockets
 Vue.use(new VueSocketIO({
-    connection: window.location.toString(),
+    connection: process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.toString(),
     options: {path: '/socket'}
 }));
 
@@ -236,7 +236,7 @@ new Vue({
             this.playbackInfo = playbackInfo;
 
             //Stream URL
-            let url = `${window.location.origin}${this.playbackInfo.url}`;
+            let url = `${process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.origin}${this.playbackInfo.url}`;
             //Cancel loading
             this.loaders--;
             if (this.loaders > 0) {
@@ -424,7 +424,7 @@ new Vue({
                 if (this.gapless.promise) resolve();
             }
             this.gapless.info = info
-            this.gapless.audio = new Audio(`${window.location.origin}${info.url}`);
+            this.gapless.audio = new Audio(`${process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.origin}${info.url}`);
             this.gapless.audio.volume = 0.00;
             this.gapless.audio.preload = 'auto';
             this.gapless.crossfade = false;
@@ -526,6 +526,9 @@ new Vue({
         let res = await this.$axios.get('/settings');
         this.settings = res.data;
         this.$vuetify.theme.themes.dark.primary = this.settings.primaryColor;
+        this.$vuetify.theme.themes.light.primary = this.settings.primaryColor;
+        if (this.settings.lightTheme)
+            this.$vuetify.theme.dark = false;
         i18n.locale = this.settings.language;
         this.volume = this.settings.volume;
 
