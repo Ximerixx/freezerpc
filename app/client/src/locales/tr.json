@@ -147,7 +147,7 @@
   "Edit playlist": "Çalma listesini düzenle",
   "Save": "Kaydet",
   "Edit": "Düzenle",
-  "Importer": "Aktaracı",
+  "Importer": "Aktarıcı",
   "Enter URL": "URL girin",
   "Currently only Spotify is supported and limited to 100 tracks.": "Şimdilik sadece Spotify destekleniyor ve 100 parça sınırı mevcut.",
   "Import into playlist": "Çalma listesine aktar",
@@ -162,5 +162,7 @@
   "Yes": "Evet",
   "No": "Hayır",
   "Download Filename": "Adlandırma taslağı indir",
-  "Language": "Dil"
+  "Language": "Dil",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

@@ -150,7 +150,7 @@
   "Importer": "Importador",
   "Enter URL": "Introduzir ARL",
   "Currently only Spotify is supported and limited to 100 tracks.": "Atualmente apenas o Spotify é suportado e limitado a 100 faixas.",
-  "Import into playlist": "Importar para a playlist",
+  "Import into playlist": "Importar playlist",
   "Keep sidebar open": "Manter a barra lateral aberta",
   "WARNING: Might require reload to work properly!": "AVISO: Pode ser necessário recarregar para funcionar corretamente!",
   "An error occured, URL might be invalid or unsupported.": "Ocorreu um erro, a URL pode ser inválida ou não suportada.",
@@ -162,5 +162,7 @@
   "Yes": "Sim",
   "No": "Não",
   "Download Filename": "Nomenclatura de download",
-  "Language": "Idioma"
+  "Language": "Idioma",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

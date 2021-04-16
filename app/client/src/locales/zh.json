@@ -162,5 +162,7 @@
   "Yes": "是",
   "No": "否",
   "Download Filename": "下载文件名",
-  "Language": "语言"
+  "Language": "语言",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

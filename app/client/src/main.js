@@ -230,6 +230,7 @@ new Vue({
             //Load track meta
             let playbackInfo = await this.loadPlaybackInfo(track.streamUrl, track.duration);
             if (!playbackInfo) {
+                this.loaders--;
                 this.skipNext();
                 return;
             }

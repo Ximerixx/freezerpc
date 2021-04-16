@@ -162,5 +162,7 @@
   "Yes": "Igen",
   "No": "Nem",
   "Download Filename": "Letöltött fájlnév",
-  "Language": "Nyelv"
+  "Language": "Nyelv",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

@@ -162,5 +162,7 @@
   "Yes": "Tak",
   "No": "Nie",
   "Download Filename": "Nazwa pobieranego pliku",
-  "Language": "Język"
+  "Language": "Język",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

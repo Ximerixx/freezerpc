@@ -54,3 +54,6 @@
 .theme--light.v-select-list div {
     background-color: #ffffff;
 }
+.v-menu__content {
+    backdrop-filter: blur(16px);
+}

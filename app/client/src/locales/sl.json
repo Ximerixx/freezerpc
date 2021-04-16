@@ -162,5 +162,7 @@
   "Yes": "Da",
   "No": "Ne",
   "Download Filename": "Imena prenosa",
-  "Language": "Jezik"
+  "Language": "Jezik",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

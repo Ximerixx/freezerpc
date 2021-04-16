@@ -162,5 +162,7 @@
   "Yes": "Có",
   "No": "Không",
   "Download Filename": "Tải xuống tên tệp",
-  "Language": "Ngôn ngữ"
+  "Language": "Ngôn ngữ",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

@@ -156,11 +156,13 @@
   "An error occured, URL might be invalid or unsupported.": "Виникла помилка, можливо посилання є недійсним або не підтримується.",
   "Top tracks": "Популярні треки",
   "Show all top tracks": "Показати всі популярні треки",
-  "Singles": "Singles",
+  "Singles": "Композиції",
   "Album:": "Альбом:",
   "Artists:": "Виконавці:",
   "Yes": "Так",
   "No": "Ні",
   "Download Filename": "Download Filename",
-  "Language": "Мова"
+  "Language": "Мова",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

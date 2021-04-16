@@ -176,7 +176,14 @@
                 <v-list-item-subtitle>{{$t("WARNING: Might require reload to work properly!")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
-
+        <!-- Background image -->
+        <v-text-field
+            class='px-4 my-2'
+            :label='$t("Background Image")'
+            persistent-hint
+            v-model='$root.settings.backgroundImage'
+            :hint='$t("Enter URL or absolute path. WARNING: Requires reload!")'
+        ></v-text-field>
         
         <!-- Accounts -->
         <v-subheader>{{$t("Integrations")}}</v-subheader>

@@ -35,7 +35,7 @@
   "Add to playlist": "Aan afspeellijst toevoegen",
   "Create new": "Nieuw aanmaken",
   "Remove": "Verwijderen",
-  "Play next": "Volgende afspelen",
+  "Play next": "Volgende nummer afspelen",
   "Add to queue": "Aan wachtrij toevoegen",
   "Remove from library": "Uit bibliotheek verwijderen",
   "Remove from playlist": "Uit afspeellijst verwijderen",
@@ -46,7 +46,7 @@
   "Released": "Gepubliceerd",
   "Disk": "Schijf",
   "albums": "albums",
-  "Play top": "Bovenaan afspelen",
+  "Play top": "Top nummers afspelen",
   "Radio": "Radio",
   "Show all albums": "Alle albums tonen",
   "Show all singles": "Alle singles weergeven",
@@ -162,5 +162,7 @@
   "Yes": "Ja",
   "No": "Nee",
   "Download Filename": "Bestandsnaam Downloaden",
-  "Language": "Taal"
+  "Language": "Taal",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

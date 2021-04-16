@@ -162,5 +162,7 @@
   "Yes": "Iya",
   "No": "Tidak",
   "Download Filename": "Unduh Nama File",
-  "Language": "Bahasa"
+  "Language": "Bahasa",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

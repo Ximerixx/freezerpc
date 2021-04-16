@@ -162,5 +162,7 @@
   "Yes": "Ναι",
   "No": "Όχι",
   "Download Filename": "Όνομα Αρχείου Λήψης",
-  "Language": "Γλώσσα"
+  "Language": "Γλώσσα",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

@@ -162,5 +162,7 @@
   "Yes": "Áno",
   "No": "Nie",
   "Download Filename": "Stiahnuť názov súboru",
-  "Language": "Jazyk"
+  "Language": "Jazyk",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }

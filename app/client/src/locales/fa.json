@@ -162,5 +162,7 @@
   "Yes": "بله",
   "No": "نه",
   "Download Filename": "بارگیری اسم فایل",
-  "Language": "زبان"
+  "Language": "زبان",
+  "Background Image": "Background Image",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
 }
