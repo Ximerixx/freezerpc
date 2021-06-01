@@ -527,6 +527,11 @@ class DownloadThread {
             }
         }
 
+        //Cut path to fit into windows limits
+        if (fn.length >= 249) {
+            fn = fn.substring(0, 249);
+        }
+
         //Extension
         if (quality.toString() == '9') {
             fn += '.flac';

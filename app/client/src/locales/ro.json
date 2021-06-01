@@ -163,6 +163,9 @@
   "No": "Nu",
   "Download Filename": "Denumirea Descărcării",
   "Language": "Limba",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "Imagine de fundal",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Introduceţi URL-ul sau calea completă. ATENŢIE: Necesită reîncărcare!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

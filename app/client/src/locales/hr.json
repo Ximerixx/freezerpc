@@ -163,6 +163,9 @@
   "No": "Ne",
   "Download Filename": "Naziv datoteke preuzimanja",
   "Language": "Jezik",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "Pozadinska slika",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Unesire URL ili apsolutnu putanju. UPOZORENJE: Zahtijeva ponovno pokretanje!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

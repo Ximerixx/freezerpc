@@ -152,7 +152,7 @@
   "Currently only Spotify is supported and limited to 100 tracks.": "Actuellement, seul Spotify est pris en charge et limité à 100 titres.",
   "Import into playlist": "Importer dans la playlist",
   "Keep sidebar open": "Garder le panneau latéral ouvert",
-  "WARNING: Might require reload to work properly!": "AVERTISSEMENT : Il peut être nécessaire de recharger pour fonctionner correctement !",
+  "WARNING: Might require reload to work properly!": "AVERTISSEMENT : Il peut être nécessaire de redémarrer pour fonctionner correctement !",
   "An error occured, URL might be invalid or unsupported.": "Une erreur est survenue, l'URL est peut-être invalide ou non prise en charge.",
   "Top tracks": "Titres populaires",
   "Show all top tracks": "Afficher tous les titres populaires",
@@ -163,6 +163,9 @@
   "No": "Non",
   "Download Filename": "Nom du fichier à télécharger",
   "Language": "Langue",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "Image d'arrière-plan",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Entrez l'URL ou le chemin absolu. ATTENTION : Nécessite un redémarrage !",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

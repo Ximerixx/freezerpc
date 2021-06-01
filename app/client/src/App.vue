@@ -3,10 +3,11 @@
   <v-app v-esc='closePlayer'>
 
     <v-system-bar 
-      :color='$root.settings.lightTheme ? "#f5f5f5" : "#121212"' 
+      :color='$root.settings.lgbtMode ? null : $root.settings.lightTheme ? "#f5f5f5" : "#121212"' 
       app 
       class='topbar' 
-      v-if='$root.settings.electron'
+      :class='{"lgbt-header": $root.settings.lgbtMode}'
+      v-if='$root.settings.electron && !$root.settings.nativeTopBar'
       height='28'>
 
       <v-spacer></v-spacer>
@@ -192,11 +193,11 @@
     <v-main>
       <img :src='backgroundSrc' class='wallpaper' v-if='$root.settings.backgroundImage'>
       <v-container 
-        class='overflow-y-auto' 
-        fluid
-        style='height: calc(100vh - 140px);'>
+        class='overflow-y-auto'
+        :class='{"main-container": $root.topBar, "main-container-notop": !$root.topBar}' 
+        :fluid='fluidContainer'>
         <keep-alive include='Search,PlaylistPage,HomeScreen,DeezerPage'>
-          <router-view class='router-wiev'></router-view>
+          <router-view></router-view>
         </keep-alive>
       </v-container>
     </v-main>
@@ -340,6 +341,30 @@
   position: absolute;
   object-fit: fill;
 }
+
+.main-container {
+  height: calc(100vh - 140px);
+}
+
+.main-container-notop {
+  height: calc(100vh - 118px);
+}
+
+.lgbt-header  {
+  background-image: linear-gradient(135deg,  
+    #FE0000FF 16.66%,
+		#FD8C00FF 16.66%, 33.32%,
+		#FFE500FF 33.32%, 49.98%,
+		#119F0BFF 49.98%, 66.64%,
+		#0644B3FF 66.64%, 83.3%,
+		#C22EDCFF 83.3%);
+  color: #000 !important;
+}
+
+.lgbt-header button {
+  color: #000 !important;
+}
+
 </style>
 
 <script>
@@ -363,7 +388,8 @@ export default {
       cancelSuggestions: false,
       globalSnackbar: false,
       version: null,
-      updateAvailable: false
+      updateAvailable: false,
+      fluidContainer: window.innerWidth < 1300
     }
   },
   methods: {
@@ -485,7 +511,7 @@ export default {
       if (this.$root.settings.backgroundImage && this.$root.settings.backgroundImage.startsWith("http"))
         return this.$root.settings.backgroundImage;
       return process.env.NODE_ENV === 'development' ? "http://localhost:10069/background" : "/background";
-    }
+    },
   },
   async mounted() {
     //Scroll on volume
@@ -522,6 +548,11 @@ export default {
     //Wait for volume to load
     if (this.$root.loadingPromise) await this.$root.loadingPromise;
     this.volume = this.$root.volume;
+
+    //Limit content width on large displays
+    window.addEventListener('resize', () => {
+      this.fluidContainer = window.innerWidth < 1300;
+    });
 
     //Check for update
     this.checkUpdate();

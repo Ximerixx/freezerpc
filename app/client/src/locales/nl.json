@@ -164,5 +164,8 @@
   "Download Filename": "Bestandsnaam Downloaden",
   "Language": "Taal",
   "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

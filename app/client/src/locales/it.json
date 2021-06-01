@@ -163,6 +163,9 @@
   "No": "No",
   "Download Filename": "Nome del file scaricato",
   "Language": "Lingua",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "Immagine di sfondo",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Inserisci l'URL o il percorso assoluto. ATTENZIONE: Richiede il ricaricamento!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

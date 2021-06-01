@@ -176,6 +176,25 @@
                 <v-list-item-subtitle>{{$t("WARNING: Might require reload to work properly!")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
+        <!-- LGBT Mode -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.lgbtMode' class='pl-2' @click='applyLGBT'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("LGBT Mode")}}</v-list-item-title>
+            </v-list-item-content>
+        </v-list-item>
+        <!-- Native top bar -->
+        <v-list-item>
+            <v-list-item-action>
+                <v-checkbox v-model='$root.settings.nativeTopBar' class='pl-2'></v-checkbox>
+            </v-list-item-action>
+            <v-list-item-content>
+                <v-list-item-title>{{$t("Native top bar")}}</v-list-item-title>
+                <v-list-item-subtitle>{{$t("Requires restart of Freezer!")}}</v-list-item-subtitle>
+            </v-list-item-content>
+        </v-list-item>
         <!-- Background image -->
         <v-text-field
             class='px-4 my-2'
@@ -372,10 +391,6 @@ export default {
             ],
             artResolutions: [256, 512, 600, 800, 1000, 1200, 1400, 1600, 1800],
             colorPicker: false,
-            primaryColorIndex: 0,
-            primaries: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', 
-                '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
-                '#795548', '#607D8B', '#9E9E9E'],
             
             //Lists from Deezer website
             languageList: ["me", "da", "de", "en", "us", "es", "mx", "fr", "hr", "id", "it", "hu", "ms", "nl", "no", "pl", "br", "pt", "ru", "ro", "sq", "sk", "sl", "sr", "fi", "sv", "tr", "cs", "bg", "uk", "he", "ar", "th", "cn", "ja", "ko"],
@@ -464,6 +479,10 @@ export default {
                 this.$vuetify.theme.dark = true;
                 this.$vuetify.theme.light = false;
             }
+        },
+        async applyLGBT() {
+            await this.save();
+            window.location.reload();
         }
     },
     computed: {
@@ -492,14 +511,7 @@ export default {
 
             //RGB
             if (event.code == 'KeyG' && event.ctrlKey && event.altKey) {
-                setInterval(() => {
-                    this.$vuetify.theme.themes.dark.primary = this.primaries[this.primaryColorIndex];
-                    this.$vuetify.theme.themes.light.primary = this.primaries[this.primaryColorIndex];
-                    this.$root.settings.primaryColor = this.primaries[this.primaryColorIndex];
-                    this.primaryColorIndex++;
-                    if (this.primaryColorIndex == this.primaries.length)
-                        this.primaryColorIndex = 0;
-                }, 400);
+                this.$root.primaryColorRainbow();
             }
         });
     }

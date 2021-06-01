@@ -54,11 +54,12 @@ class Integrations extends EventEmitter {
     }
 
     //LastFM Scrobble
-    async scrobbleLastFM(title, artist) {
+    async scrobbleLastFM(title, album, artist) {
         if (this.settings.lastFM) 
             this.lastfm.track.scrobble({
-                artist: artist,
+                artist,
                 track: title,
+                album,
                 timestamp: Math.floor((new Date()).getTime() / 1000)
             });
     }
@@ -103,35 +104,39 @@ class Integrations extends EventEmitter {
     //Called when playback state changed
     async updateState(data) {
         if (this.discordReady) {
-            let richPresence = {
-                state: data.track.artistString,
-                details: data.track.title,   
-                largeImageKey: 'icon',
-                instance: true,
+            if (data.state == 2){
+                let richPresence = {
+                    state: data.track.artistString,
+                    details: data.track.title,   
+                    largeImageKey: 'icon',
+                    instance: true,
+                }
+                //Show timestamp only if playing
+                if (data.state == 2) {
+                    Object.assign(richPresence, {
+                        startTimestamp: Date.now() - data.position,
+                        endTimestamp: (Date.now() - data.position) + data.duration,
+                    });
+                }
+                //Enabled discord join
+                if (this.settings.discordJoin) {
+                    Object.assign(richPresence, {
+                        partySize: 1,
+                        partyMax: 10,
+                        matchSecret: 'match_secret_' + data.track.id,
+                        joinSecret: JSON.stringify({
+                            pos: Math.floor(data.position),
+                            ts: Date.now(),
+                            id: data.track.id
+                        }),
+                        partyId: 'party_id_' + data.track.id
+                    });
+                }
+                //Set
+                this.discordRPC.setActivity(richPresence);
+            } else {
+                this.discordRPC.clearActivity();
             }
-            //Show timestamp only if playing
-            if (data.state == 2) {
-                Object.assign(richPresence, {
-                    startTimestamp: Date.now() - data.position,
-                    endTimestamp: (Date.now() - data.position) + data.duration,
-                });
-            }
-            //Enabled discord join
-            if (this.settings.discordJoin) {
-                Object.assign(richPresence, {
-                    partySize: 1,
-                    partyMax: 10,
-                    matchSecret: 'match_secret_' + data.track.id,
-                    joinSecret: JSON.stringify({
-                        pos: Math.floor(data.position),
-                        ts: Date.now(),
-                        id: data.track.id
-                    }),
-                    partyId: 'party_id_' + data.track.id
-                });
-            }
-            //Set
-            this.discordRPC.setActivity(richPresence);
         }
     }
 

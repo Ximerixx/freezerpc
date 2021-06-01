@@ -4,8 +4,8 @@ import router from './js/router';
 import vuetify from './js/vuetify';
 import axios from 'axios';
 import VueEsc from 'vue-esc';
-import VueSocketIO from 'vue-socket.io';
 import i18n from './js/i18n';
+import { io } from "socket.io-client";
 
 //Globals
 let ipcRenderer;
@@ -52,10 +52,9 @@ Vue.prototype.$filesize = (bytes) => {
 }
 
 //Sockets
-Vue.use(new VueSocketIO({
-    connection: process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.toString(),
-    options: {path: '/socket'}
-}));
+Vue.prototype.$io = io("http://localhost:10069", {
+    path: '/socket'
+});
 
 Vue.config.productionTip = false;
 Vue.use(VueEsc);
@@ -503,7 +502,7 @@ new Vue({
                 }, 500);
                 return;
             }
-            this.$socket.emit('stateChange', {
+            this.$io.emit('stateChange', {
                 position: this.position,
                 duration: this.duration(),
                 state: this.state,
@@ -517,6 +516,29 @@ new Vue({
         },
         updateLanguage(l) {
             i18n.locale = l;
+        },
+        //For LGBT/Gayming mode
+        primaryColorRainbow() {
+            const colors = ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', 
+                '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722',
+                '#795548', '#607D8B', '#9E9E9E'];
+            let index = 0;
+            setInterval(() => {
+                this.$vuetify.theme.themes.dark.primary = colors[index];
+                this.$vuetify.theme.themes.light.primary = colors[index];
+                this.$root.settings.primaryColor = colors[index];
+                index++;
+                if (index == colors.length)
+                    index = 0;
+            }, 400);
+        }
+    },
+
+    computed: {
+        //Show or no topbar
+        topBar() {
+            if (!this.settings.electron) return false;
+            return !this.settings.nativeTopBar;
         }
     },
 
@@ -530,6 +552,18 @@ new Vue({
         this.$vuetify.theme.themes.light.primary = this.settings.primaryColor;
         if (this.settings.lightTheme)
             this.$vuetify.theme.dark = false;
+
+        //LGBT mode
+        const lgbt = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Gay_Pride_Flag.svg/1280px-Gay_Pride_Flag.svg.png';
+        if (this.settings.lgbtMode) {
+            this.settings.backgroundImage = lgbt;
+            this.primaryColorRainbow();
+        } else {
+            //Remove bg image
+            if (this.settings.backgroundImage == lgbt)
+            this.settings.backgroundImage = null;
+        }
+            
         i18n.locale = this.settings.language;
         this.volume = this.settings.volume;
 
@@ -584,15 +618,15 @@ new Vue({
         //Sockets
 
         //Queue change
-        this.sockets.subscribe('downloads', (data) => {
+        this.$io.on('downloads', (data) => {
             this.downloads = data;
         });
         //Current download change
-        this.sockets.subscribe('currentlyDownloading', (data) => {
+        this.$io.on('currentlyDownloading', (data) => {
             this.downloads.threads = data;
         });
         //Play at offset (for integrations)
-        this.sockets.subscribe('playOffset', async (data) => {
+        this.$io.on('playOffset', async (data) => {
             this.queue.data.splice(this.queue.index + 1, 0, data.track);
             await this.skip(1);
             this.seek(data.position);
@@ -601,25 +635,25 @@ new Vue({
         //Importer
 
         //Start
-        this.sockets.subscribe('importerInit', (data) => {
+        this.$io.on('importerInit', (data) => {
             this.importer = data;
         });
         //New track imported
-        this.sockets.subscribe('importerTrack', (data) => {
+        this.$io.on('importerTrack', (data) => {
             this.importer.tracks.push(data);
         });
         //Mark as done
-        this.sockets.subscribe('importerDone', () => {
+        this.$io.on('importerDone', () => {
             this.importer.active = false;
             this.importer.done = true;
         });
-        this.sockets.subscribe('importerError', () => {
+        this.$io.on('importerError', () => {
             this.importer.error = true;
             this.importer.active = false;
             this.importer.done = false;
         });
         //Album
-        this.sockets.subscribe('importerAlbum', a => {
+        this.$io.on('importerAlbum', a => {
             //Not downloading, got albumn
             if (a) {
                 this.$router.push({

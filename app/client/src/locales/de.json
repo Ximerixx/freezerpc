@@ -163,6 +163,9 @@
   "No": "Nein",
   "Download Filename": "Dateiname herunterladen",
   "Language": "Sprache",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "Hintergrundbild",
+  "Enter URL or absolute path. WARNING: Requires reload!": "URL oder absoluten Pfad eingeben. WARNUNG: Neuladen erforderlich!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class='pa-0' :class='{electron: $root.settings.electron, notop: !$root.settings.electron}'>
+    <div class='pa-0' :class='{electron: $root.topBar, notop: !$root.topBar}'>
 
         <v-app-bar dense>
             <v-btn icon @click='close'>
@@ -144,7 +144,7 @@
                     <!-- Queue tab -->
                     <v-tab-item key='queue' v-if='showQueue'>
                         <v-list two-line avatar class='overflow-y-auto' style='max-height: calc(100vh - 160px)'>
-                            <v-virtual-scroll :items='$root.queue.data' item-height='72' benched='5'>
+                            <v-virtual-scroll :items='$root.queue.data' item-height='72' benched='5' style='overflow-y: hidden !important'>
                                 <template v-slot:default="{ index, item }">
                                     <draggable v-model='$root.queue.data' @move='queueMove'>
                                         <v-lazy min-height="1" transition="fade-transition" :key='"qq" + index'>

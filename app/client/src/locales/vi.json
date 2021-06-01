@@ -163,6 +163,9 @@
   "No": "Không",
   "Download Filename": "Tải xuống tên tệp",
   "Language": "Ngôn ngữ",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "Ảnh nền",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Nhập URL hoặc đường dẫn hợp lệ. CẢNH BÁO: Yêu cầu tải lại!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

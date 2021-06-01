@@ -163,6 +163,9 @@
   "No": "לא",
   "Download Filename": "הורד/י את שם הקובץ",
   "Language": "שפה",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "תמונת רקע",
+  "Enter URL or absolute path. WARNING: Requires reload!": "הזן כתובת אתר או נתיב מוחלט. אזהרה: מחייב טעינה מחדש!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

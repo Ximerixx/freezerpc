@@ -163,6 +163,9 @@
   "No": "Όχι",
   "Download Filename": "Όνομα Αρχείου Λήψης",
   "Language": "Γλώσσα",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!"
+  "Background Image": "Εικόνα Φόντου",
+  "Enter URL or absolute path. WARNING: Requires reload!": "Εισάγετε URL ή απόλυτη διαδρομή. ΠΡΟΕΙΔΟΠΟΙΗΣΗ: Απαιτείται επαναφόρτωση!",
+  "LGBT Mode": "LGBT Mode",
+  "Native top bar": "Native top bar",
+  "Requires restart of Freezer!": "Requires restart of Freezer!"
 }

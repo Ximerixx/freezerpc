@@ -27,8 +27,14 @@ app.use(express.static(path.join(__dirname, '../client', 'dist')));
 app.use(cors({origin: 'http://localhost:8080'}));
 //Server
 const server = require('http').createServer(app);
-const io = require('socket.io').listen(server, {
+const { Server } = require('socket.io');
+const io = new Server(server, {
     path: '/socket',
+    //CORS for webpack debug
+    cors: {
+        origin: 'http://localhost:8080',
+        methods: ["GET", "POST"],
+    }
 });
 
 //Get playback info
@@ -463,7 +469,7 @@ app.delete('/downloads/:index', async (req, res) => {
 //Log listen to deezer & lastfm
 app.post('/log', async (req, res) => {
     //LastFM
-    integrations.scrobbleLastFM(req.body.title, req.body.artists[0].name);
+    integrations.scrobbleLastFM(req.body.title, req.body.album.title, req.body.artists[0].name);
 
     //Deezer
     if (settings.logListen)

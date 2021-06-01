@@ -44,6 +44,8 @@ class Settings {
         this.contentLanguage = 'en';
         this.contentCountry = 'US';
         this.sidebarOpen = false;
+        this.lgbtMode = false;
+        this.nativeTopBar = false;
 
         //Has to be local path
         this.backgroundImage = null;

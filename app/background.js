@@ -117,13 +117,14 @@ async function createWindow() {
         minHeight: 600,
         resizable: true,
         autoHideMenuBar: true,
-        frame: false,
+        frame: settings.nativeTopBar,
         icon: assetPath("icon.png"),
         title: 'Freezer',
         webPreferences: {
             enableRemoteModule: true,
             nodeIntegration: true,
-            devTools: true
+            devTools: true,
+            contextIsolation: false
         }
     });
 
