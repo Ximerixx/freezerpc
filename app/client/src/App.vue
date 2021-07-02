@@ -190,8 +190,8 @@
     </v-app-bar>
     
     <!-- Main -->
+    <img :src='backgroundSrc' class='wallpaper' v-if='$root.settings.backgroundImage'>
     <v-main>
-      <img :src='backgroundSrc' class='wallpaper' v-if='$root.settings.backgroundImage'>
       <v-container 
         class='overflow-y-auto'
         :class='{"main-container": $root.topBar, "main-container-notop": !$root.topBar}' 
@@ -328,8 +328,6 @@
 .wallpaper {
   width: 100vw;
   height: 100vh;
-  top: -48px;
-  left: -56px;
   z-index: -100;
   position: absolute;
   object-fit: fill;
@@ -348,17 +346,6 @@
 
 .main-container-notop {
   height: calc(100vh - 118px);
-}
-
-.lgbt-header  {
-  background-image: linear-gradient(135deg,  
-    #FE0000FF 16.66%,
-		#FD8C00FF 16.66%, 33.32%,
-		#FFE500FF 33.32%, 49.98%,
-		#119F0BFF 49.98%, 66.64%,
-		#0644B3FF 66.64%, 83.3%,
-		#C22EDCFF 83.3%);
-  color: #000 !important;
 }
 
 .lgbt-header button {

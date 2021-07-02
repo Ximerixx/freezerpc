@@ -176,15 +176,6 @@
                 <v-list-item-subtitle>{{$t("WARNING: Might require reload to work properly!")}}</v-list-item-subtitle>
             </v-list-item-content>
         </v-list-item>
-        <!-- LGBT Mode -->
-        <v-list-item>
-            <v-list-item-action>
-                <v-checkbox v-model='$root.settings.lgbtMode' class='pl-2' @click='applyLGBT'></v-checkbox>
-            </v-list-item-action>
-            <v-list-item-content>
-                <v-list-item-title>{{$t("LGBT Mode")}}</v-list-item-title>
-            </v-list-item-content>
-        </v-list-item>
         <!-- Native top bar -->
         <v-list-item>
             <v-list-item-action>

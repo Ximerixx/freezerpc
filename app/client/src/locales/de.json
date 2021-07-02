@@ -165,7 +165,7 @@
   "Language": "Sprache",
   "Background Image": "Hintergrundbild",
   "Enter URL or absolute path. WARNING: Requires reload!": "URL oder absoluten Pfad eingeben. WARNUNG: Neuladen erforderlich!",
-  "LGBT Mode": "LGBT Mode",
-  "Native top bar": "Native top bar",
-  "Requires restart of Freezer!": "Requires restart of Freezer!"
+  "LGBT Mode": "LGBT-Modus",
+  "Native top bar": "System-Titelleiste verwenden",
+  "Requires restart of Freezer!": "Benötigt Neustart von Freezer!"
 }

@@ -26,8 +26,12 @@
     </v-list-item-action>
     <v-list-item-action>
         <!-- Quick add to playlist -->
-        <v-btn @click.stop='popup = true' icon>
+        <v-btn @click.stop='popup = true' icon v-if='!removeQueue'>
             <v-icon>mdi-playlist-plus</v-icon>
+        </v-btn>
+        <!-- Remove from queue -->
+        <v-btn @click.stop='$emit("removeQueue")' icon v-if='removeQueue' color='red'>
+            <v-icon>mdi-close</v-icon>
         </v-btn>
     </v-list-item-action>
     <v-list-item-action>
@@ -186,6 +190,10 @@ export default {
         ripple: {
             type: Boolean,
             default: true
+        },
+        removeQueue: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {

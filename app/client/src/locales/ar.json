@@ -163,9 +163,9 @@
   "No": "لا",
   "Download Filename": "تنزيل اسم الملف",
   "Language": "اللغة",
-  "Background Image": "Background Image",
-  "Enter URL or absolute path. WARNING: Requires reload!": "Enter URL or absolute path. WARNING: Requires reload!",
-  "LGBT Mode": "LGBT Mode",
-  "Native top bar": "Native top bar",
-  "Requires restart of Freezer!": "Requires restart of Freezer!"
+  "Background Image": "صورة الخلفية",
+  "Enter URL or absolute path. WARNING: Requires reload!": "أدخل عنوان URL أو المسار المطلق. تحذير: يتطلب إعادة التحميل!",
+  "LGBT Mode": "وضع LGBT",
+  "Native top bar": "الشريط العلوي الأصلي",
+  "Requires restart of Freezer!": "يتطلب إعادة تشغيل فريزر!"
 }

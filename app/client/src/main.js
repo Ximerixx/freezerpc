@@ -553,16 +553,11 @@ new Vue({
         if (this.settings.lightTheme)
             this.$vuetify.theme.dark = false;
 
-        //LGBT mode
+        //Remove LGBT
         const lgbt = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Gay_Pride_Flag.svg/1280px-Gay_Pride_Flag.svg.png';
-        if (this.settings.lgbtMode) {
-            this.settings.backgroundImage = lgbt;
-            this.primaryColorRainbow();
-        } else {
-            //Remove bg image
-            if (this.settings.backgroundImage == lgbt)
+        if (this.settings.backgroundImage == lgbt)
             this.settings.backgroundImage = null;
-        }
+        
             
         i18n.locale = this.settings.language;
         this.volume = this.settings.volume;

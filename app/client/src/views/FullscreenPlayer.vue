@@ -153,6 +153,8 @@
                                                 @click='$root.playIndex(index)'
                                                 @redirect='close'
                                                 :ripple='false'
+                                                removeQueue
+                                                @removeQueue='removeQueue(index)'
                                             ></TrackTile>
                                         </v-lazy>
                                     </draggable>
@@ -332,6 +334,13 @@ export default {
         queueMove() {
             console.log('move');
             this.$root.queue.index = this.$root.queue.data.findIndex(t => t.id == this.$root.track.id);
+        },
+        // Remove from queue
+        removeQueue(i) {
+            if (this.$root.queue.index == i) return;
+            if (this.$root.queue.index > i)
+                this.$root.queue.index -= 1;
+            this.$root.queue.data.splice(i, 1);
         }
     },
     mounted() {
