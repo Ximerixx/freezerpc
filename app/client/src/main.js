@@ -236,7 +236,11 @@ new Vue({
             this.playbackInfo = playbackInfo;
 
             //Stream URL
-            let url = `${process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.origin}${this.playbackInfo.url}`;
+            let url;
+            if (this.playbackInfo.encrypted)
+                url = `${process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.origin}${this.playbackInfo.url}`;
+            else
+                url = this.playbackInfo.direct;
             //Cancel loading
             this.loaders--;
             if (this.loaders > 0) {
@@ -424,7 +428,10 @@ new Vue({
                 if (this.gapless.promise) resolve();
             }
             this.gapless.info = info
-            this.gapless.audio = new Audio(`${process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.origin}${info.url}`);
+            if (info.encrypted)
+                this.gapless.audio = new Audio(`${process.env.NODE_ENV === 'development' ? "http://localhost:10069" : window.location.origin}${info.url}`);
+            else
+                this.gapless.audio = new Audio(info.direct);
             this.gapless.audio.volume = 0.00;
             this.gapless.audio.preload = 'auto';
             this.gapless.crossfade = false;

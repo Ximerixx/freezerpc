@@ -206,6 +206,7 @@ class DownloadThread {
         this.stopped = true;
         this.isUserUploaded = download.track.id.toString().startsWith('-');
         this.coverPath = null;
+        this.encrypted = false;
     }
 
     //Callback wrapper
@@ -262,9 +263,11 @@ class DownloadThread {
         this.download.downloaded = start;
 
         //Download
-        let url = DeezerAPI.getUrl(this.qualityInfo.trackId, this.qualityInfo.md5origin, this.qualityInfo.mediaVersion, this.qualityInfo.quality);
+        let urlGen = await deezer.generateUrl(this.qualityInfo.trackId, this.qualityInfo.md5origin, this.qualityInfo.mediaVersion, this.qualityInfo.quality);
+        this.encrypted = urlGen.encrypted;
+
         if (this.stopped) return;
-        this._request = https.get(url, {headers: {'Range': `bytes=${start}-`}}, (r) => {
+        this._request = https.get(urlGen.url, {headers: {'Range': `bytes=${start}-`}}, (r) => {
             this._response = r;
             let outFile = fs.createWriteStream(tmp, {flags: 'a'});
             
@@ -321,12 +324,17 @@ class DownloadThread {
         this.download.state = 2;
 
         //Decrypt
-        decryptor.decryptFile(decryptor.getKey(this.qualityInfo.trackId), tmp, `${tmp}.DEC`);
         let outPath = this.generatePath(this.qualityInfo.quality);
         await fs.promises.mkdir(path.dirname(outPath), {recursive: true});
-        await fs.promises.copyFile(`${tmp}.DEC`, outPath);
-        await fs.promises.unlink(`${tmp}.DEC`);
+        if (this.encrypted) {
+            decryptor.decryptFile(decryptor.getKey(this.qualityInfo.trackId), tmp, `${tmp}.DEC`);
+            await fs.promises.copyFile(`${tmp}.DEC`, outPath);
+            await fs.promises.unlink(`${tmp}.DEC`);
+        } else {
+            await fs.promises.copyFile(tmp, outPath);
+        }
         await fs.promises.unlink(tmp);
+
 
         let cover = null;
 

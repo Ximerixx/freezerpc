@@ -140,9 +140,35 @@ class DeezerAPI {
         this.token = data.results.checkForm;
         this.userId = data.results.USER.USER_ID;
         this.favoritesPlaylist = data.results.USER.LOVEDTRACKS_ID.toString();
+        try {
+            await this.authorizeAtv();
+        } catch (e) {
+            logger.warn(`Couldnt authorize ATV: ${e}`);
+        }
 
         if (!this.userId || this.userId == 0 || !this.token) return false;
         return true;
+    }
+
+    //Authorize Android TV
+    async authorizeAtv() {
+        let res = await axios.post(
+            "https://distribution-api.deezer.com/device/token",
+            {"brand_name":"Hisense","device_id":"7239e4071d8992c955ad","model_name":"HE50A6109FUWTS","country_code":"FRA"}
+        );
+        let deviceToken = res.data.device_token;
+        // Get unauthorized token
+        res = await axios.get('https://connect.deezer.com/oauth/access_token.php?grant_type=client_credentials&client_id=447462&client_secret=a83bf7f38ad2f137e444727cfc3775cf&output=json');
+        let accessToken = res.data.access_token;
+        // Get smart login code
+        res = await axios.post(`https://connect.deezer.com/2.0/smartlogin/device?access_token=${accessToken}&device_token=${deviceToken}`);
+        let smartLoginCode = res.data.data.smartLoginCode;
+        // Associate
+        await this.callApi('deezer.associateSmartLoginCodeWithUser', {'SMARTLOGIN_CODE': smartLoginCode});
+        // Get authorized token
+        res = await axios.get(`https://connect.deezer.com/2.0/smartlogin/${smartLoginCode}?access_token=${accessToken}`);
+        accessToken = res.data.data.accessToken; 
+        this.accessToken = accessToken;
     }
 
     //Wrapper because electron is piece of shit
@@ -223,6 +249,30 @@ class DeezerAPI {
         return `https://e-cdns-proxy-${md5origin.substring(0, 1)}.dzcdn.net/mobile/1/${step3}`;
     }
 
+    //Generate url with android tv support
+    async generateUrl(trackId, md5origin, mediaVersion, quality = 3) {
+        if (quality == 9 && this.accessToken) {
+            try {
+                let res = await axios({
+                    method: 'GET',
+                    url: `https://api.deezer.com/platform/gcast/track/${trackId}/streamUrls`,
+                    headers: {
+                        "Authorization": "Bearer " + this.accessToken
+                    },
+                    responseType: 'json'
+                });
+                if (res.data.data.attributes.url_flac)
+                    return {encrypted: false, url: res.data.data.attributes.url_flac};
+            } catch (e) {
+                console.warn(`Failed getting ATV URL! Using normal: ${e}`)
+            }
+        }
+        return {
+            encrypted: true,
+            url: DeezerAPI.getUrl(trackId, md5origin, mediaVersion, quality)
+        };
+    }
+
 
     async fallback(info, quality = 3) {
         let qualityInfo = Track.getUrlInfo(info);
@@ -266,11 +316,15 @@ class DeezerAPI {
     //Fallback thru available qualities, -1 if none work
     async qualityFallback(info, quality = 3) {
         try {
-            let res = await axios.head(DeezerAPI.getUrl(info.trackId, info.md5origin, info.mediaVersion, quality));
+            let urlGen = await this.generateUrl(info.trackId, info.md5origin, info.mediaVersion, quality);
+            let res = await axios.head(urlGen.url);
             if (res.status > 400) throw new Error(`Status code: ${res.status}`);
             //Make sure it's an int
             info.quality = parseInt(quality.toString(), 10);
             info.size = parseInt(res.headers['content-length'], 10);
+            info.encrypted = urlGen.encrypted;
+            if (!info.encrypted)
+                info.direct = urlGen.url;
             return info;
         } catch (e) {
             logger.warn('Quality fallback: ' + e);
